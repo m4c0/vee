@@ -7,6 +7,8 @@ module;
 #define VK_USE_PLATFORM_WIN32_KHR
 #endif
 
-#include "vulkan/vulkan.h"
+#define VOLK_IMPLEMENTATION
+
+#include "volk/volk.h"
 
 export module vee:vulkan;
