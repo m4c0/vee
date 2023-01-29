@@ -1,2 +1,2 @@
 export module vee;
-export import :vulkan;
+export import :instance;

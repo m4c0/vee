@@ -6,6 +6,8 @@ int main(int argc, char **argv) {
   auto m = unit::create<mod>("vee");
   m->add_include_dir("vulkan-headers/include");
   m->add_part("vulkan");
+  m->add_part("calls");
+  m->add_part("instance");
 
   auto poc = unit::create<app>("vee-poc");
   poc->add_ref(m);

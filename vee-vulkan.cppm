@@ -13,12 +13,25 @@ module;
 
 export module vee:vulkan;
 
-export namespace vee::loader {
-void initialise() { volkInitialize(); }
+namespace vee {
+constexpr const auto vk_api_version = VK_API_VERSION_1_0;
+
+using VkApplicationInfo = ::VkApplicationInfo;
+using VkAllocationCallbacks = ::VkAllocationCallbacks;
+using VkInstanceCreateInfo = ::VkInstanceCreateInfo;
+using VkInstance = ::VkInstance;
+
+inline auto vkCreateInstance = ::vkCreateInstance;
+
+void initialise() {
+  static struct init {
+    init() { volkInitialize(); }
+  } i;
+}
 
 void load_instance(VkInstance i) { volkLoadInstance(i); }
 VkInstance get_instance() { return volkGetLoadedInstance(); }
 
 void load_device(VkDevice d) { volkLoadDevice(d); }
 VkDevice get_device() { return volkGetLoadedDevice(); }
-} // namespace vee::loader
+} // namespace vee
