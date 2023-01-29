@@ -1,0 +1,3 @@
+import vee;
+
+int main() {}
