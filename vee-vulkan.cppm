@@ -12,3 +12,13 @@ module;
 #include "volk/volk.h"
 
 export module vee:vulkan;
+
+export namespace vee::loader {
+void initialise() { volkInitialize(); }
+
+void load_instance(VkInstance i) { volkLoadInstance(i); }
+VkInstance get_instance() { return volkGetLoadedInstance(); }
+
+void load_device(VkDevice d) { volkLoadDevice(d); }
+VkDevice get_device() { return volkGetLoadedDevice(); }
+} // namespace vee::loader
