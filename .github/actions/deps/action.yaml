@@ -6,3 +6,4 @@ runs:
       with:
         repository: m4c0/vee
         path: vee
+        submodules: true
