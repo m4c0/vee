@@ -12,13 +12,15 @@ module;
 #include "volk/volk.h"
 
 export module vee:vulkan;
+import silog;
 
 namespace vee::calls {
 template <auto *Fn, typename Ret> consteval auto wrap() {
   return [](auto &in) {
     Ret out{};
     if ((*Fn)(&in, nullptr, &out) != VK_SUCCESS) {
-      // TODO: log? throw?
+      silog::log(silog::error, "Vulkan API failure");
+      // TODO: throw?
     }
     return out;
   };
