@@ -1,5 +1,4 @@
 export module vee:instance;
-import :calls;
 import :vulkan;
 
 namespace vee {
@@ -27,7 +26,7 @@ static auto create_instance(const char *app_name) {
   // create_info.enabledExtensionCount = extensions.size();
   // create_info.ppEnabledExtensionNames = extensions.data();
 
-  return create(vkCreateInstance, &create_info);
+  return calls::create_instance(create_info);
 }
 
 export class instance {

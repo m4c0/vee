@@ -13,15 +13,25 @@ module;
 
 export module vee:vulkan;
 
+namespace vee::calls {
+template <auto *Fn, typename Ret> consteval auto wrap() {
+  return [](auto &in) {
+    Ret out{};
+    if ((*Fn)(&in, nullptr, &out) != VK_SUCCESS) {
+      // TODO: log? throw?
+    }
+    return out;
+  };
+}
+
+constexpr const auto create_instance = wrap<&::vkCreateInstance, VkInstance>();
+} // namespace vee::calls
+
 namespace vee {
 constexpr const auto vk_api_version = VK_API_VERSION_1_0;
 
 using VkApplicationInfo = ::VkApplicationInfo;
-using VkAllocationCallbacks = ::VkAllocationCallbacks;
 using VkInstanceCreateInfo = ::VkInstanceCreateInfo;
-using VkInstance = ::VkInstance;
-
-inline auto vkCreateInstance = ::vkCreateInstance;
 
 void initialise() {
   static struct init {
