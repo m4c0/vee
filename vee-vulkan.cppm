@@ -1,10 +1,13 @@
 module;
 #ifdef __APPLE__
 #define VK_USE_PLATFORM_METAL_EXT
+#define VEE_VULKAN_PLATFORM_EXT VK_EXT_METAL_SURFACE_EXTENSION_NAME
 #elif __ANDROID__
 #define VK_USE_PLATFORM_ANDROID_KHR
+#define VEE_VULKAN_PLATFORM_EXT VK_KHR_ANDROID_SURFACE_EXTENSION_NAME
 #elif __WIN32__
 #define VK_USE_PLATFORM_WIN32_KHR
+#define VEE_VULKAN_PLATFORM_EXT VK_KHR_WIN32_SURFACE_EXTENSION_NAME
 #endif
 
 #define VOLK_IMPLEMENTATION
@@ -12,32 +15,37 @@ module;
 #include "volk/volk.h"
 
 export module vee:vulkan;
-import silog;
+import :calls;
+import jute;
 
-namespace vee::calls {
-template <auto *Fn, typename Ret> consteval auto wrap() {
-  return [](auto &in) {
-    Ret out{};
-    if ((*Fn)(&in, nullptr, &out) != VK_SUCCESS) {
-      silog::log(silog::error, "Vulkan API failure");
-      // TODO: throw?
-    }
-    return out;
-  };
-}
+namespace vee::vk {
+static_assert(VK_SUCCESS == 0);
 
-constexpr const auto create_instance = wrap<&::vkCreateInstance, VkInstance>();
-} // namespace vee::calls
+constexpr const auto api_version = VK_API_VERSION_1_0;
+
+constexpr const jute::view debug_utils_ext_name{
+    VK_EXT_DEBUG_UTILS_EXTENSION_NAME};
+constexpr const jute::view khr_surf_ext_name{VK_KHR_SURFACE_EXTENSION_NAME};
+constexpr const jute::view plat_surf_ext_name{VEE_VULKAN_PLATFORM_EXT};
+
+constexpr const auto create_instance =
+    calls::wrap<&::vkCreateInstance, VkInstance>();
+constexpr const auto enum_instance_layer_props =
+    calls::enumerate<&::vkEnumerateInstanceLayerProperties,
+                     VkLayerProperties>();
+constexpr const auto enum_instance_ext_props =
+    calls::enumerate<&::vkEnumerateInstanceExtensionProperties,
+                     VkExtensionProperties>();
+} // namespace vee::vk
 
 namespace vee {
-constexpr const auto vk_api_version = VK_API_VERSION_1_0;
-
 using VkApplicationInfo = ::VkApplicationInfo;
 using VkInstanceCreateInfo = ::VkInstanceCreateInfo;
+using VkInstance = ::VkInstance;
 
 void initialise() {
   static struct init {
-    init() { volkInitialize(); }
+    init() { calls::call(volkInitialize); }
   } i;
 }
 
