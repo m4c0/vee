@@ -1,3 +1,3 @@
 import vee;
 
-int main() { vee::instance i{"my-app"}; }
+int main() { auto i = vee::create_instance("my-app"); }

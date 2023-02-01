@@ -17,6 +17,7 @@ module;
 export module vee:vulkan;
 import :calls;
 import jute;
+import silog;
 
 namespace vee::vk {
 static_assert(VK_SUCCESS == 0);
@@ -35,24 +36,36 @@ constexpr const auto enum_instance_ext_props =
     calls::enumerate<&::vkEnumerateInstanceExtensionProperties,
                      VkExtensionProperties>();
 } // namespace vee::vk
+
+namespace vee::details {
+inline VkResult create_instance(const VkInstanceCreateInfo *info,
+                                const VkAllocationCallbacks *cb,
+                                VkInstance *out) {
+  VkResult result = ::vkCreateInstance(info, cb, out);
+  if (result == VK_SUCCESS) {
+    ::volkLoadInstance(*out);
+    silog::log(silog::info, "Vulkan instance created");
+  }
+  return result;
+}
+} // namespace vee::details
+
 namespace vee::objects {
 using instance =
-    calls::handle<VkInstance, &::vkCreateInstance, &::vkDestroyInstance>;
+    calls::handle<VkInstance, &details::create_instance, &::vkDestroyInstance>;
 }
 
 namespace vee {
 using VkApplicationInfo = ::VkApplicationInfo;
+using VkDevice = ::VkDevice;
 using VkInstanceCreateInfo = ::VkInstanceCreateInfo;
 
-void initialise() {
-  static struct init {
-    init() { calls::call(volkInitialize); }
-  } i;
-}
-
-void load_instance(VkInstance i) { volkLoadInstance(i); }
 VkInstance get_instance() { return volkGetLoadedInstance(); }
 
 void load_device(VkDevice d) { volkLoadDevice(d); }
 VkDevice get_device() { return volkGetLoadedDevice(); }
 } // namespace vee
+
+static struct init {
+  init() { vee::calls::call(volkInitialize); }
+} i;

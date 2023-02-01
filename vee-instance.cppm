@@ -69,9 +69,7 @@ static auto get_extensions() {
   return res;
 }
 
-static auto create_instance(const char *app_name) {
-  initialise();
-
+export inline auto create_instance(const char *app_name) {
   auto layers = get_layers();
   auto extensions = get_extensions();
 
@@ -95,12 +93,4 @@ static auto create_instance(const char *app_name) {
 
   return objects::instance(&create_info);
 }
-
-export struct instance : objects::instance {
-  explicit instance(const char *app_name)
-      : objects::instance{create_instance(app_name)} {
-    silog::log(silog::info, "Vulkan instance created");
-    load_instance(**this);
-  }
-};
 } // namespace vee
