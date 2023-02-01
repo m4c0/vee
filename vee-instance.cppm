@@ -70,6 +70,8 @@ static auto get_extensions() {
 }
 
 static auto create_instance(const char *app_name) {
+  initialise();
+
   auto layers = get_layers();
   auto extensions = get_extensions();
 
@@ -91,18 +93,14 @@ static auto create_instance(const char *app_name) {
   create_info.enabledExtensionCount = extensions.size();
   create_info.ppEnabledExtensionNames = extensions.data();
 
-  return vk::create_instance(create_info);
+  return objects::instance(&create_info);
 }
 
-export class instance {
-  VkInstance i;
-
-public:
-  explicit instance(const char *app_name) {
-    initialise();
-    i = create_instance(app_name);
+export struct instance : objects::instance {
+  explicit instance(const char *app_name)
+      : objects::instance{create_instance(app_name)} {
     silog::log(silog::info, "Vulkan instance created");
-    load_instance(i);
+    load_instance(**this);
   }
 };
 } // namespace vee

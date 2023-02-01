@@ -1,6 +1,7 @@
 export module vee:calls;
 import hai;
 import silog;
+import traits;
 
 namespace vee::calls {
 template <typename Fn, typename... Args>
@@ -11,16 +12,24 @@ constexpr void call(Fn &&fn, Args &&...args) {
   }
 }
 
-template <auto *Fn, typename Ret> consteval auto create() {
-  return [](auto &in) {
-    Ret out{};
-    call(*Fn, &in, nullptr, &out);
-    return out;
-  };
-}
-template <auto *Fn> consteval auto destroy() {
-  return [](auto ptr) { call(*Fn, ptr, nullptr); };
-}
+template <auto *DFn> struct h_destroyer {
+  constexpr void operator()(auto h) { (*DFn)(h, nullptr); }
+};
+template <typename Tp, auto *CFn, auto *DFn> class handle {
+  hai::holder<traits::remove_ptr_t<Tp>, h_destroyer<DFn>> m_h{};
+
+  static constexpr const auto create(const auto *in) {
+    Tp h{};
+    call(*CFn, in, nullptr, &h);
+    return h;
+  }
+
+public:
+  constexpr explicit handle(const auto *in) : m_h{create(in)} {}
+
+  [[nodiscard]] constexpr auto operator*() const noexcept { return *m_h; }
+};
+
 template <auto *Fn, typename Ret> consteval auto enumerate() {
   class vec {
     hai::holder<Ret[]> m_data;
