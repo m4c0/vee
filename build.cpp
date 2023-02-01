@@ -18,6 +18,7 @@ int main(int argc, char **argv) {
 
   m->add_part("calls");
 
+  m->add_part("debug_utils_messenger");
   m->add_part("instance");
 
   auto poc = unit::create<app>("vee-poc");

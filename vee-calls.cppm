@@ -1,3 +1,6 @@
+module;
+#include "vulkan.hpp"
+
 export module vee:calls;
 import hai;
 import silog;
@@ -5,15 +8,30 @@ import traits;
 
 namespace vee::calls {
 template <typename Fn, typename... Args>
+  requires requires(Fn fn, Args... args) {
+             { fn(args...) } -> traits::same_as<void>;
+           }
+constexpr void call(Fn &&fn, Args &&...args) {
+  fn(args...);
+}
+template <typename Fn, typename... Args>
+  requires requires(Fn fn, Args... args) {
+             { fn(args...) } -> traits::not_same_as<void>;
+           }
 constexpr void call(Fn &&fn, Args &&...args) {
   if (fn(args...) != 0) {
     silog::log(silog::error, "Vulkan API failure");
     // TODO: throw?
   }
 }
+template <typename Fn, typename... Args>
+  requires requires(Fn fn, VkInstance_T *i, Args... args) { fn(i, args...); }
+constexpr void call(Fn &&fn, Args &&...args) {
+  call(fn, volkGetLoadedInstance(), args...);
+}
 
 template <auto *DFn> struct h_destroyer {
-  constexpr void operator()(auto h) { (*DFn)(h, nullptr); }
+  constexpr void operator()(auto h) { call(*DFn, h, nullptr); }
 };
 template <typename Tp, auto *CFn, auto *DFn> class handle {
   hai::holder<traits::remove_ptr_t<Tp>, h_destroyer<DFn>> m_h{};
@@ -25,6 +43,7 @@ template <typename Tp, auto *CFn, auto *DFn> class handle {
   }
 
 public:
+  constexpr handle() = default;
   constexpr explicit handle(const auto *in) : m_h{create(in)} {}
 
   [[nodiscard]] constexpr auto operator*() const noexcept { return *m_h; }
