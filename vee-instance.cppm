@@ -49,7 +49,7 @@ static auto get_layers() {
 
   vec<const char *> res{2};
   for (auto &lp : enum_instance_layer_props()) {
-    jute::view layer_name{lp.layerName};
+    auto layer_name = jute::view::unsafe(lp.layerName);
     if (layer_name == "VK_LAYER_KHRONOS_validation") {
       res.push_back("VK_LAYER_KHRONOS_validation");
       silog::log(silog::info, "Enabling validation layer");
@@ -67,7 +67,7 @@ static auto get_extensions() {
   res.push_back(VEE_VULKAN_PLATFORM_EXT);
 
   for (auto &lp : enum_instance_ext_props(nullptr)) {
-    jute::view name{lp.extensionName};
+    auto name = jute::view::unsafe(lp.extensionName);
     if (name == jute::view{VK_EXT_DEBUG_UTILS_EXTENSION_NAME}) {
       res.push_back(lp.extensionName);
       silog::log(silog::info, "Enabling debug utils");
