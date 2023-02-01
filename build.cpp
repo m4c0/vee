@@ -13,8 +13,9 @@ int main(int argc, char **argv) {
   m->add_wsdep("silog", silog());
   m->add_wsdep("traits", traits());
   m->add_include_dir("vulkan-headers/include");
+
   m->add_part("calls");
-  m->add_part("vulkan");
+
   m->add_part("instance");
 
   auto poc = unit::create<app>("vee-poc");

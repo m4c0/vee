@@ -1,8 +1,9 @@
 module;
+#include "vulkan.hpp"
 extern "C" char *getenv(const char *);
 
 export module vee:instance;
-import :vulkan;
+import :calls;
 import hai;
 import jute;
 import silog;
@@ -37,11 +38,17 @@ static bool is_api_dump_requested() {
   }
   return false;
 }
+static constexpr const auto enum_instance_layer_props =
+    calls::enumerate<&::vkEnumerateInstanceLayerProperties,
+                     VkLayerProperties>();
+static constexpr const auto enum_instance_ext_props =
+    calls::enumerate<&::vkEnumerateInstanceExtensionProperties,
+                     VkExtensionProperties>();
 static auto get_layers() {
   auto api_dump = is_api_dump_requested();
 
   vec<const char *> res{2};
-  for (auto &lp : vk::enum_instance_layer_props()) {
+  for (auto &lp : enum_instance_layer_props()) {
     jute::view layer_name{lp.layerName};
     if (layer_name == "VK_LAYER_KHRONOS_validation") {
       res.push_back("VK_LAYER_KHRONOS_validation");
@@ -56,13 +63,13 @@ static auto get_layers() {
 
 static auto get_extensions() {
   vec<const char *> res{3};
-  res.push_back(vk::khr_surf_ext_name.data());
-  res.push_back(vk::plat_surf_ext_name.data());
+  res.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+  res.push_back(VEE_VULKAN_PLATFORM_EXT);
 
-  for (auto &lp : vk::enum_instance_ext_props(nullptr)) {
+  for (auto &lp : enum_instance_ext_props(nullptr)) {
     jute::view name{lp.extensionName};
-    if (name == vk::debug_utils_ext_name) {
-      res.push_back(vk::debug_utils_ext_name.data());
+    if (name == jute::view{VK_EXT_DEBUG_UTILS_EXTENSION_NAME}) {
+      res.push_back(lp.extensionName);
       silog::log(silog::info, "Enabling debug utils");
     }
   }
@@ -79,7 +86,7 @@ export inline auto create_instance(const char *app_name) {
   app_info.applicationVersion = 1;
   app_info.pEngineName = "m4c0/vee";
   app_info.engineVersion = 1;
-  app_info.apiVersion = vk::api_version;
+  app_info.apiVersion = VK_API_VERSION_1_0;
 
   VkInstanceCreateInfo create_info{};
   create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -91,6 +98,15 @@ export inline auto create_instance(const char *app_name) {
   create_info.enabledExtensionCount = extensions.size();
   create_info.ppEnabledExtensionNames = extensions.data();
 
-  return objects::instance(&create_info);
+  auto res =
+      calls::handle<VkInstance, &::vkCreateInstance, &::vkDestroyInstance>(
+          &create_info);
+  ::volkLoadInstance(*res);
+  silog::log(silog::info, "Vulkan instance created");
+  return res;
 }
 } // namespace vee
+
+static struct init {
+  init() { vee::calls::call(volkInitialize); }
+} i;
