@@ -10,12 +10,16 @@ constexpr void call(Fn &&fn, Args &&...args) {
     // TODO: throw?
   }
 }
-template <auto *Fn, typename Ret> consteval auto wrap() {
+
+template <auto *Fn, typename Ret> consteval auto create() {
   return [](auto &in) {
     Ret out{};
     call(*Fn, &in, nullptr, &out);
     return out;
   };
+}
+template <auto *Fn> consteval auto destroy() {
+  return [](auto ptr) { call(*Fn, ptr, nullptr); };
 }
 template <auto *Fn, typename Ret> consteval auto enumerate() {
   class vec {

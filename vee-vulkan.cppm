@@ -29,7 +29,8 @@ constexpr const jute::view khr_surf_ext_name{VK_KHR_SURFACE_EXTENSION_NAME};
 constexpr const jute::view plat_surf_ext_name{VEE_VULKAN_PLATFORM_EXT};
 
 constexpr const auto create_instance =
-    calls::wrap<&::vkCreateInstance, VkInstance>();
+    calls::create<&::vkCreateInstance, VkInstance>();
+constexpr const auto destroy_instance = calls::destroy<&::vkDestroyInstance>();
 constexpr const auto enum_instance_layer_props =
     calls::enumerate<&::vkEnumerateInstanceLayerProperties,
                      VkLayerProperties>();
