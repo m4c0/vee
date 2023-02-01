@@ -101,7 +101,7 @@ export inline auto create_instance(const char *app_name) {
   auto res =
       calls::handle<VkInstance, &::vkCreateInstance, &::vkDestroyInstance>(
           &create_info);
-  ::volkLoadInstance(*res);
+  volkLoadInstance(*res);
   silog::log(silog::info, "Vulkan instance created");
   return res;
 }

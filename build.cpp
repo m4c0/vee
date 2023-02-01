@@ -14,6 +14,8 @@ int main(int argc, char **argv) {
   m->add_wsdep("traits", traits());
   m->add_include_dir("vulkan-headers/include");
 
+  m->add_unit<>("volk.cpp")->add_include_dir("vulkan-headers/include");
+
   m->add_part("calls");
 
   m->add_part("instance");
