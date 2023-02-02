@@ -2,7 +2,7 @@ module;
 #include "vulkan.hpp"
 #include <windows.h>
 
-export module vee:metal;
+export module vee:windows;
 import :calls;
 
 namespace vee {
