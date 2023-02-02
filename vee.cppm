@@ -1,5 +1,6 @@
 export module vee;
 export import :debug_utils_messenger;
+export import :device;
 export import :instance;
 export import :physical_device;
 

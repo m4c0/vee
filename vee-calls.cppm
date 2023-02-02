@@ -36,15 +36,15 @@ template <auto *DFn> struct h_destroyer {
 template <typename Tp, auto *CFn, auto *DFn> class handle {
   hai::value_holder<Tp, h_destroyer<DFn>> m_h{};
 
-  static constexpr const auto create(const auto *in) {
+  static constexpr const auto create(const auto... in) {
     Tp h{};
-    call(*CFn, in, nullptr, &h);
+    call(*CFn, in..., nullptr, &h);
     return h;
   }
 
 public:
   constexpr handle() = default;
-  constexpr explicit handle(const auto *in) : m_h{create(in)} {}
+  constexpr explicit handle(const auto... in) : m_h{create(in...)} {}
 
   [[nodiscard]] constexpr auto operator*() const noexcept { return *m_h; }
 };
