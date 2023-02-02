@@ -33,4 +33,8 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
   volkLoadDevice(*res);
   return res;
 }
+
+export inline auto get_queue_for_family(unsigned qf) {
+  return calls::create<VkQueue, &::vkGetDeviceQueue>(qf, 0);
+}
 } // namespace vee

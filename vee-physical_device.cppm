@@ -64,7 +64,7 @@ static void log_rejected_device(VkPhysicalDevice pd, jute::view reason) {
 export inline auto find_physical_device_with_universal_queue(VkSurfaceKHR s) {
   struct res {
     VkPhysicalDevice device;
-    unsigned queue;
+    unsigned queue_family;
   };
 
   for (auto pd : enum_physical_devices()) {

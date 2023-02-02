@@ -7,4 +7,6 @@ int main() {
   auto s = vee::create_surface(nullptr);
   const auto &[pd, qf] = vee::find_physical_device_with_universal_queue(*s);
   auto d = vee::create_single_queue_device(pd, qf);
+
+  auto q = vee::get_queue_for_family(qf);
 }

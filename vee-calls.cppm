@@ -25,9 +25,21 @@ constexpr void call(Fn &&fn, Args &&...args) {
   }
 }
 template <typename Fn, typename... Args>
-  requires requires(Fn fn, VkInstance_T *i, Args... args) { fn(i, args...); }
+  requires requires(Fn fn, VkInstance i, Args... args) { fn(i, args...); }
 constexpr void call(Fn &&fn, Args &&...args) {
   call(fn, volkGetLoadedInstance(), args...);
+}
+template <typename Fn, typename... Args>
+  requires requires(Fn fn, VkDevice d, Args... args) { fn(d, args...); }
+constexpr void call(Fn &&fn, Args &&...args) {
+  call(fn, volkGetLoadedDevice(), args...);
+}
+
+template <typename Tp, auto *Fn, typename... Args>
+constexpr const auto create(Args... in) {
+  Tp h{};
+  call(*Fn, in..., &h);
+  return h;
 }
 
 template <auto *DFn> struct h_destroyer {
@@ -36,15 +48,10 @@ template <auto *DFn> struct h_destroyer {
 template <typename Tp, auto *CFn, auto *DFn> class handle {
   hai::value_holder<Tp, h_destroyer<DFn>> m_h{};
 
-  static constexpr const auto create(const auto... in) {
-    Tp h{};
-    call(*CFn, in..., nullptr, &h);
-    return h;
-  }
-
 public:
   constexpr handle() = default;
-  constexpr explicit handle(const auto... in) : m_h{create(in...)} {}
+  constexpr explicit handle(const auto... in)
+      : m_h{create<Tp, CFn>(in..., nullptr)} {}
 
   [[nodiscard]] constexpr auto operator*() const noexcept { return *m_h; }
 };
