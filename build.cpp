@@ -22,6 +22,7 @@ int main(int argc, char **argv) {
     m.add_part("device");
     m.add_part("instance");
     m.add_part("physical_device");
+    m.add_part("render_pass");
     m.add_part("surface_format");
 
     return m;

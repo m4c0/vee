@@ -3,6 +3,7 @@ export import :debug_utils_messenger;
 export import :device;
 export import :instance;
 export import :physical_device;
+export import :render_pass;
 export import :surface_format;
 
 #ifdef __APPLE__
