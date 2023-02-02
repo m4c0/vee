@@ -9,4 +9,6 @@ int main() {
   auto d = vee::create_single_queue_device(pd, qf);
 
   auto q = vee::get_queue_for_family(qf);
+
+  auto sfmt = vee::find_best_surface_format(pd, *s);
 }
