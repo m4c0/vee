@@ -7,19 +7,27 @@
 int main(int argc, char **argv) {
   using namespace ecow;
 
-  auto m = unit::create<mod>("vee");
-  m->add_wsdep("hai", hai());
-  m->add_wsdep("jute", jute());
-  m->add_wsdep("silog", silog());
-  m->add_wsdep("traits", traits());
-  m->add_include_dir("vulkan-headers/include");
+  constexpr const auto setup = [](mod &m) -> mod & {
+    m.add_wsdep("hai", hai());
+    m.add_wsdep("jute", jute());
+    m.add_wsdep("silog", silog());
+    m.add_wsdep("traits", traits());
+    m.add_include_dir("vulkan-headers/include");
 
-  m->add_unit<>("volk.cpp")->add_include_dir("vulkan-headers/include");
+    m.add_unit<>("volk.cpp")->add_include_dir("vulkan-headers/include");
 
-  m->add_part("calls");
+    m.add_part("calls");
 
-  m->add_part("debug_utils_messenger");
-  m->add_part("instance");
+    m.add_part("debug_utils_messenger");
+    m.add_part("instance");
+
+    return m;
+  };
+
+  auto m = unit::create<per_feat<mod>>("vee");
+  setup(m->for_feature(android_ndk)).add_part("android");
+  setup(m->for_feature(objective_c)).add_part("metal");
+  setup(m->for_feature(windows_api)).add_part("windows");
 
   auto poc = unit::create<app>("vee-poc");
   poc->add_ref(m);
