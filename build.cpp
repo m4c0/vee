@@ -20,6 +20,7 @@ int main(int argc, char **argv) {
 
     m.add_part("debug_utils_messenger");
     m.add_part("instance");
+    m.add_part("physical_device");
 
     return m;
   };
