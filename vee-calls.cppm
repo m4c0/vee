@@ -34,7 +34,7 @@ template <auto *DFn> struct h_destroyer {
   constexpr void operator()(auto h) { call(*DFn, h, nullptr); }
 };
 template <typename Tp, auto *CFn, auto *DFn> class handle {
-  hai::holder<traits::remove_ptr_t<Tp>, h_destroyer<DFn>> m_h{};
+  hai::value_holder<Tp, h_destroyer<DFn>> m_h{};
 
   static constexpr const auto create(const auto *in) {
     Tp h{};
