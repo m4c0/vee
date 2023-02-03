@@ -1,3 +1,4 @@
+#include "../casein/build.hpp"
 #include "../hai/build.hpp"
 #include "../jute/build.hpp"
 #include "../silog/build.hpp"
@@ -34,6 +35,7 @@ int main(int argc, char **argv) {
   setup(m->for_feature(windows_api)).add_part("windows");
 
   auto poc = unit::create<app>("vee-poc");
+  poc->add_wsdep("casein", casein());
   poc->add_ref(m);
   poc->add_unit<>("poc");
 
