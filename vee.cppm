@@ -1,4 +1,5 @@
 export module vee;
+export import :command_pool;
 export import :debug_utils_messenger;
 export import :device;
 export import :instance;

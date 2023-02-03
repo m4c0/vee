@@ -14,6 +14,8 @@ void on_window_created(auto ptr) {
 
   static auto sfmt = vee::find_best_surface_format(pd, *s);
   static auto rp = vee::create_render_pass(&sfmt);
+
+  static auto cp = vee::create_command_pool(qf);
 }
 
 extern "C" void casein_handle(const casein::event &e) {

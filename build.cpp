@@ -19,6 +19,7 @@ int main(int argc, char **argv) {
 
     m.add_part("calls");
 
+    m.add_part("command_pool");
     m.add_part("debug_utils_messenger");
     m.add_part("device");
     m.add_part("instance");
