@@ -9,13 +9,18 @@ struct stuff {
   unsigned q_family;
 };
 
-static stuff get_dev_stuff(casein::native_handle_t ptr = nullptr) {
-  if (ptr == nullptr)
+static auto &current_nptr() {
+  static casein::native_handle_t i{};
+  return i;
+}
+
+static stuff get_dev_stuff() {
+  if (!current_nptr())
     return {};
 
   static auto i = vee::create_instance("my-app");
   static auto dbg = vee::create_debug_utils_messenger();
-  static auto s = vee::create_surface(ptr);
+  static auto s = vee::create_surface(current_nptr());
   static const auto &[pd, qf] =
       vee::find_physical_device_with_universal_queue(*s);
 
@@ -25,8 +30,8 @@ static stuff get_dev_stuff(casein::native_handle_t ptr = nullptr) {
   return {*s, pd, qf};
 }
 
-void on_window_created(auto ptr) {
-  static const auto &[s, pd, qf] = get_dev_stuff(ptr);
+void on_window_created() {
+  static const auto &[s, pd, qf] = get_dev_stuff();
 
   static auto q = vee::get_queue_for_family(qf);
   static auto rp = vee::create_render_pass(pd, s);
@@ -48,9 +53,9 @@ void on_paint() {
 extern "C" void casein_handle(const casein::event &e) {
   switch (e.type()) {
   case casein::CREATE_WINDOW:
-    // You can fetch the native handle (HWND, NSWindow, etc) like this:
-    on_window_created(
-        e.as<casein::events::create_window>().native_window_handle());
+    current_nptr() =
+        e.as<casein::events::create_window>().native_window_handle();
+    on_window_created();
     break;
   case casein::REPAINT:
     on_paint();
