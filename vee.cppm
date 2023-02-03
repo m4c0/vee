@@ -5,6 +5,7 @@ export import :debug_utils_messenger;
 export import :device;
 export import :device_memory;
 export import :image;
+export import :image_view;
 export import :instance;
 export import :physical_device;
 export import :render_pass;
