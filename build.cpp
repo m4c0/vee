@@ -24,9 +24,12 @@ int main(int argc, char **argv) {
     m.add_part("surface_format");
 
     // Everybody else
+    m.add_part("actions");
     m.add_part("command_pool");
     m.add_part("debug_utils_messenger");
     m.add_part("device");
+    m.add_part("device_memory");
+    m.add_part("image");
     m.add_part("instance");
     m.add_part("physical_device");
     m.add_part("render_pass");
@@ -43,7 +46,7 @@ int main(int argc, char **argv) {
   auto poc = unit::create<app>("vee-poc");
   poc->add_wsdep("casein", casein());
   poc->add_ref(m);
-  poc->add_unit<>("poc");
+  poc->add_unit<>("poc")->add_include_dir("vulkan-headers/include");
 
   auto pf = unit::create<per_feat<seq>>("vee-filter");
   pf->for_feature(android_ndk).add_ref(poc);

@@ -1,8 +1,7 @@
+#include "vulkan.hpp"
+
 import casein;
 import vee;
-
-typedef struct VkSurfaceKHR_T *VkSurfaceKHR;
-typedef struct VkPhysicalDevice_T *VkPhysicalDevice;
 
 struct stuff {
   VkSurfaceKHR surface;
@@ -36,10 +35,14 @@ void on_window_created(auto ptr) {
 void on_paint() {
   static const auto &[s, pd, qf] = get_dev_stuff();
   // we might receive a frame before vulkan is initialised
-  if (s == nullptr)
+  if (!s)
     return;
 
   static auto swc = vee::create_swapchain(pd, s);
+
+  static auto d_img = vee::create_depth_image(pd, s);
+  static auto d_mem = vee::create_local_memory(pd, *d_img);
+  static auto d_bind = vee::bind_image_memory(*d_img, *d_mem);
 }
 
 extern "C" void casein_handle(const casein::event &e) {
