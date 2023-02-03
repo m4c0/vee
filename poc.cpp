@@ -1,21 +1,45 @@
 import casein;
 import vee;
 
-void on_window_created(auto ptr) {
+typedef struct VkSurfaceKHR_T *VkSurfaceKHR;
+typedef struct VkPhysicalDevice_T *VkPhysicalDevice;
+
+struct stuff {
+  VkSurfaceKHR surface;
+  VkPhysicalDevice phys_device;
+  unsigned q_family;
+};
+
+static stuff get_dev_stuff(casein::native_handle_t ptr = nullptr) {
+  if (ptr == nullptr)
+    return {};
+
   static auto i = vee::create_instance("my-app");
   static auto dbg = vee::create_debug_utils_messenger();
-  // pointer should come from UI (CAMetalLayer, HWND or AWindow)
   static auto s = vee::create_surface(ptr);
   static const auto &[pd, qf] =
       vee::find_physical_device_with_universal_queue(*s);
+
+  // available everywhere as a volk global
   static auto d = vee::create_single_queue_device(pd, qf);
 
+  return {*s, pd, qf};
+}
+
+void on_window_created(auto ptr) {
+  static const auto &[s, pd, qf] = get_dev_stuff(ptr);
+
   static auto q = vee::get_queue_for_family(qf);
-
-  static auto sfmt = vee::find_best_surface_format(pd, *s);
-  static auto rp = vee::create_render_pass(&sfmt);
-
+  static auto rp = vee::create_render_pass(pd, s);
   static auto cp = vee::create_command_pool(qf);
+}
+void on_paint() {
+  static const auto &[s, pd, qf] = get_dev_stuff();
+  // we might receive a frame before vulkan is initialised
+  if (s == nullptr)
+    return;
+
+  static auto swc = vee::create_swapchain(pd, s);
 }
 
 extern "C" void casein_handle(const casein::event &e) {
@@ -24,6 +48,9 @@ extern "C" void casein_handle(const casein::event &e) {
     // You can fetch the native handle (HWND, NSWindow, etc) like this:
     on_window_created(
         e.as<casein::events::create_window>().native_window_handle());
+    break;
+  case casein::REPAINT:
+    on_paint();
     break;
   case casein::QUIT:
     // SDL_Quit, release shenanigans, etc

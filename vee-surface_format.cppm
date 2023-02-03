@@ -9,8 +9,7 @@ static constexpr const auto get_pd_surf_fmts =
     calls::enumerate<&::vkGetPhysicalDeviceSurfaceFormatsKHR,
                      VkSurfaceFormatKHR>();
 
-export inline auto find_best_surface_format(VkPhysicalDevice pd,
-                                            VkSurfaceKHR surf) {
+inline auto find_best_surface_format(VkPhysicalDevice pd, VkSurfaceKHR surf) {
   auto formats = get_pd_surf_fmts(pd, surf);
   for (const auto &fmt : formats) {
     if ((fmt.format == VK_FORMAT_B8G8R8A8_SRGB) &&

@@ -17,15 +17,20 @@ int main(int argc, char **argv) {
 
     m.add_unit<>("volk.cpp")->add_include_dir("vulkan-headers/include");
 
+    // Used by all
     m.add_part("calls");
 
+    // Used by others
+    m.add_part("surface_format");
+
+    // Everybody else
     m.add_part("command_pool");
     m.add_part("debug_utils_messenger");
     m.add_part("device");
     m.add_part("instance");
     m.add_part("physical_device");
     m.add_part("render_pass");
-    m.add_part("surface_format");
+    m.add_part("swapchain");
 
     return m;
   };

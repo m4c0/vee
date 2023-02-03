@@ -3,6 +3,7 @@ module;
 
 export module vee:render_pass;
 import :calls;
+import :surface_format;
 
 namespace vee {
 static constexpr auto create_color_attachment(VkFormat format) {
@@ -84,9 +85,11 @@ static constexpr auto create_depth_dependency() {
   return dep;
 }
 
-export inline auto create_render_pass(const VkSurfaceFormatKHR *sfmt) {
+export inline auto create_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
+  static auto sfmt = find_best_surface_format(pd, s);
+
   const VkAttachmentDescription attachments[2]{
-      create_color_attachment(sfmt->format), create_depth_attachment()};
+      create_color_attachment(sfmt.format), create_depth_attachment()};
 
   const auto color_attachment_ref = create_color_attachment_ref();
   const auto depth_attachment_ref = create_depth_attachment_ref();
