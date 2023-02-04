@@ -1,28 +1,22 @@
 #include "vulkan.hpp"
 
 import casein;
+import hai;
 import vee;
 
-static auto &current_nptr() {
-  static casein::native_handle_t i{};
-  return i;
-}
-
 struct device_stuff {
+  casein::native_handle_t nptr;
+
   vee::instance i = vee::create_instance("my-app");
   vee::debug_utils_messenger dbg = vee::create_debug_utils_messenger();
-  vee::surface s = vee::create_surface(current_nptr());
+  vee::surface s = vee::create_surface(nptr);
   vee::physical_device_pair pdqf =
       vee::find_physical_device_with_universal_queue(*s);
   vee::device d =
       vee::create_single_queue_device(pdqf.physical_device, pdqf.queue_family);
 };
-static device_stuff &get_device_stuff() {
-  static device_stuff x{};
-  return x;
-}
 
-struct extend_stuff {
+struct extent_stuff {
   VkPhysicalDevice pd;
   VkSurfaceKHR s;
 
@@ -33,57 +27,59 @@ struct extend_stuff {
   decltype(nullptr) d_bind = vee::bind_image_memory(*d_img, *d_mem);
   vee::image_view d_iv = vee::create_depth_image_view(*d_img);
 };
-static extend_stuff &get_extend_stuff() {
-  static const auto &[pd, qf] = get_device_stuff().pdqf;
-  static auto s = *get_device_stuff().s;
-
-  static extend_stuff x{pd, s};
-  return x;
-}
 
 struct inflight_stuff {
+  VkCommandPool pool;
+  VkCommandBuffer cb = vee::allocate_secondary_command_buffer(pool);
+
   vee::semaphore img_available_sema{};
   vee::semaphore rnd_finished_sema{};
   vee::fence f{};
 };
 struct inflights {
-  inflight_stuff front;
-  inflight_stuff back;
-};
-static inflights &get_inflights() {
-  static inflights x{};
-  return x;
-}
+  unsigned qf;
 
+  vee::command_pool cp = vee::create_command_pool(qf);
+
+  inflight_stuff front{*cp};
+  inflight_stuff back{*cp};
+};
+
+/*
 void on_window_created() {
   static const auto &[pd, qf] = get_device_stuff().pdqf;
   static auto s = *get_device_stuff().s;
 
   static auto q = vee::get_queue_for_family(qf);
   static auto rp = vee::create_render_pass(pd, s);
-  static auto cp = vee::create_command_pool(qf);
 }
-void on_paint() {
-  // we might receive a frame before vulkan is initialised
-  if (!current_nptr())
-    return;
-
-  get_extend_stuff();
-  get_inflights();
-}
+*/
 
 extern "C" void casein_handle(const casein::event &e) {
+  static casein::native_handle_t nptr;
+  static hai::uptr<device_stuff> dev;
+  static hai::uptr<extent_stuff> ext;
+  static hai::uptr<inflights> infs;
+
   switch (e.type()) {
-  case casein::CREATE_WINDOW:
-    current_nptr() =
-        e.as<casein::events::create_window>().native_window_handle();
-    on_window_created();
+  case casein::CREATE_WINDOW: {
+    nptr = e.as<casein::events::create_window>().native_window_handle();
+
     break;
+  }
   case casein::REPAINT:
-    on_paint();
+    // we might receive a frame before vulkan is initialised
+    if (nptr && !dev) {
+      dev = hai::uptr<device_stuff>::make(nptr);
+      const auto &[pd, qf] = dev->pdqf;
+      ext = hai::uptr<extent_stuff>::make(pd, *dev->s);
+      infs = hai::uptr<inflights>::make(qf);
+    }
     break;
   case casein::QUIT:
-    // SDL_Quit, release shenanigans, etc
+    infs = {};
+    ext = {};
+    dev = {};
     break;
   default:
     break;

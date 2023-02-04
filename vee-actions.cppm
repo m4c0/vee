@@ -15,4 +15,13 @@ export inline auto bind_image_memory(VkImage img, VkDeviceMemory mem,
   calls::call(vkBindImageMemory, img, mem, sz);
   return nullptr; // Returns "something" to allow binding via RAII
 }
+
+export inline auto allocate_secondary_command_buffer(VkCommandPool pool) {
+  VkCommandBufferAllocateInfo info{};
+  info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  info.commandBufferCount = 1;
+  info.commandPool = pool;
+  info.level = VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+  return calls::create<VkCommandBuffer, &::vkAllocateCommandBuffers>(&info);
+}
 } // namespace vee
