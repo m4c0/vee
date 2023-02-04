@@ -14,34 +14,35 @@ static auto &current_nptr() {
   return i;
 }
 
-static stuff get_dev_stuff() {
-  if (!current_nptr())
-    return {};
-
-  static auto i = vee::create_instance("my-app");
-  static auto dbg = vee::create_debug_utils_messenger();
-  static auto s = vee::create_surface(current_nptr());
-  static const auto &[pd, qf] =
+struct dev_stuff {
+  vee::instance i = vee::create_instance("my-app");
+  vee::debug_utils_messenger dbg = vee::create_debug_utils_messenger();
+  vee::surface s = vee::create_surface(current_nptr());
+  vee::physical_device_pair pdqf =
       vee::find_physical_device_with_universal_queue(*s);
-
-  // available everywhere as a volk global
-  static auto d = vee::create_single_queue_device(pd, qf);
-
-  return {*s, pd, qf};
+  vee::device d =
+      vee::create_single_queue_device(pdqf.physical_device, pdqf.queue_family);
+};
+static dev_stuff &get_dev_stuff() {
+  static dev_stuff x{};
+  return x;
 }
 
 void on_window_created() {
-  static const auto &[s, pd, qf] = get_dev_stuff();
+  static const auto &[pd, qf] = get_dev_stuff().pdqf;
+  static auto *s = *get_dev_stuff().s;
 
   static auto q = vee::get_queue_for_family(qf);
   static auto rp = vee::create_render_pass(pd, s);
   static auto cp = vee::create_command_pool(qf);
 }
 void on_paint() {
-  static const auto &[s, pd, qf] = get_dev_stuff();
   // we might receive a frame before vulkan is initialised
-  if (!s)
+  if (!current_nptr())
     return;
+
+  static const auto &[pd, qf] = get_dev_stuff().pdqf;
+  static auto *s = *get_dev_stuff().s;
 
   static auto swc = vee::create_swapchain(pd, s);
 

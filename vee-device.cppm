@@ -5,6 +5,8 @@ export module vee:device;
 import :calls;
 
 namespace vee {
+export using device =
+    calls::handle<VkDevice, &::vkCreateDevice, &::vkDestroyDevice>;
 export inline auto create_single_queue_device(VkPhysicalDevice pd,
                                               unsigned qf) {
   const auto extension = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
@@ -28,8 +30,7 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
   ci.enabledExtensionCount = 1;
   ci.enabledLayerCount = 0; // device layer is legacy
 
-  auto res =
-      calls::handle<VkDevice, &::vkCreateDevice, &::vkDestroyDevice>(pd, &ci);
+  auto res = device(pd, &ci);
   volkLoadDevice(*res);
   return res;
 }

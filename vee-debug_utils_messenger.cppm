@@ -50,13 +50,12 @@ debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
 }
 
 namespace vee {
+export using debug_utils_messenger =
+    calls::handle<VkDebugUtilsMessengerEXT, &::vkCreateDebugUtilsMessengerEXT,
+                  &::vkDestroyDebugUtilsMessengerEXT>;
 export inline auto create_debug_utils_messenger() {
-  using res_t =
-      calls::handle<VkDebugUtilsMessengerEXT, &::vkCreateDebugUtilsMessengerEXT,
-                    &::vkDestroyDebugUtilsMessengerEXT>;
-
   if (vkCreateDebugUtilsMessengerEXT == nullptr)
-    return res_t{};
+    return debug_utils_messenger{};
 
   VkDebugUtilsMessengerCreateInfoEXT info{};
   info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -69,6 +68,6 @@ export inline auto create_debug_utils_messenger() {
                      VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
                      VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 
-  return res_t{&info};
+  return debug_utils_messenger{&info};
 }
 } // namespace vee

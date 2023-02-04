@@ -76,6 +76,8 @@ static auto get_extensions() {
   return res;
 }
 
+export using instance =
+    calls::handle<VkInstance, &::vkCreateInstance, &::vkDestroyInstance>;
 export inline auto create_instance(const char *app_name) {
   auto layers = get_layers();
   auto extensions = get_extensions();
@@ -98,9 +100,7 @@ export inline auto create_instance(const char *app_name) {
   create_info.enabledExtensionCount = extensions.size();
   create_info.ppEnabledExtensionNames = extensions.data();
 
-  auto res =
-      calls::handle<VkInstance, &::vkCreateInstance, &::vkDestroyInstance>(
-          &create_info);
+  instance res{&create_info};
   volkLoadInstance(*res);
   silog::log(silog::info, "Vulkan instance created");
   return res;

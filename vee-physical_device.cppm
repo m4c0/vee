@@ -61,12 +61,11 @@ static void log_rejected_device(VkPhysicalDevice pd, jute::view reason) {
   silog::log(silog::warning, msg.cstr().data());
 }
 
+export struct physical_device_pair {
+  VkPhysicalDevice physical_device;
+  unsigned queue_family;
+};
 export inline auto find_physical_device_with_universal_queue(VkSurfaceKHR s) {
-  struct res {
-    VkPhysicalDevice device;
-    unsigned queue_family;
-  };
-
   for (auto pd : enum_physical_devices()) {
     auto qf = get_queue_family(pd, s);
     if (qf == 0) {
@@ -86,10 +85,10 @@ export inline auto find_physical_device_with_universal_queue(VkSurfaceKHR s) {
     auto msg = "Using device: "_s + jute::view::unsafe(props.deviceName);
     silog::log(silog::info, msg.cstr().data());
 
-    return res{pd, qf - 1};
+    return physical_device_pair{pd, qf - 1};
   }
 
   silog::log(silog::error, "No suitable physical devices found");
-  return res{};
+  return physical_device_pair{};
 }
 } // namespace vee
