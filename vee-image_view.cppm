@@ -18,7 +18,7 @@ static auto create_info_for_aspect_mask(VkImageAspectFlags aspect_mask) {
 export using image_view =
     calls::handle<VkImageView, &::vkCreateImageView, &::vkDestroyImageView>;
 export inline auto create_depth_image_view(VkImage img) {
-  auto info = create_info_for_aspect_mask(VK_IMAGE_ASPECT_COLOR_BIT);
+  auto info = create_info_for_aspect_mask(VK_IMAGE_ASPECT_DEPTH_BIT);
   info.image = img;
   info.format = VK_FORMAT_D32_SFLOAT;
   return image_view{&info};
