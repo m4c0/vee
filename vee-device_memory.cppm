@@ -25,6 +25,8 @@ inline unsigned find_memory_type_index(VkPhysicalDevice pd, unsigned type_bits,
   // TODO: throw exception?
   return 0;
 }
+export using device_memory =
+    calls::handle<VkDeviceMemory, &::vkAllocateMemory, &::vkFreeMemory>;
 export inline auto create_local_memory(VkPhysicalDevice pd, VkImage img) {
   constexpr const auto flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 
@@ -35,8 +37,6 @@ export inline auto create_local_memory(VkPhysicalDevice pd, VkImage img) {
   info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
   info.allocationSize = mr.size;
   info.memoryTypeIndex = find_memory_type_index(pd, mr.memoryTypeBits, flags);
-
-  return calls::handle<VkDeviceMemory, &::vkAllocateMemory, &::vkFreeMemory>(
-      &info);
+  return device_memory(&info);
 }
 } // namespace vee

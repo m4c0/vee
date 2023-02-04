@@ -19,11 +19,13 @@ inline auto create_info_for_extent(VkExtent2D ext) {
   info.samples = VK_SAMPLE_COUNT_1_BIT;
   return info;
 }
+export using image =
+    calls::handle<VkImage, &::vkCreateImage, &::vkDestroyImage>;
 export inline auto create_depth_image(VkExtent2D ext) {
   auto info = create_info_for_extent(ext);
   info.format = VK_FORMAT_D32_SFLOAT;
   info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-  return calls::handle<VkImage, &::vkCreateImage, &::vkDestroyImage>(&info);
+  return image{&info};
 }
 export inline auto create_depth_image(VkPhysicalDevice pd, VkSurfaceKHR s) {
   return create_depth_image(get_surface_capabilities(pd, s).currentExtent);

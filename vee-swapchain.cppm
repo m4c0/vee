@@ -31,6 +31,8 @@ inline auto get_present_mode(VkPhysicalDevice pd, VkSurfaceKHR s) {
   return VK_PRESENT_MODE_FIFO_KHR;
 }
 
+export using swapchain = calls::handle<VkSwapchainKHR, &::vkCreateSwapchainKHR,
+                                       &::vkDestroySwapchainKHR>;
 export inline auto create_swapchain(VkPhysicalDevice pd, VkSurfaceKHR s) {
   const auto cap = get_surface_capabilities(pd, s);
   const auto present_mode = get_present_mode(pd, s);
@@ -50,8 +52,6 @@ export inline auto create_swapchain(VkPhysicalDevice pd, VkSurfaceKHR s) {
   info.preTransform = cap.currentTransform;
   info.imageColorSpace = format.colorSpace;
   info.imageFormat = format.format;
-
-  return calls::handle<VkSwapchainKHR, &::vkCreateSwapchainKHR,
-                       &::vkDestroySwapchainKHR>(&info);
+  return swapchain(&info);
 }
 } // namespace vee

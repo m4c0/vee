@@ -3,12 +3,6 @@
 import casein;
 import vee;
 
-struct stuff {
-  VkSurfaceKHR surface;
-  VkPhysicalDevice phys_device;
-  unsigned q_family;
-};
-
 static auto &current_nptr() {
   static casein::native_handle_t i{};
   return i;
@@ -28,6 +22,25 @@ static dev_stuff &get_dev_stuff() {
   return x;
 }
 
+struct ext_stuff {
+  VkPhysicalDevice pd;
+  VkSurfaceKHR s;
+
+  vee::swapchain swc = vee::create_swapchain(pd, s);
+
+  vee::image d_img = vee::create_depth_image(pd, s);
+  vee::device_memory d_mem = vee::create_local_memory(pd, *d_img);
+  decltype(nullptr) d_bind = vee::bind_image_memory(*d_img, *d_mem);
+  vee::image_view d_iv = vee::create_depth_image_view(*d_img);
+};
+static ext_stuff &get_ext_stuff() {
+  static const auto &[pd, qf] = get_dev_stuff().pdqf;
+  static auto *s = *get_dev_stuff().s;
+
+  static ext_stuff x{pd, s};
+  return x;
+}
+
 void on_window_created() {
   static const auto &[pd, qf] = get_dev_stuff().pdqf;
   static auto *s = *get_dev_stuff().s;
@@ -41,15 +54,7 @@ void on_paint() {
   if (!current_nptr())
     return;
 
-  static const auto &[pd, qf] = get_dev_stuff().pdqf;
-  static auto *s = *get_dev_stuff().s;
-
-  static auto swc = vee::create_swapchain(pd, s);
-
-  static auto d_img = vee::create_depth_image(pd, s);
-  static auto d_mem = vee::create_local_memory(pd, *d_img);
-  static auto d_bind = vee::bind_image_memory(*d_img, *d_mem);
-  static auto d_iv = vee::create_depth_image_view(*d_img);
+  get_ext_stuff();
 }
 
 extern "C" void casein_handle(const casein::event &e) {
