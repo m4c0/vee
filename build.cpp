@@ -21,7 +21,6 @@ int main(int argc, char **argv) {
     m.add_part("calls");
 
     // Used by others
-    m.add_part("surface");
     m.add_part("surface_format");
     m.add_part("swapchain"); // TODO: move get_surf_cap out
 
@@ -36,6 +35,7 @@ int main(int argc, char **argv) {
     m.add_part("instance");
     m.add_part("physical_device");
     m.add_part("render_pass");
+    m.add_part("semaphore");
 
     return m;
   };

@@ -7,12 +7,12 @@ import :calls;
 class ANativeWindow;
 
 namespace vee {
+export using surface = calls::handle<VkSurfaceKHR, &::vkCreateAndroidSurfaceKHR,
+                                     &::vkDestroySurfaceKHR>;
 export inline auto create_surface(ANativeWindow *wnd) {
   VkAndroidSurfaceCreateInfoKHR info{};
   info.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
   info.window = wnd;
-
-  return calls::handle<VkSurfaceKHR, &::vkCreateAndroidSurfaceKHR,
-                       &::vkDestroySurfaceKHR>{&info};
+  return surface{&info};
 }
 } // namespace vee

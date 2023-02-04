@@ -8,7 +8,7 @@ static auto &current_nptr() {
   return i;
 }
 
-struct dev_stuff {
+struct device_stuff {
   vee::instance i = vee::create_instance("my-app");
   vee::debug_utils_messenger dbg = vee::create_debug_utils_messenger();
   vee::surface s = vee::create_surface(current_nptr());
@@ -17,12 +17,12 @@ struct dev_stuff {
   vee::device d =
       vee::create_single_queue_device(pdqf.physical_device, pdqf.queue_family);
 };
-static dev_stuff &get_dev_stuff() {
-  static dev_stuff x{};
+static device_stuff &get_device_stuff() {
+  static device_stuff x{};
   return x;
 }
 
-struct ext_stuff {
+struct extend_stuff {
   VkPhysicalDevice pd;
   VkSurfaceKHR s;
 
@@ -33,17 +33,30 @@ struct ext_stuff {
   decltype(nullptr) d_bind = vee::bind_image_memory(*d_img, *d_mem);
   vee::image_view d_iv = vee::create_depth_image_view(*d_img);
 };
-static ext_stuff &get_ext_stuff() {
-  static const auto &[pd, qf] = get_dev_stuff().pdqf;
-  static auto *s = *get_dev_stuff().s;
+static extend_stuff &get_extend_stuff() {
+  static const auto &[pd, qf] = get_device_stuff().pdqf;
+  static auto s = *get_device_stuff().s;
 
-  static ext_stuff x{pd, s};
+  static extend_stuff x{pd, s};
+  return x;
+}
+
+struct inflight_stuff {
+  vee::semaphore img_available_sema{};
+  vee::semaphore rnd_finished_sema{};
+};
+struct inflights {
+  inflight_stuff front;
+  inflight_stuff back;
+};
+static inflights &get_inflights() {
+  static inflights x{};
   return x;
 }
 
 void on_window_created() {
-  static const auto &[pd, qf] = get_dev_stuff().pdqf;
-  static auto *s = *get_dev_stuff().s;
+  static const auto &[pd, qf] = get_device_stuff().pdqf;
+  static auto s = *get_device_stuff().s;
 
   static auto q = vee::get_queue_for_family(qf);
   static auto rp = vee::create_render_pass(pd, s);
@@ -54,7 +67,8 @@ void on_paint() {
   if (!current_nptr())
     return;
 
-  get_ext_stuff();
+  get_extend_stuff();
+  get_inflights();
 }
 
 extern "C" void casein_handle(const casein::event &e) {

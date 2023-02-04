@@ -9,7 +9,7 @@ export import :image_view;
 export import :instance;
 export import :physical_device;
 export import :render_pass;
-export import :surface;
+export import :semaphore;
 export import :swapchain;
 
 #ifdef __APPLE__
