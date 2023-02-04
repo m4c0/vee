@@ -44,6 +44,7 @@ static extend_stuff &get_extend_stuff() {
 struct inflight_stuff {
   vee::semaphore img_available_sema{};
   vee::semaphore rnd_finished_sema{};
+  vee::fence f{};
 };
 struct inflights {
   inflight_stuff front;

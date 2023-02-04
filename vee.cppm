@@ -4,6 +4,7 @@ export import :command_pool;
 export import :debug_utils_messenger;
 export import :device;
 export import :device_memory;
+export import :fence;
 export import :image;
 export import :image_view;
 export import :instance;
