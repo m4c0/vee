@@ -6,6 +6,11 @@ import hai;
 import silog;
 import traits;
 
+namespace vee {
+struct api_failure {};
+struct out_of_date_error {};
+} // namespace vee
+
 namespace vee::calls {
 template <typename Fn, typename... Args>
   requires requires(Fn fn, Args... args) {
@@ -19,9 +24,15 @@ template <typename Fn, typename... Args>
              { fn(args...) } -> traits::not_same_as<void>;
            }
 constexpr void call(Fn &&fn, Args &&...args) {
-  if (fn(args...) != 0) {
+  switch (fn(args...)) {
+  case VK_SUCCESS:
+  case VK_SUBOPTIMAL_KHR:
+    break;
+  case VK_ERROR_OUT_OF_DATE_KHR:
+    throw out_of_date_error{};
+  default:
     silog::log(silog::error, "Vulkan API failure");
-    // TODO: throw?
+    throw api_failure{};
   }
 }
 template <typename Fn, typename... Args>
