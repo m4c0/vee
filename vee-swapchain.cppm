@@ -3,6 +3,7 @@ module;
 
 export module vee:swapchain;
 import :calls;
+import :surface_capabilities;
 import :surface_format;
 
 namespace vee {
@@ -16,11 +17,6 @@ inline constexpr auto get_min_image_count(const VkSurfaceCapabilitiesKHR &cap) {
     return cap.maxImageCount;
   }
   return count;
-}
-
-inline auto get_surface_capabilities(VkPhysicalDevice pd, VkSurfaceKHR s) {
-  return calls::create<VkSurfaceCapabilitiesKHR,
-                       &::vkGetPhysicalDeviceSurfaceCapabilitiesKHR>(pd, s);
 }
 
 inline auto get_present_mode(VkPhysicalDevice pd, VkSurfaceKHR s) {
