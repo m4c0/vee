@@ -51,6 +51,7 @@ int main(int argc, char **argv) {
   auto poc = unit::create<app>("vee-poc");
   poc->add_wsdep("casein", casein());
   poc->add_wsdep("hai", hai());
+  poc->add_wsdep("traits", traits());
   poc->add_ref(m);
   poc->add_unit<>("poc")->add_include_dir("vulkan-headers/include");
 

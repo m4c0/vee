@@ -2,6 +2,7 @@
 
 import casein;
 import hai;
+import traits;
 import vee;
 
 struct device_stuff {
@@ -74,6 +75,11 @@ void on_window_created() {
   static auto q = vee::get_queue_for_family(qf);
 }
 */
+inline void flip(inflights &i) {
+  auto tmp = traits::move(i.front);
+  i.front = traits::move(i.back);
+  i.back = traits::move(tmp);
+}
 
 extern "C" void casein_handle(const casein::event &e) {
   static volatile casein::native_handle_t nptr{};
@@ -99,6 +105,10 @@ extern "C" void casein_handle(const casein::event &e) {
       for (auto i = 0; i < imgs.size(); i++) {
         (*frms)[i] = hai::uptr<frame_stuff>::make(&*ext, (imgs.data())[i]);
       }
+    }
+    if (infs) {
+      flip(*infs);
+      vee::wait_and_reset_fence(*infs->back.f);
     }
     break;
   case casein::QUIT:
