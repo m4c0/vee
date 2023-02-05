@@ -54,4 +54,7 @@ export inline auto create_swapchain(VkPhysicalDevice pd, VkSurfaceKHR s) {
   info.imageFormat = format.format;
   return swapchain(&info);
 }
+
+export inline constexpr const auto get_swapchain_images =
+    calls::enumerate<&::vkGetSwapchainImagesKHR, VkImage>();
 } // namespace vee

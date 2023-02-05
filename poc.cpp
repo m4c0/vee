@@ -62,11 +62,9 @@ extern "C" void casein_handle(const casein::event &e) {
   static hai::uptr<inflights> infs;
 
   switch (e.type()) {
-  case casein::CREATE_WINDOW: {
+  case casein::CREATE_WINDOW:
     nptr = e.as<casein::events::create_window>().native_window_handle();
-
     break;
-  }
   case casein::REPAINT:
     // we might receive a frame before vulkan is initialised
     if (nptr && !dev) {
