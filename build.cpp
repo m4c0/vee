@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
     m.add_part("device");
     m.add_part("device_memory");
     m.add_part("fence");
+    m.add_part("framebuffer");
     m.add_part("image");
     m.add_part("image_view");
     m.add_part("instance");

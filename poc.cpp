@@ -19,7 +19,10 @@ struct device_stuff {
 struct extent_stuff {
   VkPhysicalDevice pd;
   VkSurfaceKHR s;
+  unsigned qf;
 
+  vee::command_pool cp = vee::create_command_pool(qf);
+  vee::render_pass rp = vee::create_render_pass(pd, s);
   vee::swapchain swc = vee::create_swapchain(pd, s);
 
   vee::image d_img = vee::create_depth_image(pd, s);
@@ -51,7 +54,6 @@ void on_window_created() {
   static auto s = *get_device_stuff().s;
 
   static auto q = vee::get_queue_for_family(qf);
-  static auto rp = vee::create_render_pass(pd, s);
 }
 */
 
@@ -70,7 +72,7 @@ extern "C" void casein_handle(const casein::event &e) {
     if (nptr && !dev) {
       dev = hai::uptr<device_stuff>::make(nptr);
       const auto &[pd, qf] = dev->pdqf;
-      ext = hai::uptr<extent_stuff>::make(pd, *dev->s);
+      ext = hai::uptr<extent_stuff>::make(pd, *dev->s, qf);
       infs = hai::uptr<inflights>::make(qf);
     }
     break;

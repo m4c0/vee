@@ -85,6 +85,8 @@ static constexpr auto create_depth_dependency() {
   return dep;
 }
 
+export using render_pass =
+    calls::handle<VkRenderPass, &::vkCreateRenderPass, &::vkDestroyRenderPass>;
 export inline auto create_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
   static auto sfmt = find_best_surface_format(pd, s);
 
@@ -107,7 +109,6 @@ export inline auto create_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
   info.pSubpasses = &subpass;
   info.dependencyCount = 2;
   info.pDependencies = deps;
-  return calls::handle<VkRenderPass, &::vkCreateRenderPass,
-                       &::vkDestroyRenderPass>(&info);
+  return render_pass{&info};
 }
 } // namespace vee
