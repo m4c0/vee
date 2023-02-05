@@ -36,9 +36,9 @@ struct inflight_stuff {
   VkCommandPool pool;
   VkCommandBuffer cb = vee::allocate_secondary_command_buffer(pool);
 
-  vee::semaphore img_available_sema{};
-  vee::semaphore rnd_finished_sema{};
-  vee::fence f{};
+  vee::semaphore img_available_sema = vee::create_semaphore();
+  vee::semaphore rnd_finished_sema = vee::create_semaphore();
+  vee::fence f = vee::create_fence_signaled();
 };
 struct inflights {
   unsigned qf;
@@ -105,10 +105,12 @@ extern "C" void casein_handle(const casein::event &e) {
       for (auto i = 0; i < imgs.size(); i++) {
         (*frms)[i] = hai::uptr<frame_stuff>::make(&*ext, (imgs.data())[i]);
       }
-    }
-    if (infs) {
+    } else if (infs) {
       flip(*infs);
       vee::wait_and_reset_fence(*infs->back.f);
+
+      auto idx =
+          vee::acquire_next_image(*ext->swc, *infs->back.img_available_sema);
     }
     break;
   case casein::QUIT:

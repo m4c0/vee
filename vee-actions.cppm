@@ -16,6 +16,11 @@ export inline auto bind_image_memory(VkImage img, VkDeviceMemory mem,
   return nullptr; // Returns "something" to allow binding via RAII
 }
 
+export inline auto acquire_next_image(VkSwapchainKHR swc, VkSemaphore sema) {
+  return calls::create<unsigned, &::vkAcquireNextImageKHR>(swc, ~0UL, sema,
+                                                           VK_NULL_HANDLE);
+}
+
 export inline auto allocate_primary_command_buffer(VkCommandPool pool) {
   VkCommandBufferAllocateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
