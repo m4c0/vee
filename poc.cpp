@@ -48,6 +48,24 @@ struct inflights {
   inflight_stuff back{*cp};
 };
 
+struct frame_stuff {
+  const extent_stuff *xs;
+  VkImage img;
+
+  VkCommandBuffer cb = vee::allocate_primary_command_buffer(*xs->cp);
+
+  vee::image_view iv = vee::create_rgba_image_view(img, xs->pd, xs->s);
+
+  vee::fb_params fbp{
+      .physical_device = xs->pd,
+      .surface = xs->s,
+      .render_pass = *xs->rp,
+      .image_buffer = *iv,
+      .depth_buffer = *xs->d_iv,
+  };
+  vee::framebuffer fb = vee::create_framebuffer(fbp);
+};
+
 /*
 void on_window_created() {
   static const auto &[pd, qf] = get_device_stuff().pdqf;
@@ -74,6 +92,8 @@ extern "C" void casein_handle(const casein::event &e) {
       const auto &[pd, qf] = dev->pdqf;
       ext = hai::uptr<extent_stuff>::make(pd, *dev->s, qf);
       infs = hai::uptr<inflights>::make(qf);
+
+      auto imgs = vee::get_swapchain_images(*ext->swc);
     }
     break;
   case casein::QUIT:

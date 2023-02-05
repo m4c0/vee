@@ -3,7 +3,7 @@ module;
 
 export module vee:image;
 import :calls;
-import :swapchain;
+import :surface_capabilities;
 
 namespace vee {
 inline auto create_info_for_extent(VkExtent2D ext) {
