@@ -76,10 +76,11 @@ void on_window_created() {
 */
 
 extern "C" void casein_handle(const casein::event &e) {
-  static casein::native_handle_t nptr;
-  static hai::uptr<device_stuff> dev;
-  static hai::uptr<extent_stuff> ext;
-  static hai::uptr<inflights> infs;
+  static volatile casein::native_handle_t nptr{};
+  static hai::uptr<device_stuff> dev{};
+  static hai::uptr<extent_stuff> ext{};
+  static hai::uptr<inflights> infs{};
+  static hai::holder<hai::uptr<frame_stuff>[]> frms{};
 
   switch (e.type()) {
   case casein::CREATE_WINDOW:
@@ -94,9 +95,14 @@ extern "C" void casein_handle(const casein::event &e) {
       infs = hai::uptr<inflights>::make(qf);
 
       auto imgs = vee::get_swapchain_images(*ext->swc);
+      frms = decltype(frms)::make(imgs.size());
+      for (auto i = 0; i < imgs.size(); i++) {
+        (*frms)[i] = hai::uptr<frame_stuff>::make(&*ext, (imgs.data())[i]);
+      }
     }
     break;
   case casein::QUIT:
+    frms = {};
     infs = {};
     ext = {};
     dev = {};

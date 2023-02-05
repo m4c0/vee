@@ -24,7 +24,7 @@ export inline auto create_framebuffer(const fb_params &p) {
   info.height = scap.currentExtent.height;
   info.renderPass = p.render_pass;
   info.attachmentCount = 2;
-  info.pAttachments = &p.depth_buffer;
+  info.pAttachments = &p.image_buffer;
   info.layers = 1;
   return framebuffer(&info);
 }
