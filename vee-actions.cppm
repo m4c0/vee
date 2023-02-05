@@ -32,4 +32,9 @@ export inline auto allocate_secondary_command_buffer(VkCommandPool pool) {
   info.level = VK_COMMAND_BUFFER_LEVEL_SECONDARY;
   return calls::create<VkCommandBuffer, &::vkAllocateCommandBuffers>(&info);
 }
+
+export inline auto wait_and_reset_fence(VkFence fence) {
+  calls::call(vkWaitForFences, 1, &fence, VK_TRUE, ~0UL);
+  calls::call(vkResetFences, 1, &fence);
+}
 } // namespace vee
