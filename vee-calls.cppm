@@ -91,6 +91,8 @@ inline constexpr const auto message_for_result(VkResult res) {
     return "Vulkan API failure: VK_OPERATION_NOT_DEFERRED_KHR";
   case VK_ERROR_COMPRESSION_EXHAUSTED_EXT:
     return "Vulkan API failure: VK_ERROR_COMPRESSION_EXHAUSTED_EXT";
+  default:
+    return "Unknown Vulkan API failure";
   }
 }
 } // namespace vee
