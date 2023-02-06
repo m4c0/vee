@@ -8,6 +8,8 @@
 #elif defined(_WIN32)
 #define VK_USE_PLATFORM_WIN32_KHR
 #define VEE_VULKAN_PLATFORM_EXT VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+#else
+#error Unsupported platform
 #endif
 
 #include "volk/volk.h"
