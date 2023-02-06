@@ -38,6 +38,60 @@ export inline auto allocate_secondary_command_buffer(VkCommandPool pool) {
   return calls::create<VkCommandBuffer, &::vkAllocateCommandBuffers>(&info);
 }
 
+export inline auto begin_cmd_buf_render_pass_continue(VkCommandBuffer cb,
+                                                      VkRenderPass rp) {
+  VkCommandBufferInheritanceInfo inheritance{};
+  inheritance.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+  inheritance.renderPass = rp;
+
+  VkCommandBufferBeginInfo info{};
+  info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  info.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+  info.pInheritanceInfo = &inheritance;
+  calls::call(vkBeginCommandBuffer, cb, &info);
+}
+export inline auto begin_cmd_buf_one_time_submit(VkCommandBuffer cb) {
+  VkCommandBufferBeginInfo info{};
+  info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+  calls::call(vkBeginCommandBuffer, cb, &info);
+}
+
+export struct render_pass_begin {
+  VkCommandBuffer command_buffer;
+  VkRenderPass render_pass;
+  VkFramebuffer framebuffer;
+};
+export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
+  // Using sensible defaults. The magenta color is a visible marker for pixels
+  // missing rendering
+  VkClearValue values[2];
+  values[0].color = {1.0f, 0.0f, 1.0f, 1.0f};
+  values[1].depthStencil = {0, 0};
+
+  VkRenderPassBeginInfo info{};
+  info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+  info.renderPass = rpb.render_pass;
+  info.framebuffer = rpb.framebuffer;
+  info.clearValueCount = 2;
+  info.pClearValues = values;
+  calls::call(vkCmdBeginRenderPass, rpb.command_buffer, &info,
+              VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
+}
+
+export inline auto cmd_end_render_pass(VkCommandBuffer cb) {
+  calls::call(vkCmdEndRenderPass, cb);
+}
+
+export inline auto cmd_execute_command(VkCommandBuffer pri_cb,
+                                       VkCommandBuffer sec_cb) {
+  calls::call(vkCmdExecuteCommands, pri_cb, 1, &sec_cb);
+}
+
+export inline auto end_cmd_buf(VkCommandBuffer cb) {
+  calls::call(vkEndCommandBuffer, cb);
+}
+
 export struct present_info {
   VkQueue queue;
   VkSwapchainKHR swapchain;

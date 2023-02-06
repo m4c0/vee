@@ -69,13 +69,6 @@ struct frame_stuff {
   vee::framebuffer fb = vee::create_framebuffer(fbp);
 };
 
-/*
-void on_window_created() {
-  static const auto &[pd, qf] = get_device_stuff().pdqf;
-  static auto s = *get_device_stuff().s;
-
-}
-*/
 inline void flip(inflights &i) {
   auto tmp = traits::move(i.front);
   i.front = traits::move(i.back);
@@ -137,6 +130,22 @@ extern "C" void casein_handle(const casein::event &e) {
       auto idx = vee::acquire_next_image(*ext->swc, *inf.img_available_sema);
       auto &frame = (*frms)[idx];
 
+      {
+        vee::begin_cmd_buf_render_pass_continue(inf.cb, *ext->rp);
+        vee::end_cmd_buf(inf.cb);
+      }
+      {
+        vee::begin_cmd_buf_one_time_submit(frame->cb);
+        vee::cmd_begin_render_pass({
+            .command_buffer = frame->cb,
+            .render_pass = *ext->rp,
+            .framebuffer = *frame->fb,
+        });
+        vee::cmd_execute_command(frame->cb, inf.cb);
+        vee::cmd_end_render_pass(frame->cb);
+        vee::end_cmd_buf(frame->cb);
+      }
+
       vee::queue_submit({
           .queue = dev->q,
           .fence = *inf.f,
@@ -148,6 +157,7 @@ extern "C" void casein_handle(const casein::event &e) {
           .queue = dev->q,
           .swapchain = *ext->swc,
           .wait_semaphore = *inf.rnd_finished_sema,
+          .image_index = idx,
       });
       break;
     }
