@@ -105,8 +105,6 @@ export inline auto create_instance(const char *app_name) {
   silog::log(silog::info, "Vulkan instance created");
   return res;
 }
-} // namespace vee
 
-static struct init {
-  init() { vee::calls::call(volkInitialize); }
-} i;
+export inline void initialise() { vee::calls::call(volkInitialize); }
+} // namespace vee

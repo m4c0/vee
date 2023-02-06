@@ -81,20 +81,36 @@ inline void flip(inflights &i) {
   i.back = traits::move(tmp);
 }
 
+enum states {
+  waiting_nptr,
+  setup_stuff,
+  ready_to_paint,
+  done,
+};
+
 extern "C" void casein_handle(const casein::event &e) {
   static volatile casein::native_handle_t nptr{};
   static hai::uptr<device_stuff> dev{};
   static hai::uptr<extent_stuff> ext{};
   static hai::uptr<inflights> infs{};
   static hai::holder<hai::uptr<frame_stuff>[]> frms{};
+  static states state = waiting_nptr;
 
   switch (e.type()) {
   case casein::CREATE_WINDOW:
+    switch (state) {
+    case waiting_nptr:
+      vee::initialise();
+      break;
+    default:
+      break;
+    }
     nptr = e.as<casein::events::create_window>().native_window_handle();
+    state = setup_stuff;
     break;
   case casein::REPAINT:
-    // we might receive a frame before vulkan is initialised
-    if (nptr && !dev) {
+    switch (state) {
+    case setup_stuff: {
       dev = hai::uptr<device_stuff>::make(nptr);
       const auto &[pd, qf] = dev->pdqf;
       ext = hai::uptr<extent_stuff>::make(pd, *dev->s, qf);
@@ -105,12 +121,20 @@ extern "C" void casein_handle(const casein::event &e) {
       for (auto i = 0; i < imgs.size(); i++) {
         (*frms)[i] = hai::uptr<frame_stuff>::make(&*ext, (imgs.data())[i]);
       }
-    } else if (infs) {
+
+      state = ready_to_paint;
+      break;
+    }
+    case ready_to_paint: {
       flip(*infs);
       vee::wait_and_reset_fence(*infs->back.f);
 
       auto idx =
           vee::acquire_next_image(*ext->swc, *infs->back.img_available_sema);
+      break;
+    }
+    default:
+      break;
     }
     break;
   case casein::QUIT:
@@ -118,6 +142,7 @@ extern "C" void casein_handle(const casein::event &e) {
     infs = {};
     ext = {};
     dev = {};
+    state = done;
     break;
   default:
     break;
