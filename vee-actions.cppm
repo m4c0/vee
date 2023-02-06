@@ -61,18 +61,20 @@ export struct render_pass_begin {
   VkCommandBuffer command_buffer;
   VkRenderPass render_pass;
   VkFramebuffer framebuffer;
+  VkExtent2D extent;
 };
 export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
   // Using sensible defaults. The magenta color is a visible marker for pixels
   // missing rendering
   VkClearValue values[2];
   values[0].color = {1.0f, 0.0f, 1.0f, 1.0f};
-  values[1].depthStencil = {0, 0};
+  values[1].depthStencil = {1.0f, 0};
 
   VkRenderPassBeginInfo info{};
   info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
   info.renderPass = rpb.render_pass;
   info.framebuffer = rpb.framebuffer;
+  info.renderArea.extent = rpb.extent;
   info.clearValueCount = 2;
   info.pClearValues = values;
   calls::call(vkCmdBeginRenderPass, rpb.command_buffer, &info,

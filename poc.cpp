@@ -24,6 +24,8 @@ struct extent_stuff {
   VkSurfaceKHR s;
   unsigned qf;
 
+  VkExtent2D extent = vee::get_surface_capabilities(pd, s).currentExtent;
+
   vee::command_pool cp = vee::create_command_pool(qf);
   vee::render_pass rp = vee::create_render_pass(pd, s);
   vee::swapchain swc = vee::create_swapchain(pd, s);
@@ -139,6 +141,7 @@ extern "C" void casein_handle(const casein::event &e) {
               .command_buffer = frame->cb,
               .render_pass = *ext->rp,
               .framebuffer = *frame->fb,
+              .extent = ext->extent,
           });
           vee::cmd_execute_command(frame->cb, inf.cb);
           vee::cmd_end_render_pass(frame->cb);

@@ -12,6 +12,7 @@ export import :instance;
 export import :physical_device;
 export import :render_pass;
 export import :semaphore;
+export import :surface_capabilities;
 export import :swapchain;
 
 #ifdef __APPLE__
