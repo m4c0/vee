@@ -16,6 +16,9 @@ struct device_stuff {
   vee::device d =
       vee::create_single_queue_device(pdqf.physical_device, pdqf.queue_family);
 
+  vee::descriptor_set_layout dsl =
+      vee::create_descriptor_set_layout<vee::dsl_fragment_uniform>();
+
   VkQueue q = vee::get_queue_for_family(pdqf.queue_family);
 };
 
