@@ -15,6 +15,8 @@ struct device_stuff {
       vee::find_physical_device_with_universal_queue(*s);
   vee::device d =
       vee::create_single_queue_device(pdqf.physical_device, pdqf.queue_family);
+
+  VkQueue q = vee::get_queue_for_family(pdqf.queue_family);
 };
 
 struct extent_stuff {
@@ -72,7 +74,6 @@ void on_window_created() {
   static const auto &[pd, qf] = get_device_stuff().pdqf;
   static auto s = *get_device_stuff().s;
 
-  static auto q = vee::get_queue_for_family(qf);
 }
 */
 inline void flip(inflights &i) {
@@ -126,11 +127,28 @@ extern "C" void casein_handle(const casein::event &e) {
       break;
     }
     case ready_to_paint: {
+      // Note to self: this will hang until we actually use those
+      // fences/semaphores
       flip(*infs);
-      vee::wait_and_reset_fence(*infs->back.f);
 
-      auto idx =
-          vee::acquire_next_image(*ext->swc, *infs->back.img_available_sema);
+      auto &inf = infs->back;
+      vee::wait_and_reset_fence(*inf.f);
+
+      auto idx = vee::acquire_next_image(*ext->swc, *inf.img_available_sema);
+      auto &frame = (*frms)[idx];
+
+      vee::queue_submit({
+          .queue = dev->q,
+          .fence = *inf.f,
+          .command_buffer = frame->cb,
+          .wait_semaphore = *inf.img_available_sema,
+          .signal_semaphore = *inf.rnd_finished_sema,
+      });
+      vee::queue_present({
+          .queue = dev->q,
+          .swapchain = *ext->swc,
+          .wait_semaphore = *inf.rnd_finished_sema,
+      });
       break;
     }
     default:
