@@ -21,3 +21,8 @@ export import :android;
 #elif defined(_WIN32)
 export import :windows;
 #endif
+
+namespace vee {
+export struct api_failure;
+export struct out_of_date_error;
+} // namespace vee

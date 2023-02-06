@@ -95,17 +95,17 @@ extern "C" void casein_handle(const casein::event &e) {
     switch (state) {
     case waiting_nptr:
       vee::initialise();
+      nptr = e.as<casein::events::create_window>().native_window_handle();
+      dev = hai::uptr<device_stuff>::make(nptr);
       break;
     default:
       break;
     }
-    nptr = e.as<casein::events::create_window>().native_window_handle();
     state = setup_stuff;
     break;
   case casein::REPAINT:
     switch (state) {
     case setup_stuff: {
-      dev = hai::uptr<device_stuff>::make(nptr);
       const auto &[pd, qf] = dev->pdqf;
       ext = hai::uptr<extent_stuff>::make(pd, *dev->s, qf);
       infs = hai::uptr<inflights>::make(qf);
@@ -120,45 +120,48 @@ extern "C" void casein_handle(const casein::event &e) {
       break;
     }
     case ready_to_paint: {
-      // Note to self: this will hang until we actually use those
-      // fences/semaphores
-      flip(*infs);
+      try {
+        flip(*infs);
 
-      auto &inf = infs->back;
-      vee::wait_and_reset_fence(*inf.f);
+        auto &inf = infs->back;
+        vee::wait_and_reset_fence(*inf.f);
 
-      auto idx = vee::acquire_next_image(*ext->swc, *inf.img_available_sema);
-      auto &frame = (*frms)[idx];
+        auto idx = vee::acquire_next_image(*ext->swc, *inf.img_available_sema);
+        auto &frame = (*frms)[idx];
 
-      {
-        vee::begin_cmd_buf_render_pass_continue(inf.cb, *ext->rp);
-        vee::end_cmd_buf(inf.cb);
-      }
-      {
-        vee::begin_cmd_buf_one_time_submit(frame->cb);
-        vee::cmd_begin_render_pass({
+        {
+          vee::begin_cmd_buf_render_pass_continue(inf.cb, *ext->rp);
+          vee::end_cmd_buf(inf.cb);
+        }
+        {
+          vee::begin_cmd_buf_one_time_submit(frame->cb);
+          vee::cmd_begin_render_pass({
+              .command_buffer = frame->cb,
+              .render_pass = *ext->rp,
+              .framebuffer = *frame->fb,
+          });
+          vee::cmd_execute_command(frame->cb, inf.cb);
+          vee::cmd_end_render_pass(frame->cb);
+          vee::end_cmd_buf(frame->cb);
+        }
+
+        vee::queue_submit({
+            .queue = dev->q,
+            .fence = *inf.f,
             .command_buffer = frame->cb,
-            .render_pass = *ext->rp,
-            .framebuffer = *frame->fb,
+            .wait_semaphore = *inf.img_available_sema,
+            .signal_semaphore = *inf.rnd_finished_sema,
         });
-        vee::cmd_execute_command(frame->cb, inf.cb);
-        vee::cmd_end_render_pass(frame->cb);
-        vee::end_cmd_buf(frame->cb);
+        vee::queue_present({
+            .queue = dev->q,
+            .swapchain = *ext->swc,
+            .wait_semaphore = *inf.rnd_finished_sema,
+            .image_index = idx,
+        });
+      } catch (vee::out_of_date_error) {
+        state = setup_stuff;
+        vee::device_wait_idle();
       }
-
-      vee::queue_submit({
-          .queue = dev->q,
-          .fence = *inf.f,
-          .command_buffer = frame->cb,
-          .wait_semaphore = *inf.img_available_sema,
-          .signal_semaphore = *inf.rnd_finished_sema,
-      });
-      vee::queue_present({
-          .queue = dev->q,
-          .swapchain = *ext->swc,
-          .wait_semaphore = *inf.rnd_finished_sema,
-          .image_index = idx,
-      });
       break;
     }
     default:
@@ -166,6 +169,7 @@ extern "C" void casein_handle(const casein::event &e) {
     }
     break;
   case casein::QUIT:
+    vee::device_wait_idle();
     frms = {};
     infs = {};
     ext = {};

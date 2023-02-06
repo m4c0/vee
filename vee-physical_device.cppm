@@ -29,10 +29,11 @@ static bool is_surface_compatible(VkPhysicalDevice pd, VkSurfaceKHR s) {
   return f.samplerAnisotropy == VK_TRUE;
 }
 
-static unsigned get_queue_family(VkPhysicalDevice pd, VkSurfaceKHR s) {
-  unsigned idx = 0;
-  for (auto q : get_pd_queue_family_props(pd)) {
-    idx++;
+static bool get_queue_family(VkPhysicalDevice pd, VkSurfaceKHR s,
+                             unsigned *idx) {
+  auto queues = get_pd_queue_family_props(pd);
+  for (*idx = 0; *idx < queues.size(); (*idx)++) {
+    auto q = (queues.data())[*idx];
 
     if ((q.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0) {
       continue;
@@ -42,12 +43,12 @@ static unsigned get_queue_family(VkPhysicalDevice pd, VkSurfaceKHR s) {
     }
 
     VkBool32 surf_support{};
-    vkGetPhysicalDeviceSurfaceSupportKHR(pd, idx, s, &surf_support);
+    vkGetPhysicalDeviceSurfaceSupportKHR(pd, *idx, s, &surf_support);
     if (surf_support == VK_TRUE) {
-      return idx;
+      return true;
     }
   }
-  return 0;
+  return false;
 }
 
 static void log_rejected_device(VkPhysicalDevice pd, jute::view reason) {
@@ -67,8 +68,8 @@ export struct physical_device_pair {
 };
 export inline auto find_physical_device_with_universal_queue(VkSurfaceKHR s) {
   for (auto pd : enum_physical_devices()) {
-    auto qf = get_queue_family(pd, s);
-    if (qf == 0) {
+    unsigned qf{};
+    if (!get_queue_family(pd, s, &qf)) {
       log_rejected_device(pd, "Missing compatible queue family");
       continue;
     }
@@ -85,7 +86,7 @@ export inline auto find_physical_device_with_universal_queue(VkSurfaceKHR s) {
     auto msg = "Using device: "_s + jute::view::unsafe(props.deviceName);
     silog::log(silog::info, msg.cstr().data());
 
-    return physical_device_pair{pd, qf - 1};
+    return physical_device_pair{pd, qf};
   }
 
   silog::log(silog::error, "No suitable physical devices found");

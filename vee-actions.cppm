@@ -88,6 +88,8 @@ export inline auto cmd_execute_command(VkCommandBuffer pri_cb,
   calls::call(vkCmdExecuteCommands, pri_cb, 1, &sec_cb);
 }
 
+export inline auto device_wait_idle() { calls::call(vkDeviceWaitIdle); }
+
 export inline auto end_cmd_buf(VkCommandBuffer cb) {
   calls::call(vkEndCommandBuffer, cb);
 }
