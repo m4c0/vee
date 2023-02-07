@@ -37,6 +37,7 @@ int main(int argc, char **argv) {
     m.add_part("image_view");
     m.add_part("instance");
     m.add_part("physical_device");
+    m.add_part("pipeline_layout");
     m.add_part("render_pass");
     m.add_part("semaphore");
     m.add_part("swapchain");
