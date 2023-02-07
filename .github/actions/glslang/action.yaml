@@ -1,0 +1,22 @@
+name: Install glslang
+inputs:
+  os:
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Install via vcpkg
+      if: inputs.os == 'windows-latest'
+      shell: pwsh
+      run: vcpkg install glslang
+    - name: Install via homebrew
+      if: inputs.os == 'macos-latest'
+      shell: bash
+      run: brew install glslang
+    - name: Install via linuxbrew
+      if: inputs.os == 'ubuntu-latest'
+      shell: bash
+      run: |
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        brew install glslang
+

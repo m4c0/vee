@@ -18,6 +18,10 @@ jobs:
         uses: m4c0/ecow/.github/actions/setup@main
         with:
           os: ${{ matrix.os }}
+      - name: Install glslang
+        uses: m4c0/vee/.github/actions/glslang@main
+        with:
+          os: ${{ matrix.os }}
       - name: 🧀 Prepare Deps
         uses: m4c0/vee/.github/actions/deps@main
       - name: 🔨 Build
