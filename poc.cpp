@@ -19,6 +19,7 @@ struct device_stuff {
   vee::descriptor_set_layout dsl =
       vee::create_descriptor_set_layout<vee::dsl_fragment_uniform>();
   vee::pipeline_layout pl = vee::create_pipeline_layout();
+  vee::gr_pipeline p = vee::create_graphics_pipeline(0);
 
   VkQueue q = vee::get_queue_for_family(pdqf.queue_family);
 };

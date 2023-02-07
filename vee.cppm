@@ -7,6 +7,7 @@ export import :device;
 export import :device_memory;
 export import :fence;
 export import :framebuffer;
+export import :gr_pipeline;
 export import :image;
 export import :image_view;
 export import :instance;
