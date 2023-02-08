@@ -5,6 +5,22 @@
 #include "../traits/build.hpp"
 #include "ecow.hpp"
 
+class spirv : public ecow::unit {
+  void build_self() const override {
+    if (!ecow::impl::must_recompile(name(), "out/" + name() + ".spv"))
+      return;
+
+    auto cmd =
+        std::string{"glslangValidator -V -o out/"} + name() + ".spv " + name();
+    if (std::system(cmd.c_str()) != 0)
+      throw std::runtime_error("Failed to compile shader");
+  }
+  [[nodiscard]] pathset self_objects() const override { return {}; }
+
+public:
+  explicit spirv(const std::string &name) : unit{name} {}
+};
+
 int main(int argc, char **argv) {
   using namespace ecow;
 
@@ -57,6 +73,8 @@ int main(int argc, char **argv) {
   poc->add_wsdep("traits", traits());
   poc->add_ref(m);
   poc->add_unit<>("poc")->add_include_dir("vulkan-headers/include");
+  poc->add_unit<spirv>("poc.vert");
+  poc->add_resource("poc.vert.spv");
 
   auto pf = unit::create<per_feat<seq>>("vee-filter");
   pf->for_feature(android_ndk).add_ref(poc);
