@@ -2,6 +2,7 @@
 
 import casein;
 import hai;
+import sires;
 import traits;
 import vee;
 
@@ -87,6 +88,7 @@ enum states {
   setup_stuff,
   ready_to_paint,
   done,
+  failed_to_start,
 };
 
 extern "C" void casein_handle(const casein::event &e) {
@@ -108,7 +110,9 @@ extern "C" void casein_handle(const casein::event &e) {
     default:
       break;
     }
-    state = setup_stuff;
+    state = sires::open("poc.vert.spv")
+                .map([](auto &&) { return setup_stuff; })
+                .unwrap(failed_to_start);
     break;
   case casein::REPAINT:
     switch (state) {
