@@ -11,6 +11,7 @@ class spirv : public ecow::unit {
     if (!ecow::impl::must_recompile(name(), "out/" + name() + ".spv"))
       return;
 
+    std::cerr << "compiling " << name() << std::endl;
     auto cmd =
         std::string{"glslangValidator -V -o out/"} + name() + ".spv " + name();
     if (std::system(cmd.c_str()) != 0)
@@ -29,6 +30,7 @@ int main(int argc, char **argv) {
     m.add_wsdep("hai", hai());
     m.add_wsdep("jute", jute());
     m.add_wsdep("silog", silog());
+    m.add_wsdep("sires", sires());
     m.add_wsdep("traits", traits());
     m.add_include_dir("vulkan-headers/include");
 
