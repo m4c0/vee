@@ -15,6 +15,7 @@ export import :physical_device;
 export import :pipeline_layout;
 export import :render_pass;
 export import :semaphore;
+export import :shader_module;
 export import :surface_capabilities;
 export import :swapchain;
 

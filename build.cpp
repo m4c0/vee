@@ -58,6 +58,7 @@ int main(int argc, char **argv) {
     m.add_part("pipeline_layout");
     m.add_part("render_pass");
     m.add_part("semaphore");
+    m.add_part("shader_module");
     m.add_part("swapchain");
 
     return m;
