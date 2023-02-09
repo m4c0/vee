@@ -169,6 +169,7 @@ extern "C" void casein_handle(const casein::event &e) {
         {
           vee::begin_cmd_buf_render_pass_continue(inf.cb, *ext->rp);
           vee::cmd_bind_gr_pipeline(inf.cb, *ext->gp);
+          vee::cmd_bind_vertex_buffers(inf.cb, 0, *ext->v_buf);
           vee::cmd_draw(inf.cb, 0);
           vee::end_cmd_buf(inf.cb);
         }

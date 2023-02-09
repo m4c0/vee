@@ -85,6 +85,12 @@ export inline auto cmd_bind_gr_pipeline(VkCommandBuffer cb, VkPipeline p) {
   calls::call(vkCmdBindPipeline, cb, VK_PIPELINE_BIND_POINT_GRAPHICS, p);
 }
 
+export inline auto cmd_bind_vertex_buffers(VkCommandBuffer cb, unsigned idx,
+                                           VkBuffer buf) {
+  VkDeviceSize offs{};
+  calls::call(vkCmdBindVertexBuffers, cb, idx, 1, &buf, &offs);
+}
+
 export inline auto cmd_draw(VkCommandBuffer cb, unsigned vtx,
                             unsigned inst = 1) {
   calls::call(vkCmdDraw, cb, vtx, inst, 0U, 0U);
