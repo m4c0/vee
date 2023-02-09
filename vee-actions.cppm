@@ -81,6 +81,15 @@ export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
               VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
 }
 
+export inline auto cmd_bind_gr_pipeline(VkCommandBuffer cb, VkPipeline p) {
+  calls::call(vkCmdBindPipeline, cb, VK_PIPELINE_BIND_POINT_GRAPHICS, p);
+}
+
+export inline auto cmd_draw(VkCommandBuffer cb, unsigned vtx,
+                            unsigned inst = 1) {
+  calls::call(vkCmdDraw, cb, vtx, inst, 0U, 0U);
+}
+
 export inline auto cmd_end_render_pass(VkCommandBuffer cb) {
   calls::call(vkCmdEndRenderPass, cb);
 }
