@@ -51,6 +51,24 @@ create_graphics_pipeline(VkPipelineLayout pl, VkRenderPass rp,
     va[i].location = i;
   }
 
+  VkPipelineColorBlendAttachmentState color_blend_attachment{};
+  color_blend_attachment.colorWriteMask =
+      VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+      VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+
+  VkPipelineColorBlendStateCreateInfo color_blend{};
+  color_blend.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+  color_blend.logicOp = VK_LOGIC_OP_COPY;
+  color_blend.attachmentCount = 1;
+  color_blend.pAttachments = &color_blend_attachment;
+
+  VkPipelineDepthStencilStateCreateInfo depth_stencil{};
+  depth_stencil.sType =
+      VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+  depth_stencil.depthTestEnable = VK_TRUE;
+  depth_stencil.depthWriteEnable = VK_TRUE;
+  depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS;
+
   VkPipelineInputAssemblyStateCreateInfo in_asm{};
   in_asm.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
   in_asm.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -62,21 +80,40 @@ create_graphics_pipeline(VkPipelineLayout pl, VkRenderPass rp,
   vtx_in.pVertexAttributeDescriptions = va;
   vtx_in.vertexAttributeDescriptionCount = A;
 
+  VkPipelineMultisampleStateCreateInfo multisample{};
+  multisample.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+  multisample.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
   VkPipelineRasterizationStateCreateInfo raster{};
   raster.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
   raster.cullMode = VK_CULL_MODE_BACK_BIT;
   raster.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
   raster.lineWidth = 1;
   raster.polygonMode = VK_POLYGON_MODE_FILL;
-  raster.rasterizerDiscardEnable = VK_TRUE;
+
+  VkPipelineViewportStateCreateInfo viewport{};
+  viewport.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+  viewport.scissorCount = 1;
+  viewport.viewportCount = 1;
+
+  VkDynamicState states[]{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+  VkPipelineDynamicStateCreateInfo dynamic_state{};
+  dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+  dynamic_state.pDynamicStates = states;
+  dynamic_state.dynamicStateCount = 2;
 
   VkGraphicsPipelineCreateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
   info.layout = pl;
+  info.pColorBlendState = &color_blend;
+  info.pDepthStencilState = &depth_stencil;
+  info.pDynamicState = &dynamic_state;
   info.pInputAssemblyState = &in_asm;
+  info.pMultisampleState = &multisample;
   info.pRasterizationState = &raster;
   info.pStages = shd;
   info.pVertexInputState = &vtx_in;
+  info.pViewportState = &viewport;
   info.renderPass = rp;
   info.stageCount = S;
   return gr_pipeline(VK_NULL_HANDLE, 1, &info);

@@ -9,6 +9,8 @@ import vee;
 struct point {
   float x;
   float y;
+  float z;
+  float w;
 };
 
 struct device_stuff {
@@ -155,8 +157,8 @@ extern "C" void casein_handle(const casein::event &e) {
 
       vee::map_memory<point>(*ext->v_mem, [](auto *vs) {
         vs[0] = {-1, -1};
-        vs[1] = {1, -1};
-        vs[2] = {0, 1};
+        vs[1] = {0, 1};
+        vs[2] = {1, -1};
       });
 
       state = ready_to_paint;
@@ -174,6 +176,8 @@ extern "C" void casein_handle(const casein::event &e) {
 
         {
           vee::begin_cmd_buf_render_pass_continue(inf.cb, *ext->rp);
+          vee::cmd_set_scissor(inf.cb, ext->extent);
+          vee::cmd_set_viewport(inf.cb, ext->extent);
           vee::cmd_bind_gr_pipeline(inf.cb, *ext->gp);
           vee::cmd_bind_vertex_buffers(inf.cb, 0, *ext->v_buf);
           vee::cmd_draw(inf.cb, 3);

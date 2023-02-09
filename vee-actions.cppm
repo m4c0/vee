@@ -105,6 +105,20 @@ export inline auto cmd_execute_command(VkCommandBuffer pri_cb,
   calls::call(vkCmdExecuteCommands, pri_cb, 1, &sec_cb);
 }
 
+export inline auto cmd_set_scissor(VkCommandBuffer cb, VkExtent2D ext) {
+  VkRect2D rect{};
+  rect.extent = ext;
+  calls::call(vkCmdSetScissor, cb, 0, 1, &rect);
+}
+
+export inline auto cmd_set_viewport(VkCommandBuffer cb, VkExtent2D ext) {
+  VkViewport viewport{};
+  viewport.width = ext.width;
+  viewport.height = ext.height;
+  viewport.maxDepth = 1;
+  calls::call(vkCmdSetViewport, cb, 0, 1, &viewport);
+}
+
 export inline auto device_wait_idle() { calls::call(vkDeviceWaitIdle); }
 
 export inline auto end_cmd_buf(VkCommandBuffer cb) {
