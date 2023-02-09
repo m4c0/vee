@@ -27,16 +27,25 @@ inline unsigned find_memory_type_index(VkPhysicalDevice pd, unsigned type_bits,
 }
 export using device_memory =
     calls::handle<VkDeviceMemory, &::vkAllocateMemory, &::vkFreeMemory>;
-export inline auto create_local_memory(VkPhysicalDevice pd, VkImage img) {
+inline auto create_local_memory(VkPhysicalDevice pd, VkMemoryRequirements mr) {
   constexpr const auto flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-
-  auto mr =
-      calls::create<VkMemoryRequirements, &::vkGetImageMemoryRequirements>(img);
 
   VkMemoryAllocateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
   info.allocationSize = mr.size;
   info.memoryTypeIndex = find_memory_type_index(pd, mr.memoryTypeBits, flags);
   return device_memory(&info);
+}
+
+export inline auto create_local_memory(VkPhysicalDevice pd, VkImage img) {
+  auto mr =
+      calls::create<VkMemoryRequirements, &::vkGetImageMemoryRequirements>(img);
+  return create_local_memory(pd, mr);
+}
+export inline auto create_local_memory(VkPhysicalDevice pd, VkBuffer buf) {
+  auto mr =
+      calls::create<VkMemoryRequirements, &::vkGetBufferMemoryRequirements>(
+          buf);
+  return create_local_memory(pd, mr);
 }
 } // namespace vee

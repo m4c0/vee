@@ -58,6 +58,10 @@ struct extent_stuff {
                                         vee::vertex_attribute_vec2(0, 0),
                                     });
 
+  vee::buffer v_buf = vee::create_vertex_buffer(sizeof(point) * 3);
+  vee::device_memory v_mem = vee::create_local_memory(pd, *v_buf);
+  decltype(nullptr) v_bind = vee::bind_buffer_memory(*v_buf, *v_mem);
+
   vee::image d_img = vee::create_depth_image(pd, s);
   vee::device_memory d_mem = vee::create_local_memory(pd, *d_img);
   decltype(nullptr) d_bind = vee::bind_image_memory(*d_img, *d_mem);

@@ -1,5 +1,6 @@
 export module vee;
 export import :actions;
+export import :buffer;
 export import :command_pool;
 export import :debug_utils_messenger;
 export import :descriptor_set_layout;

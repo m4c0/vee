@@ -45,6 +45,7 @@ int main(int argc, char **argv) {
 
     // Everybody else
     m.add_part("actions");
+    m.add_part("buffer");
     m.add_part("command_pool");
     m.add_part("debug_utils_messenger");
     m.add_part("descriptor_set_layout");
