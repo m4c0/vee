@@ -6,6 +6,11 @@ import sires;
 import traits;
 import vee;
 
+struct point {
+  float x;
+  float y;
+};
+
 struct device_stuff {
   casein::native_handle_t nptr;
 
@@ -45,6 +50,12 @@ struct extent_stuff {
                                     {
                                         vee::pipeline_vert_stage(*vert, "main"),
                                         vee::pipeline_frag_stage(*frag, "main"),
+                                    },
+                                    {
+                                        vee::vertex_input_bind(sizeof(point)),
+                                    },
+                                    {
+                                        vee::vertex_attribute_vec2(0, 0),
                                     });
 
   vee::image d_img = vee::create_depth_image(pd, s);
