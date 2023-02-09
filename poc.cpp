@@ -59,7 +59,7 @@ struct extent_stuff {
                                     });
 
   vee::buffer v_buf = vee::create_vertex_buffer(sizeof(point) * 3);
-  vee::device_memory v_mem = vee::create_local_memory(pd, *v_buf);
+  vee::device_memory v_mem = vee::create_host_memory(pd, *v_buf);
   decltype(nullptr) v_bind = vee::bind_buffer_memory(*v_buf, *v_mem);
 
   vee::image d_img = vee::create_depth_image(pd, s);
@@ -153,6 +153,12 @@ extern "C" void casein_handle(const casein::event &e) {
         (*frms)[i] = hai::uptr<frame_stuff>::make(&*ext, (imgs.data())[i]);
       }
 
+      vee::map_memory<point>(*ext->v_mem, [](auto *vs) {
+        vs[0] = {-1, -1};
+        vs[1] = {1, -1};
+        vs[2] = {0, 1};
+      });
+
       state = ready_to_paint;
       break;
     }
@@ -170,7 +176,7 @@ extern "C" void casein_handle(const casein::event &e) {
           vee::begin_cmd_buf_render_pass_continue(inf.cb, *ext->rp);
           vee::cmd_bind_gr_pipeline(inf.cb, *ext->gp);
           vee::cmd_bind_vertex_buffers(inf.cb, 0, *ext->v_buf);
-          vee::cmd_draw(inf.cb, 0);
+          vee::cmd_draw(inf.cb, 3);
           vee::end_cmd_buf(inf.cb);
         }
         {

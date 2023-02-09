@@ -111,6 +111,13 @@ export inline auto end_cmd_buf(VkCommandBuffer cb) {
   calls::call(vkEndCommandBuffer, cb);
 }
 
+export template <typename Tp>
+inline void map_memory(VkDeviceMemory m, auto fn) {
+  void *ptr = calls::create<void *, &::vkMapMemory>(m, 0, VK_WHOLE_SIZE, 0);
+  fn(static_cast<Tp *>(ptr));
+  calls::call(vkUnmapMemory, m);
+}
+
 export struct present_info {
   VkQueue queue;
   VkSwapchainKHR swapchain;
