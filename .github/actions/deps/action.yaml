@@ -6,6 +6,7 @@ runs:
     - uses: m4c0/hai/.github/actions/deps@main
     - uses: m4c0/jute/.github/actions/deps@main
     - uses: m4c0/silog/.github/actions/deps@main
+    - uses: m4c0/sires/.github/actions/deps@main
     - uses: m4c0/traits/.github/actions/deps@main
     - uses: actions/checkout@v3
       with:
