@@ -125,11 +125,16 @@ export inline auto end_cmd_buf(VkCommandBuffer cb) {
   calls::call(vkEndCommandBuffer, cb);
 }
 
+// Indirection because (for some weird reason), clang decides to behave
+// differently when compiling this on Windows
+inline void raw_map_memory(VkDeviceMemory m, auto fn) {
+  void *ptr = calls::create<void *, &::vkMapMemory>(m, 0, VK_WHOLE_SIZE, 0);
+  fn(ptr);
+  calls::call(vkUnmapMemory, m);
+}
 export template <typename Tp>
 inline void map_memory(VkDeviceMemory m, auto fn) {
-  void *ptr = calls::create<void *, &::vkMapMemory>(m, 0, VK_WHOLE_SIZE, 0);
-  fn(static_cast<Tp *>(ptr));
-  calls::call(vkUnmapMemory, m);
+  raw_map_memory(m, [&](auto ptr) { fn(static_cast<Tp *>(ptr)); });
 }
 
 export struct present_info {
