@@ -36,13 +36,14 @@ export inline auto create_memory(VkPhysicalDevice pd, VkMemoryRequirements mr,
   return device_memory(&info);
 }
 
-export inline auto create_local_memory(VkPhysicalDevice pd, VkImage img) {
+export inline auto create_local_image_memory(VkPhysicalDevice pd, VkImage img) {
   constexpr const auto flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
   auto mr =
       calls::create<VkMemoryRequirements, &::vkGetImageMemoryRequirements>(img);
   return create_memory(pd, mr, flags);
 }
-export inline auto create_local_memory(VkPhysicalDevice pd, VkBuffer buf) {
+export inline auto create_local_buffer_memory(VkPhysicalDevice pd,
+                                              VkBuffer buf) {
   constexpr const auto flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
   auto mr =
       calls::create<VkMemoryRequirements, &::vkGetBufferMemoryRequirements>(
@@ -50,7 +51,8 @@ export inline auto create_local_memory(VkPhysicalDevice pd, VkBuffer buf) {
   return create_memory(pd, mr, flags);
 }
 
-export inline auto create_host_memory(VkPhysicalDevice pd, VkBuffer buf) {
+export inline auto create_host_buffer_memory(VkPhysicalDevice pd,
+                                             VkBuffer buf) {
   constexpr const auto flags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
   auto mr =
