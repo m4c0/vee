@@ -5,10 +5,13 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Install via vcpkg
+    - name: Install via download
       if: inputs.os == 'windows-latest'
       shell: pwsh
-      run: vcpkg install glslang
+      run: |
+        Invoke-WebRequest -OutFile glslang.zip -Uri https://github.com/m4c0/glslangValidator/releases/download/v0/glslang-windows.zip
+        Expand-Archive glslang.zip -DestinationPath glslang
+        Move-Item -Path glslang\bin\glslangValidator.exe -Destination vee
     - name: Install via homebrew
       if: inputs.os == 'macos-latest'
       shell: bash
