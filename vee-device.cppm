@@ -9,8 +9,19 @@ export using device =
     calls::handle<VkDevice, &::vkCreateDevice, &::vkDestroyDevice>;
 export inline auto create_single_queue_device(VkPhysicalDevice pd,
                                               unsigned qf) {
-  const auto extension = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
   const float priority = 1.0f;
+
+#ifdef __APPLE__
+  // TODO: decide if support for other non-conformant Vulkan devices
+  constexpr const auto ext_count = 2;
+  const char *ext[] = {
+      VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+      "VK_KHR_portability_subset",
+  };
+#else
+  constexpr const auto ext_count = 1;
+  const char *ext[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+#endif
 
   VkDeviceQueueCreateInfo queue_create_info{};
   queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -26,8 +37,8 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
   ci.pQueueCreateInfos = &queue_create_info;
   ci.queueCreateInfoCount = 1;
   ci.pEnabledFeatures = &feats;
-  ci.ppEnabledExtensionNames = &extension;
-  ci.enabledExtensionCount = 1;
+  ci.ppEnabledExtensionNames = ext;
+  ci.enabledExtensionCount = ext_count;
   ci.enabledLayerCount = 0; // device layer is legacy
 
   auto res = device(pd, &ci);

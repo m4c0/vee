@@ -62,9 +62,15 @@ static auto get_layers() {
 }
 
 static auto get_extensions() {
-  vec<const char *> res{3};
+  vec<const char *> res{5};
   res.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
   res.push_back(VEE_VULKAN_PLATFORM_EXT);
+
+#ifdef __APPLE__
+  // TODO: decide if support for other non-conformant Vulkan devices
+  res.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+  res.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+#endif
 
   for (auto &lp : enum_instance_ext_props(nullptr)) {
     auto name = jute::view::unsafe(lp.extensionName);
@@ -92,13 +98,16 @@ export inline auto create_instance(const char *app_name) {
 
   VkInstanceCreateInfo create_info{};
   create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-  create_info.pApplicationInfo = &app_info;
-
+  create_info.enabledExtensionCount = extensions.size();
   create_info.enabledLayerCount = layers.size();
+  create_info.pApplicationInfo = &app_info;
+  create_info.ppEnabledExtensionNames = extensions.data();
   create_info.ppEnabledLayerNames = layers.data();
 
-  create_info.enabledExtensionCount = extensions.size();
-  create_info.ppEnabledExtensionNames = extensions.data();
+#ifdef __APPLE__
+  // TODO: decide if support for other non-conformant Vulkan devices
+  create_info.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif
 
   instance res{&create_info};
   volkLoadInstance(*res);
