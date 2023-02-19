@@ -45,6 +45,7 @@ auto vee() {
 
     // Everybody else
     m.add_part("actions");
+    m.add_part("alias");
     m.add_part("buffer");
     m.add_part("command_pool");
     m.add_part("debug_utils_messenger");

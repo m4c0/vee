@@ -1,5 +1,3 @@
-#include "vulkan.hpp"
-
 import casein;
 import hai;
 import sires;
@@ -27,19 +25,19 @@ struct device_stuff {
   vee::descriptor_set_layout dsl =
       vee::create_descriptor_set_layout<vee::dsl_fragment_uniform>();
 
-  VkQueue q = vee::get_queue_for_family(pdqf.queue_family);
+  vee::queue q = vee::get_queue_for_family(pdqf.queue_family);
 };
 
 struct extent_stuff {
-  VkPhysicalDevice pd;
-  VkSurfaceKHR s;
+  vee::physical_device pd;
+  vee::surface &s;
   unsigned qf;
 
-  VkExtent2D extent = vee::get_surface_capabilities(pd, s).currentExtent;
+  vee::extent extent = vee::get_surface_capabilities(pd, *s).currentExtent;
 
   vee::command_pool cp = vee::create_command_pool(qf);
-  vee::render_pass rp = vee::create_render_pass(pd, s);
-  vee::swapchain swc = vee::create_swapchain(pd, s);
+  vee::render_pass rp = vee::create_render_pass(pd, *s);
+  vee::swapchain swc = vee::create_swapchain(pd, *s);
 
   vee::pipeline_layout pl = vee::create_pipeline_layout();
 
@@ -64,15 +62,15 @@ struct extent_stuff {
   vee::device_memory v_mem = vee::create_host_buffer_memory(pd, *v_buf);
   decltype(nullptr) v_bind = vee::bind_buffer_memory(*v_buf, *v_mem);
 
-  vee::image d_img = vee::create_depth_image(pd, s);
+  vee::image d_img = vee::create_depth_image(pd, *s);
   vee::device_memory d_mem = vee::create_local_image_memory(pd, *d_img);
   decltype(nullptr) d_bind = vee::bind_image_memory(*d_img, *d_mem);
   vee::image_view d_iv = vee::create_depth_image_view(*d_img);
 };
 
 struct inflight_stuff {
-  VkCommandPool pool;
-  VkCommandBuffer cb = vee::allocate_secondary_command_buffer(pool);
+  vee::command_pool *pool;
+  vee::command_buffer cb = vee::allocate_secondary_command_buffer(**pool);
 
   vee::semaphore img_available_sema = vee::create_semaphore();
   vee::semaphore rnd_finished_sema = vee::create_semaphore();
@@ -83,21 +81,19 @@ struct inflights {
 
   vee::command_pool cp = vee::create_command_pool(qf);
 
-  inflight_stuff front{*cp};
-  inflight_stuff back{*cp};
+  inflight_stuff front{&cp};
+  inflight_stuff back{&cp};
 };
 
 struct frame_stuff {
   const extent_stuff *xs;
-  VkImage img;
+  vee::image_view iv;
 
-  VkCommandBuffer cb = vee::allocate_primary_command_buffer(*xs->cp);
-
-  vee::image_view iv = vee::create_rgba_image_view(img, xs->pd, xs->s);
+  vee::command_buffer cb = vee::allocate_primary_command_buffer(*xs->cp);
 
   vee::fb_params fbp{
       .physical_device = xs->pd,
-      .surface = xs->s,
+      .surface = *xs->s,
       .render_pass = *xs->rp,
       .image_buffer = *iv,
       .depth_buffer = *xs->d_iv,
@@ -146,13 +142,15 @@ extern "C" void casein_handle(const casein::event &e) {
     switch (state) {
     case setup_stuff: {
       const auto &[pd, qf] = dev->pdqf;
-      ext = hai::uptr<extent_stuff>::make(pd, *dev->s, qf);
+      ext = hai::uptr<extent_stuff>::make(pd, dev->s, qf);
       infs = hai::uptr<inflights>::make(qf);
 
       auto imgs = vee::get_swapchain_images(*ext->swc);
       frms = decltype(frms)::make(imgs.size());
       for (auto i = 0; i < imgs.size(); i++) {
-        (*frms)[i] = hai::uptr<frame_stuff>::make(&*ext, (imgs.data())[i]);
+        auto img = (imgs.data())[i];
+        vee::image_view iv = vee::create_rgba_image_view(img, ext->pd, *ext->s);
+        (*frms)[i] = hai::uptr<frame_stuff>::make(&*ext, traits::move(iv));
       }
 
       vee::map_memory<point>(*ext->v_mem, [](auto *vs) {
