@@ -69,7 +69,7 @@ static auto get_extensions() {
   for (auto &lp : enum_instance_ext_props(nullptr)) {
     auto name = jute::view::unsafe(lp.extensionName);
     if (name == jute::view{VK_EXT_DEBUG_UTILS_EXTENSION_NAME}) {
-      res.push_back(lp.extensionName);
+      res.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
       silog::log(silog::info, "Enabling debug utils");
     }
   }
