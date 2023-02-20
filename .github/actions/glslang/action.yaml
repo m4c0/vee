@@ -11,7 +11,8 @@ runs:
       run: |
         Invoke-WebRequest -OutFile glslang.zip -Uri https://github.com/m4c0/glslangValidator/releases/download/v0/glslang-windows.zip
         Expand-Archive glslang.zip -DestinationPath glslang
-        Move-Item -Path glslang\bin\glslangValidator.exe -Destination vee
+        $Bin = Get-Item .\glslang\bin
+        Add-Content -Path $env:GITHUB_PATH -Value $Bin.FullName
     - name: Install via homebrew
       if: inputs.os == 'macos-latest'
       shell: bash
