@@ -22,6 +22,12 @@ export auto pipeline_vert_stage(VkShaderModule s, const char *fn) {
   return ci;
 }
 
+export auto vertex_input_bind_per_instance(unsigned stride) {
+  VkVertexInputBindingDescription b{};
+  b.stride = stride;
+  b.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
+  return b;
+}
 export auto vertex_input_bind(unsigned stride) {
   VkVertexInputBindingDescription b{};
   b.stride = stride;
