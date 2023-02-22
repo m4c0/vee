@@ -5,6 +5,14 @@ export module vee:pipeline_layout;
 import :calls;
 
 namespace vee {
+export template <typename Tp> inline auto vertex_push_constant_range() {
+  VkPushConstantRange r;
+  r.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+  r.offset = 0;
+  r.size = sizeof(Tp);
+  return r;
+}
+
 export using pipeline_layout =
     calls::handle<VkPipelineLayout, &::vkCreatePipelineLayout,
                   &::vkDestroyPipelineLayout>;

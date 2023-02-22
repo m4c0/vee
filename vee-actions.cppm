@@ -105,6 +105,13 @@ export inline auto cmd_execute_command(VkCommandBuffer pri_cb,
   calls::call(vkCmdExecuteCommands, pri_cb, 1, &sec_cb);
 }
 
+export template <typename Tp>
+inline auto cmd_push_vertex_constants(VkCommandBuffer cb, VkPipelineLayout pl,
+                                      Tp *v) {
+  calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_VERTEX_BIT, 0,
+              sizeof(Tp), v);
+}
+
 export inline auto cmd_set_scissor(VkCommandBuffer cb, VkExtent2D ext) {
   VkRect2D rect{};
   rect.extent = ext;
