@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../casein/build.hpp"
 #include "../hai/build.hpp"
 #include "../jute/build.hpp"
