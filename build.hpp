@@ -10,12 +10,15 @@
 
 class spirv : public ecow::unit {
   void build_self() const override {
-    if (!ecow::impl::must_recompile(name(), "out/" + name() + ".spv"))
+    const auto spv =
+        ecow::impl::current_target()->build_path() / (name() + ".spv");
+
+    if (!ecow::impl::must_recompile(name(), spv))
       return;
 
     std::cerr << "compiling " << name() << std::endl;
     auto cmd =
-        std::string{"glslangValidator -V -o out/"} + name() + ".spv " + name();
+        std::string{"glslangValidator -V -o "} + spv.string() + " " + name();
     if (std::system(cmd.c_str()) != 0)
       throw std::runtime_error("Failed to compile shader");
   }
