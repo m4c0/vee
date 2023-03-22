@@ -22,9 +22,6 @@ struct device_stuff {
   vee::device d =
       vee::create_single_queue_device(pdqf.physical_device, pdqf.queue_family);
 
-  vee::descriptor_set_layout dsl =
-      vee::create_descriptor_set_layout<vee::dsl_fragment_uniform>();
-
   vee::queue q = vee::get_queue_for_family(pdqf.queue_family);
 };
 
@@ -39,7 +36,10 @@ struct extent_stuff {
   vee::render_pass rp = vee::create_render_pass(pd, *s);
   vee::swapchain swc = vee::create_swapchain(pd, *s);
 
-  vee::pipeline_layout pl = vee::create_pipeline_layout();
+  vee::descriptor_set_layout dsl =
+      vee::create_descriptor_set_layout<vee::dsl_fragment_sampler>();
+
+  vee::pipeline_layout pl = vee::create_pipeline_layout({*dsl});
 
   vee::shader_module vert =
       vee::create_shader_module_from_resource("poc.vert.spv");
@@ -176,6 +176,7 @@ extern "C" void casein_handle(const casein::event &e) {
           vee::begin_cmd_buf_render_pass_continue(inf.cb, *ext->rp);
           vee::cmd_set_scissor(inf.cb, ext->extent);
           vee::cmd_set_viewport(inf.cb, ext->extent);
+          vee::cmd_bind_descriptor_set(inf.cb, *ext->pl, 0, nullptr);
           vee::cmd_bind_gr_pipeline(inf.cb, *ext->gp);
           vee::cmd_bind_vertex_buffers(inf.cb, 0, *ext->v_buf);
           vee::cmd_draw(inf.cb, 3);

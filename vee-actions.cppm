@@ -81,6 +81,13 @@ export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
               VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
 }
 
+export inline auto cmd_bind_descriptor_set(VkCommandBuffer cb,
+                                           VkPipelineLayout pl, unsigned idx,
+                                           VkDescriptorSet ds) {
+  calls::call(vkCmdBindDescriptorSets, cb, VK_PIPELINE_BIND_POINT_GRAPHICS, pl,
+              idx, 1, &ds, 0, nullptr);
+}
+
 export inline auto cmd_bind_gr_pipeline(VkCommandBuffer cb, VkPipeline p) {
   calls::call(vkCmdBindPipeline, cb, VK_PIPELINE_BIND_POINT_GRAPHICS, p);
 }
