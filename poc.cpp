@@ -58,8 +58,9 @@ struct extent_stuff {
                                         vee::vertex_attribute_vec2(0, 0),
                                     });
 
-  vee::descriptor_pool d_pool =
+  vee::descriptor_pool desc_pool =
       vee::create_descriptor_pool(1, {vee::combined_image_sampler()});
+  vee::descriptor_set desc_set = vee::allocate_descriptor_set(*desc_pool, *dsl);
 
   vee::buffer v_buf = vee::create_vertex_buffer(sizeof(point) * 3);
   vee::device_memory v_mem = vee::create_host_buffer_memory(pd, *v_buf);
@@ -179,7 +180,7 @@ extern "C" void casein_handle(const casein::event &e) {
           vee::begin_cmd_buf_render_pass_continue(inf.cb, *ext->rp);
           vee::cmd_set_scissor(inf.cb, ext->extent);
           vee::cmd_set_viewport(inf.cb, ext->extent);
-          vee::cmd_bind_descriptor_set(inf.cb, *ext->pl, 0, nullptr);
+          vee::cmd_bind_descriptor_set(inf.cb, *ext->pl, 0, ext->desc_set);
           vee::cmd_bind_gr_pipeline(inf.cb, *ext->gp);
           vee::cmd_bind_vertex_buffers(inf.cb, 0, *ext->v_buf);
           vee::cmd_draw(inf.cb, 3);

@@ -21,6 +21,16 @@ export inline auto acquire_next_image(VkSwapchainKHR swc, VkSemaphore sema) {
                                                            VK_NULL_HANDLE);
 }
 
+export inline auto allocate_descriptor_set(VkDescriptorPool pool,
+                                           VkDescriptorSetLayout layout) {
+  VkDescriptorSetAllocateInfo info{};
+  info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+  info.descriptorPool = pool;
+  info.descriptorSetCount = 1;
+  info.pSetLayouts = &layout;
+  return calls::create<VkDescriptorSet, &::vkAllocateDescriptorSets>(&info);
+}
+
 export inline auto allocate_primary_command_buffer(VkCommandPool pool) {
   VkCommandBufferAllocateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
