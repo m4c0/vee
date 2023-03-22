@@ -58,6 +58,9 @@ struct extent_stuff {
                                         vee::vertex_attribute_vec2(0, 0),
                                     });
 
+  vee::descriptor_pool d_pool =
+      vee::create_descriptor_pool(1, {vee::combined_image_sampler()});
+
   vee::buffer v_buf = vee::create_vertex_buffer(sizeof(point) * 3);
   vee::device_memory v_mem = vee::create_host_buffer_memory(pd, *v_buf);
   decltype(nullptr) v_bind = vee::bind_buffer_memory(*v_buf, *v_mem);
