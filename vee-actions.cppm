@@ -200,6 +200,23 @@ export inline auto queue_submit(const submit_info &si) {
   calls::call(vkQueueSubmit, si.queue, 1, &info, si.fence);
 }
 
+export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding,
+                                         VkImageView iv, VkSampler s) {
+  VkDescriptorImageInfo ii{};
+  ii.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+  ii.imageView = iv;
+  ii.sampler = s;
+
+  VkWriteDescriptorSet w{};
+  w.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  w.dstSet = set;
+  w.dstBinding = binding;
+  w.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+  w.descriptorCount = 1;
+  w.pImageInfo = &ii;
+  calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
+}
+
 export inline auto wait_and_reset_fence(VkFence fence) {
   calls::call(vkWaitForFences, 1, &fence, VK_TRUE, ~0UL);
   calls::call(vkResetFences, 1, &fence);

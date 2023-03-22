@@ -157,6 +157,8 @@ extern "C" void casein_handle(const casein::event &e) {
         (*frms)[i] = hai::uptr<frame_stuff>::make(&*ext, traits::move(iv));
       }
 
+      vee::update_descriptor_set(ext->desc_set, 0, nullptr, nullptr);
+
       vee::map_memory<point>(*ext->v_mem, [](auto *vs) {
         vs[0] = {-1, -1};
         vs[1] = {0, 1};
