@@ -64,6 +64,10 @@ struct extent_stuff {
 
   vee::sampler smp = vee::create_sampler();
 
+  vee::buffer ts_buf = vee::create_transfer_src_buffer(16 * 16 * sizeof(float));
+  vee::device_memory ts_mem = vee::create_host_buffer_memory(pd, *ts_buf);
+  decltype(nullptr) ts_bind = vee::bind_buffer_memory(*ts_buf, *ts_mem);
+
   vee::image t_img = vee::create_srgba_image({16, 16});
   vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
   decltype(nullptr) t_bind = vee::bind_image_memory(*t_img, *t_mem);
@@ -197,6 +201,8 @@ extern "C" void casein_handle(const casein::event &e) {
         }
         {
           vee::begin_cmd_buf_one_time_submit(frame->cb);
+          vee::cmd_copy_buffer_to_image(frame->cb, {16, 16}, *ext->ts_buf,
+                                        *ext->t_img);
           vee::cmd_begin_render_pass({
               .command_buffer = frame->cb,
               .render_pass = *ext->rp,

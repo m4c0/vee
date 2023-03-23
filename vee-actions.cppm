@@ -108,6 +108,19 @@ export inline auto cmd_bind_vertex_buffers(VkCommandBuffer cb, unsigned idx,
   calls::call(vkCmdBindVertexBuffers, cb, idx, 1, &buf, &offs);
 }
 
+export inline auto cmd_copy_buffer_to_image(VkCommandBuffer cb, VkExtent2D ext,
+                                            VkBuffer buf, VkImage img) {
+  VkBufferImageCopy r{};
+  r.bufferOffset = 0;
+  r.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+  r.imageSubresource.layerCount = 1;
+  r.imageExtent.width = ext.width;
+  r.imageExtent.height = ext.height;
+  r.imageExtent.depth = 1;
+  calls::call(vkCmdCopyBufferToImage, cb, buf, img,
+              VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &r);
+}
+
 export inline auto cmd_draw(VkCommandBuffer cb, unsigned vtx,
                             unsigned inst = 1) {
   calls::call(vkCmdDraw, cb, vtx, inst, 0U, 0U);
