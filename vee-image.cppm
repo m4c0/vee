@@ -10,6 +10,7 @@ inline auto create_info_for_extent(VkExtent2D ext) {
   VkImageCreateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
   info.imageType = VK_IMAGE_TYPE_2D;
+  info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
   info.extent = {ext.width, ext.height, 1};
   info.mipLevels = 1;
   info.arrayLayers = 1;
@@ -23,7 +24,6 @@ export using image =
 export inline auto create_depth_image(VkExtent2D ext) {
   auto info = create_info_for_extent(ext);
   info.format = VK_FORMAT_D32_SFLOAT;
-  info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
   info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
   return image{&info};
 }
@@ -34,7 +34,6 @@ export inline auto create_depth_image(VkPhysicalDevice pd, VkSurfaceKHR s) {
 export inline auto create_srgba_image(VkExtent2D ext) {
   auto info = create_info_for_extent(ext);
   info.format = VK_FORMAT_R8G8B8A8_SRGB;
-  info.initialLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
   info.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
   return image{&info};
 }
