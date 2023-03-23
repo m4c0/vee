@@ -68,7 +68,7 @@ struct extent_stuff {
       vee::create_descriptor_pool(1, {vee::combined_image_sampler()});
   vee::descriptor_set desc_set = vee::allocate_descriptor_set(*desc_pool, *dsl);
 
-  vee::sampler smp = vee::create_sampler();
+  vee::sampler smp = vee::create_sampler(vee::nearest_sampler);
 
   vee::buffer ts_buf = vee::create_transfer_src_buffer(16 * 16 * sizeof(float));
   vee::device_memory ts_mem = vee::create_host_buffer_memory(pd, *ts_buf);
