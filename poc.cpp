@@ -201,8 +201,12 @@ extern "C" void casein_handle(const casein::event &e) {
         }
         {
           vee::begin_cmd_buf_one_time_submit(frame->cb);
+          vee::cmd_pipeline_barrier(frame->cb, *ext->t_img,
+                                    vee::from_host_to_transfer);
           vee::cmd_copy_buffer_to_image(frame->cb, {16, 16}, *ext->ts_buf,
                                         *ext->t_img);
+          vee::cmd_pipeline_barrier(frame->cb, *ext->t_img,
+                                    vee::from_transfer_to_fragment);
           vee::cmd_begin_render_pass({
               .command_buffer = frame->cb,
               .render_pass = *ext->rp,

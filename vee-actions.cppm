@@ -135,6 +135,49 @@ export inline auto cmd_execute_command(VkCommandBuffer pri_cb,
   calls::call(vkCmdExecuteCommands, pri_cb, 1, &sec_cb);
 }
 
+export enum barrier_type {
+  from_host_to_transfer,
+  from_transfer_to_fragment,
+};
+export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkImage img,
+                                        barrier_type bt) {
+  VkImageMemoryBarrier imb{};
+  imb.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+  imb.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+  imb.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+  imb.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+  imb.subresourceRange.levelCount = 1;
+  imb.subresourceRange.layerCount = 1;
+  imb.image = img;
+
+  switch (bt) {
+  case from_host_to_transfer: {
+    imb.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imb.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    imb.srcAccessMask = 0;
+    imb.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+    constexpr const auto src_stage = VK_PIPELINE_STAGE_HOST_BIT;
+    constexpr const auto dst_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    calls::call(vkCmdPipelineBarrier, cb, src_stage, dst_stage, 0, 0, nullptr,
+                0, nullptr, 1, &imb);
+    break;
+  }
+  case from_transfer_to_fragment: {
+    imb.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    imb.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    imb.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    imb.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+    constexpr const auto src_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    constexpr const auto dst_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    calls::call(vkCmdPipelineBarrier, cb, src_stage, dst_stage, 0, 0, nullptr,
+                0, nullptr, 1, &imb);
+    break;
+  }
+  }
+}
+
 export template <typename Tp>
 inline auto cmd_push_vertex_constants(VkCommandBuffer cb, VkPipelineLayout pl,
                                       Tp *v) {
