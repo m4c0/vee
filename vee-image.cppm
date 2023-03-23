@@ -30,4 +30,11 @@ export inline auto create_depth_image(VkExtent2D ext) {
 export inline auto create_depth_image(VkPhysicalDevice pd, VkSurfaceKHR s) {
   return create_depth_image(get_surface_capabilities(pd, s).currentExtent);
 }
+
+export inline auto create_srgba_image(VkExtent2D ext) {
+  auto info = create_info_for_extent(ext);
+  info.format = VK_FORMAT_R8G8B8A8_SRGB;
+  info.usage = VK_IMAGE_USAGE_SAMPLED_BIT;
+  return image{&info};
+}
 } // namespace vee

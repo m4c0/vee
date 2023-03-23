@@ -62,6 +62,13 @@ struct extent_stuff {
       vee::create_descriptor_pool(1, {vee::combined_image_sampler()});
   vee::descriptor_set desc_set = vee::allocate_descriptor_set(*desc_pool, *dsl);
 
+  vee::sampler smp = vee::create_sampler();
+
+  vee::image t_img = vee::create_srgba_image({16, 16});
+  vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
+  decltype(nullptr) t_bind = vee::bind_image_memory(*t_img, *t_mem);
+  vee::image_view t_iv = vee::create_srgba_image_view(*t_img);
+
   vee::buffer v_buf = vee::create_vertex_buffer(sizeof(point) * 3);
   vee::device_memory v_mem = vee::create_host_buffer_memory(pd, *v_buf);
   decltype(nullptr) v_bind = vee::bind_buffer_memory(*v_buf, *v_mem);
@@ -157,7 +164,7 @@ extern "C" void casein_handle(const casein::event &e) {
         (*frms)[i] = hai::uptr<frame_stuff>::make(&*ext, traits::move(iv));
       }
 
-      vee::update_descriptor_set(ext->desc_set, 0, nullptr, nullptr);
+      vee::update_descriptor_set(ext->desc_set, 0, *ext->t_iv, *ext->smp);
 
       vee::map_memory<point>(*ext->v_mem, [](auto *vs) {
         vs[0] = {-1, -1};
