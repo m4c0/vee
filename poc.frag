@@ -8,5 +8,5 @@ layout(location = 0) out vec4 frag_color;
 
 void main() {
   vec4 tex_color = texture(tex, frag_uv);
-  frag_color = mix(tex_color, vec4(0, 1, 0, 1), tex_color.a);
+  frag_color = mix(vec4(0, 1, 0, 1), tex_color, tex_color.a);
 }

@@ -10,6 +10,12 @@ struct point {
   float z;
   float w;
 };
+struct rgba {
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
+  unsigned char a;
+};
 
 struct device_stuff {
   casein::native_handle_t nptr;
@@ -174,6 +180,11 @@ extern "C" void casein_handle(const casein::event &e) {
         vs[0] = {-1, -1};
         vs[1] = {0, 1};
         vs[2] = {1, -1};
+      });
+      vee::map_memory<rgba>(*ext->ts_mem, [](auto *p) {
+        for (auto i = 0; i < 16 * 16; i++) {
+          p[i] = {static_cast<unsigned char>(i), 255, 255, 255};
+        }
       });
 
       state = ready_to_paint;
