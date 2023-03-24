@@ -43,7 +43,7 @@ struct extent_stuff {
   vee::swapchain swc = vee::create_swapchain(pd, *s);
 
   vee::descriptor_set_layout dsl =
-      vee::create_descriptor_set_layout<vee::dsl_fragment_sampler>();
+      vee::create_descriptor_set_layout({vee::dsl_fragment_sampler()});
 
   vee::pipeline_layout pl = vee::create_pipeline_layout({*dsl});
 
