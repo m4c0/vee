@@ -149,7 +149,7 @@ extern "C" void casein_handle(const casein::event &e) {
     switch (state) {
     case waiting_nptr:
       vee::initialise();
-      nptr = e.as<casein::events::create_window>().native_window_handle();
+      nptr = *(e.as<casein::events::create_window>());
       dev = hai::uptr<device_stuff>::make(nptr);
       break;
     default:
@@ -223,6 +223,7 @@ extern "C" void casein_handle(const casein::event &e) {
               .render_pass = *ext->rp,
               .framebuffer = *frame->fb,
               .extent = ext->extent,
+              .clear_color = {0.1, 0.2, 0.3, 1.0},
           });
           vee::cmd_execute_command(frame->cb, inf.cb);
           vee::cmd_end_render_pass(frame->cb);

@@ -72,12 +72,13 @@ export struct render_pass_begin {
   VkRenderPass render_pass;
   VkFramebuffer framebuffer;
   VkExtent2D extent;
+  VkClearColorValue clear_color{1.0f, 0.0f, 1.0f, 1.0f};
 };
 export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
   // Using sensible defaults. The magenta color is a visible marker for pixels
   // missing rendering
   VkClearValue values[2];
-  values[0].color = {1.0f, 0.0f, 1.0f, 1.0f};
+  values[0].color = rpb.clear_color;
   values[1].depthStencil = {1.0f, 0};
 
   VkRenderPassBeginInfo info{};
