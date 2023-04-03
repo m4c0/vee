@@ -15,6 +15,18 @@ export auto combined_image_sampler(unsigned qty = 1) {
   ps.descriptorCount = qty;
   return ps;
 }
+export auto storage_buffer(unsigned qty = 1) {
+  VkDescriptorPoolSize ps{};
+  ps.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+  ps.descriptorCount = qty;
+  return ps;
+}
+export auto uniform_buffer(unsigned qty = 1) {
+  VkDescriptorPoolSize ps{};
+  ps.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+  ps.descriptorCount = qty;
+  return ps;
+}
 
 export template <unsigned N>
 inline auto create_descriptor_pool(unsigned max_sets,
