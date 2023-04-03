@@ -19,6 +19,7 @@ struct rgba {
 struct upc {
   float mouse_x;
   float mouse_y;
+  float factor;
 };
 
 struct device_stuff {
@@ -266,10 +267,12 @@ extern "C" void casein_handle(const casein::event &e) {
       break;
     }
     break;
-  case casein::RESIZE_WINDOW:
+  case casein::RESIZE_WINDOW: {
+    pc.factor = (*e.as<casein::events::resize_window>()).scale_factor;
     vee::device_wait_idle();
     state = setup_stuff;
     break;
+  }
   case casein::QUIT:
     vee::device_wait_idle();
     frms = {};
