@@ -180,6 +180,12 @@ export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkImage img,
 }
 
 export template <typename Tp>
+inline auto cmd_push_fragment_constants(VkCommandBuffer cb, VkPipelineLayout pl,
+                                        Tp *v) {
+  calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_FRAGMENT_BIT, 0,
+              sizeof(Tp), v);
+}
+export template <typename Tp>
 inline auto cmd_push_vertex_constants(VkCommandBuffer cb, VkPipelineLayout pl,
                                       Tp *v) {
   calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_VERTEX_BIT, 0,
