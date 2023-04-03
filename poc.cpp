@@ -266,6 +266,10 @@ extern "C" void casein_handle(const casein::event &e) {
       break;
     }
     break;
+  case casein::RESIZE_WINDOW:
+    vee::device_wait_idle();
+    state = setup_stuff;
+    break;
   case casein::QUIT:
     vee::device_wait_idle();
     frms = {};
