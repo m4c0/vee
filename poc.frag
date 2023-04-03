@@ -4,6 +4,7 @@ layout(set = 0, binding = 0) uniform sampler2D tex;
 layout(push_constant) uniform upc {
   vec2 mouse_pos;
   float scale_factor;
+  float vert_scale;
 } pc;
 
 layout(location = 0) in vec2 frag_uv;

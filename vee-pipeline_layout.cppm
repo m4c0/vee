@@ -5,17 +5,27 @@ export module vee:pipeline_layout;
 import :calls;
 
 namespace vee {
-export template <typename Tp> inline auto fragment_push_constant_range() {
+export template <typename Tp>
+inline auto fragment_push_constant_range(unsigned offset = 0) {
   VkPushConstantRange r;
   r.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-  r.offset = 0;
+  r.offset = offset;
   r.size = sizeof(Tp);
   return r;
 }
-export template <typename Tp> inline auto vertex_push_constant_range() {
+export template <typename Tp>
+inline auto vertex_push_constant_range(unsigned offset = 0) {
   VkPushConstantRange r;
   r.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-  r.offset = 0;
+  r.offset = offset;
+  r.size = sizeof(Tp);
+  return r;
+}
+export template <typename Tp>
+inline auto vert_frag_push_constant_range(unsigned offset = 0) {
+  VkPushConstantRange r;
+  r.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+  r.offset = offset;
   r.size = sizeof(Tp);
   return r;
 }

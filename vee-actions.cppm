@@ -191,6 +191,14 @@ inline auto cmd_push_vertex_constants(VkCommandBuffer cb, VkPipelineLayout pl,
   calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_VERTEX_BIT, offset,
               sizeof(Tp), v);
 }
+export template <typename Tp>
+inline auto cmd_push_vert_frag_constants(VkCommandBuffer cb,
+                                         VkPipelineLayout pl, Tp *v,
+                                         unsigned offset = 0) {
+  calls::call(vkCmdPushConstants, cb, pl,
+              VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, offset,
+              sizeof(Tp), v);
+}
 
 export inline auto cmd_set_scissor(VkCommandBuffer cb, VkExtent2D ext) {
   VkRect2D rect{};
