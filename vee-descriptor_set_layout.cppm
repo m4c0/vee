@@ -16,6 +16,13 @@ export constexpr VkDescriptorSetLayoutBinding dsl_fragment_sampler() {
   b.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
   return b;
 }
+export constexpr VkDescriptorSetLayoutBinding dsl_fragment_storage() {
+  VkDescriptorSetLayoutBinding b{};
+  b.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+  b.descriptorCount = 1;
+  b.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+  return b;
+}
 export constexpr VkDescriptorSetLayoutBinding dsl_fragment_uniform() {
   VkDescriptorSetLayoutBinding b{};
   b.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -26,6 +33,13 @@ export constexpr VkDescriptorSetLayoutBinding dsl_fragment_uniform() {
 export constexpr VkDescriptorSetLayoutBinding dsl_vertex_sampler() {
   VkDescriptorSetLayoutBinding b{};
   b.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+  b.descriptorCount = 1;
+  b.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+  return b;
+}
+export constexpr VkDescriptorSetLayoutBinding dsl_vertex_storage() {
+  VkDescriptorSetLayoutBinding b{};
+  b.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
   b.descriptorCount = 1;
   b.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
   return b;

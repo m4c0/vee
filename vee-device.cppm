@@ -31,6 +31,7 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
 
   VkPhysicalDeviceFeatures feats{};
   feats.samplerAnisotropy = VK_TRUE;
+  feats.fragmentStoresAndAtomics = VK_TRUE;
 
   VkDeviceCreateInfo ci{};
   ci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

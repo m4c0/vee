@@ -26,7 +26,8 @@ static bool is_surface_compatible(VkPhysicalDevice pd, VkSurfaceKHR s) {
 
   VkPhysicalDeviceFeatures f{};
   vkGetPhysicalDeviceFeatures(pd, &f);
-  return f.samplerAnisotropy == VK_TRUE;
+  return f.samplerAnisotropy == VK_TRUE &&
+         f.fragmentStoresAndAtomics == VK_TRUE;
 }
 
 static bool get_queue_family(VkPhysicalDevice pd, VkSurfaceKHR s,
