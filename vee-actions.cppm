@@ -271,6 +271,24 @@ export inline auto queue_submit(const submit_info &si) {
   calls::call(vkQueueSubmit, si.queue, 1, &info, si.fence);
 }
 
+export inline auto update_descriptor_set_with_storage(VkDescriptorSet set,
+                                                      unsigned binding,
+                                                      VkBuffer b) {
+  VkDescriptorBufferInfo ii{};
+  ii.buffer = b;
+  ii.offset = 0;
+  ii.range = VK_WHOLE_SIZE;
+
+  VkWriteDescriptorSet w{};
+  w.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  w.dstSet = set;
+  w.dstBinding = binding;
+  w.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+  w.descriptorCount = 1;
+  w.pBufferInfo = &ii;
+  calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
+}
+
 export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding,
                                          VkImageView iv, VkSampler s) {
   VkDescriptorImageInfo ii{};
@@ -282,8 +300,8 @@ export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding,
   w.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
   w.dstSet = set;
   w.dstBinding = binding;
-  w.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
   w.descriptorCount = 1;
+  w.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
   w.pImageInfo = &ii;
   calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
 }
