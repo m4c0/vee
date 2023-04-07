@@ -27,6 +27,36 @@ class spirv : public ecow::unit {
 public:
   explicit spirv(const std::string &name) : unit{name} {}
 };
+class xcframework : public ecow::unit {
+  void build_self() const override {}
+
+  [[nodiscard]] std::string xcfolder_for_target() const {
+    auto id = ecow::impl::current_target()->build_subfolder();
+    if (id == "macosx") {
+      return "macos-arm64_x86_64";
+    } else if (id == "iphoneos") {
+      return "ios-arm64";
+    } else if (id == "iphonesimulator") {
+      return "ios-arm64_x86_64-simulator";
+    } else {
+      return {};
+    }
+  }
+  [[nodiscard]] pathset self_objects() const override {
+    auto subfolder = xcfolder_for_target();
+    if (subfolder.size() == 0)
+      return {};
+
+    std::filesystem::path path = std::filesystem::current_path();
+
+    pathset res{};
+    res.insert(path / "MoltenVK.xcframework" / subfolder / "libMoltenVk.a");
+    return res;
+  }
+
+public:
+  explicit xcframework(const std::string &name) : unit{name} {}
+};
 
 auto vee() {
   using namespace ecow;
@@ -77,7 +107,11 @@ auto vee() {
 
   auto m = unit::create<per_feat<mod>>("vee");
   setup(m->for_feature(android_ndk)).add_part("android");
-  setup(m->for_feature(objective_c)).add_part("metal");
   setup(m->for_feature(windows_api)).add_part("windows");
+
+  auto &metal = setup(m->for_feature(objective_c));
+  metal.add_unit<xcframework>("MoltenVK");
+  metal.add_part("metal");
+
   return m;
 }
