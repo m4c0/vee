@@ -1,4 +1,7 @@
 name: Prepare Deps
+inputs:
+  os:
+    required: true
 runs:
   using: composite
   steps:
@@ -13,3 +16,7 @@ runs:
         repository: m4c0/vee
         path: vee
         submodules: true
+    - uses: m4c0/molten-vk-build/.github/actions/setup@main
+      with:
+        os: ${{ inputs.os }}
+        cwd: vee

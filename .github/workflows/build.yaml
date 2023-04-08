@@ -19,6 +19,8 @@ jobs:
           os: ${{ matrix.os }}
       - name: 🧀 Prepare Deps
         uses: m4c0/vee/.github/actions/deps@main
+        with:
+          os: ${{ matrix.os }}
       - name: 🖖 Install glslang
         uses: m4c0/vee/.github/actions/glslang@main
         with:
