@@ -66,12 +66,6 @@ static auto get_extensions() {
   res.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
   res.push_back(VEE_VULKAN_PLATFORM_EXT);
 
-#ifdef __APPLE__
-  // TODO: decide if support for other non-conformant Vulkan devices
-  res.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-  res.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
-#endif
-
   for (auto &lp : enum_instance_ext_props(nullptr)) {
     auto name = jute::view::unsafe(lp.extensionName);
     if (name == jute::view{VK_EXT_DEBUG_UTILS_EXTENSION_NAME}) {

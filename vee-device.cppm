@@ -11,17 +11,8 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
                                               unsigned qf) {
   const float priority = 1.0f;
 
-#ifdef __APPLE__
-  // TODO: decide if support for other non-conformant Vulkan devices
-  constexpr const auto ext_count = 2;
-  const char *ext[] = {
-      VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-      "VK_KHR_portability_subset",
-  };
-#else
   constexpr const auto ext_count = 1;
   const char *ext[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-#endif
 
   VkDeviceQueueCreateInfo queue_create_info{};
   queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -31,7 +22,6 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
 
   VkPhysicalDeviceFeatures feats{};
   feats.samplerAnisotropy = VK_TRUE;
-  feats.fragmentStoresAndAtomics = VK_TRUE;
 
   VkDeviceCreateInfo ci{};
   ci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
