@@ -12,4 +12,16 @@
 #error Unsupported platform
 #endif
 
+#ifdef __APPLE__
+#include "vulkan-headers/include/vulkan/vulkan_core.h"
+#include "vulkan-headers/include/vulkan/vulkan_metal.h"
+
+VkInstance &volkGetLoadedInstance();
+VkDevice &volkGetLoadedDevice();
+void volkLoadInstance(VkInstance i);
+void volkLoadDevice(VkDevice d);
+void volkInitialize();
+
+#else
 #include "volk/volk.h"
+#endif
