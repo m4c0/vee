@@ -47,10 +47,10 @@ class xcframework : public ecow::unit {
     if (subfolder.size() == 0)
       return {};
 
-    std::filesystem::path path = std::filesystem::current_path();
+    const auto xcfw = std::filesystem::path{"MoltenVK.xcframework"};
 
     pathset res{};
-    res.insert(path / "MoltenVK.xcframework" / subfolder / "libMoltenVk.a");
+    res.insert(xcfw / subfolder / "libMoltenVk.a");
     return res;
   }
 
