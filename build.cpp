@@ -16,11 +16,7 @@ int main(int argc, char **argv) {
   poc->add_unit<spirv>("poc.vert");
   poc->add_resource("poc.frag.spv");
   poc->add_resource("poc.vert.spv");
+  poc->add_requirement(native);
 
-  auto pf = unit::create<per_feat<seq>>("vee-filter");
-  pf->for_feature(android_ndk).add_ref(poc);
-  pf->for_feature(objective_c).add_ref(poc);
-  pf->for_feature(windows_api).add_ref(poc);
-
-  return run_main(pf, argc, argv);
+  return run_main(poc, argc, argv);
 }
