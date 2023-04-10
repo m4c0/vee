@@ -1,12 +1,9 @@
 name: Install glslang
-inputs:
-  os:
-    required: true
 runs:
   using: composite
   steps:
     - name: Install via download
-      if: inputs.os == 'windows-latest'
+      if: runner.os == 'Windows'
       shell: pwsh
       run: |
         Invoke-WebRequest -OutFile glslang.zip -Uri https://github.com/m4c0/glslangValidator/releases/download/v0/glslang-windows.zip
@@ -14,11 +11,11 @@ runs:
         $Bin = Get-Item .\glslang\bin
         Add-Content -Path $env:GITHUB_PATH -Value $Bin.FullName
     - name: Install via homebrew
-      if: inputs.os == 'macos-latest'
+      if: runner.os == 'macOS'
       shell: bash
       run: brew install glslang
     - name: Install via linuxbrew
-      if: inputs.os == 'ubuntu-latest'
+      if: runner.os == 'Linux'
       shell: bash
       run: |
         eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
