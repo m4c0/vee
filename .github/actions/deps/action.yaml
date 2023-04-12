@@ -9,8 +9,10 @@ runs:
     - uses: m4c0/sires/.github/actions/deps@main
     - uses: m4c0/traits/.github/actions/deps@main
     - uses: m4c0/ecow/.github/actions/checkout@main
+      id: vee
       with:
         path: vee
     - uses: m4c0/molten-vk-build/.github/actions/setup@main
+      if: steps.vee.outputs.cache-hit != 'true'
       with:
         cwd: vee
