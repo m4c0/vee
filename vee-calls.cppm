@@ -146,6 +146,8 @@ template <typename Tp, auto *CFn, auto *DFn> class handle {
   hai::value_holder<Tp, h_destroyer<DFn>> m_h{};
 
 public:
+  using type = Tp;
+
   constexpr handle() = default;
   constexpr explicit handle(const auto... in)
       : m_h{create<Tp, CFn>(in..., nullptr)} {}
