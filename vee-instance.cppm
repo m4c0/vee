@@ -79,6 +79,8 @@ static auto get_extensions() {
 export using instance =
     calls::handle<VkInstance, &::vkCreateInstance, &::vkDestroyInstance>;
 export inline auto create_instance(const char *app_name) {
+  vee::calls::call(volkInitialize);
+
   auto layers = get_layers();
   auto extensions = get_extensions();
 
@@ -109,5 +111,4 @@ export inline auto create_instance(const char *app_name) {
   return res;
 }
 
-export inline void initialise() { vee::calls::call(volkInitialize); }
 } // namespace vee

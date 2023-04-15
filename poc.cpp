@@ -156,7 +156,6 @@ extern "C" void casein_handle(const casein::event &e) {
   case casein::CREATE_WINDOW:
     switch (state) {
     case waiting_nptr:
-      vee::initialise();
       nptr = *(e.as<casein::events::create_window>());
       dev = hai::uptr<device_stuff>::make(nptr);
       break;
