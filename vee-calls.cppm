@@ -115,6 +115,9 @@ constexpr void call(Fn &&fn, Args &&...args) {
   case VK_SUBOPTIMAL_KHR:
     break;
   case VK_ERROR_OUT_OF_DATE_KHR:
+    // The exception might destroy RAII handles as unwinding happens. Since some
+    // of these might be in-flight, let's wait until the device idle first
+    vkDeviceWaitIdle(volkGetLoadedDevice());
     throw out_of_date_error{};
   default:
     silog::log(silog::error, message_for_result(res));
