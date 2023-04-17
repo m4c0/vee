@@ -2,6 +2,7 @@ export module vee;
 export import :actions;
 export import :alias;
 export import :buffer;
+export import :calls;
 export import :command_pool;
 export import :debug_utils_messenger;
 export import :descriptor_pool;
@@ -30,8 +31,3 @@ export import :android;
 #elif defined(_WIN32)
 export import :windows;
 #endif
-
-namespace vee {
-export struct api_failure;
-export struct out_of_date_error;
-} // namespace vee

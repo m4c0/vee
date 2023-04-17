@@ -7,8 +7,8 @@ import silog;
 import traits;
 
 namespace vee {
-struct api_failure {};
-struct out_of_date_error {};
+export struct api_failure {};
+export struct out_of_date_error {};
 
 inline constexpr const auto message_for_result(VkResult res) {
   switch (res) {
