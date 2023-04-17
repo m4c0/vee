@@ -100,15 +100,15 @@ inline constexpr const auto message_for_result(VkResult res) {
 namespace vee::calls {
 template <typename Fn, typename... Args>
   requires requires(Fn fn, Args... args) {
-             { fn(args...) } -> traits::same_as<void>;
-           }
+    { fn(args...) } -> traits::same_as<void>;
+  }
 constexpr void call(Fn &&fn, Args &&...args) {
   fn(args...);
 }
 template <typename Fn, typename... Args>
   requires requires(Fn fn, Args... args) {
-             { fn(args...) } -> traits::not_same_as<void>;
-           }
+    { fn(args...) } -> traits::not_same_as<void>;
+  }
 constexpr void call(Fn &&fn, Args &&...args) {
   switch (auto res = fn(args...)) {
   case VK_SUCCESS:
