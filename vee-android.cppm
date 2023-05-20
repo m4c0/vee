@@ -4,8 +4,6 @@ module;
 export module vee:android;
 import :calls;
 
-class ANativeWindow;
-
 namespace vee {
 export using surface = calls::handle<VkSurfaceKHR, &::vkCreateAndroidSurfaceKHR,
                                      &::vkDestroySurfaceKHR>;
