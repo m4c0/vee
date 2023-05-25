@@ -5,6 +5,7 @@ export module vee:debug_utils_messenger;
 import :calls;
 import jute;
 import silog;
+import traits;
 
 static jute::view message_type(VkDebugUtilsMessageTypeFlagsEXT type) {
   switch (type) {
@@ -54,8 +55,10 @@ export using debug_utils_messenger =
     calls::handle<VkDebugUtilsMessengerEXT, &::vkCreateDebugUtilsMessengerEXT,
                   &::vkDestroyDebugUtilsMessengerEXT>;
 export inline auto create_debug_utils_messenger() {
+#ifndef __APPLE__
   if (vkCreateDebugUtilsMessengerEXT == nullptr)
     return debug_utils_messenger{};
+#endif
 
   VkDebugUtilsMessengerCreateInfoEXT info{};
   info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
