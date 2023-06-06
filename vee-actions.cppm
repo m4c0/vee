@@ -229,7 +229,7 @@ inline void raw_map_memory(VkDeviceMemory m, auto &&fn) {
 }
 export template <typename Tp>
 inline void map_memory(VkDeviceMemory m, auto &&fn) {
-  raw_map_memory(m, [&](auto ptr) { fn(static_cast<Tp *>(ptr)); });
+  raw_map_memory(m, [&](void *ptr) { fn(static_cast<Tp *>(ptr)); });
 }
 
 export struct present_info {
