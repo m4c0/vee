@@ -46,7 +46,8 @@ debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
                VkDebugUtilsMessageTypeFlagsEXT type,
                const VkDebugUtilsMessengerCallbackDataEXT *data,
                [[maybe_unused]] void *user_data) {
-  silog::log(level_for_severity(severity), message(type, data).cstr().data());
+  silog::log(level_for_severity(severity), "%s",
+             message(type, data).cstr().data());
   return VK_FALSE;
 }
 

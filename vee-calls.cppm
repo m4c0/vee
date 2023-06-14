@@ -120,7 +120,7 @@ constexpr void call(Fn &&fn, Args &&...args) {
     vkDeviceWaitIdle(volkGetLoadedDevice());
     throw out_of_date_error{};
   default:
-    silog::log(silog::error, message_for_result(res));
+    silog::log(silog::error, "%s", message_for_result(res));
     throw api_failure{};
   }
 }

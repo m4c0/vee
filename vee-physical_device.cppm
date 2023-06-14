@@ -59,7 +59,7 @@ static void log_rejected_device(VkPhysicalDevice pd, jute::view reason) {
   auto msg = "Rejecting device ["_s + jute::view::unsafe(props.deviceName) +
              "] - reason: "_s + reason;
 
-  silog::log(silog::warning, msg.cstr().data());
+  silog::log(silog::warning, "%s", msg.cstr().data());
 }
 
 export struct physical_device_pair {
@@ -84,7 +84,7 @@ export inline auto find_physical_device_with_universal_queue(VkSurfaceKHR s) {
 
     using namespace jute::literals;
     auto msg = "Using device: "_s + jute::view::unsafe(props.deviceName);
-    silog::log(silog::info, msg.cstr().data());
+    silog::log(silog::info, "%s", msg.cstr().data());
 
     return physical_device_pair{pd, qf};
   }
