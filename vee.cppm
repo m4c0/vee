@@ -15,6 +15,7 @@ export import :gr_pipeline;
 export import :image;
 export import :image_view;
 export import :instance;
+export import :mapmem;
 export import :physical_device;
 export import :pipeline_layout;
 export import :render_pass;

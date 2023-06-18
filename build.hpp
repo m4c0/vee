@@ -77,6 +77,7 @@ auto vee() {
     m.add_part("calls");
 
     // Used by others
+    m.add_part("mapmem");
     m.add_part("surface_capabilities");
     m.add_part("surface_format");
 

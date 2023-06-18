@@ -194,11 +194,12 @@ extern "C" void casein_handle(const casein::event &e) {
         vs[1] = {0, 1};
         vs[2] = {1, -1};
       });
-      vee::map_memory<rgba>(*ext->ts_mem, [](auto *p) {
+      {
+        vee::mapmem<rgba> p{*ext->ts_mem};
         for (auto i = 0; i < 16 * 16; i++) {
           p[i] = {255, 255, 255, static_cast<unsigned char>(i)};
         }
-      });
+      }
 
       pc.vert_scale = 0.8;
 
