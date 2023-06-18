@@ -10,7 +10,6 @@ int main(int argc, char **argv) {
   poc->add_wsdep("hai", hai());
   poc->add_wsdep("sires", sires());
   poc->add_wsdep("traits", traits());
-  poc->add_unit<>("poc");
   poc->add_unit<spirv>("poc.frag");
   poc->add_unit<spirv>("poc.vert");
   poc->add_resource("poc.frag.spv");
