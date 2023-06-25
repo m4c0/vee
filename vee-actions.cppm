@@ -74,6 +74,7 @@ export struct render_pass_begin {
   VkFramebuffer framebuffer;
   VkExtent2D extent;
   VkClearColorValue clear_color{1.0f, 0.0f, 1.0f, 1.0f};
+  bool use_secondary_cmd_buf = true;
 };
 export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
   // Using sensible defaults. The magenta color is a visible marker for pixels
@@ -82,6 +83,10 @@ export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
   values[0].color = rpb.clear_color;
   values[1].depthStencil = {1.0f, 0};
 
+  VkSubpassContents sbc = rpb.use_secondary_cmd_buf
+                              ? VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS
+                              : VK_SUBPASS_CONTENTS_INLINE;
+
   VkRenderPassBeginInfo info{};
   info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
   info.renderPass = rpb.render_pass;
@@ -89,8 +94,7 @@ export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
   info.renderArea.extent = rpb.extent;
   info.clearValueCount = 2;
   info.pClearValues = values;
-  calls::call(vkCmdBeginRenderPass, rpb.command_buffer, &info,
-              VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
+  calls::call(vkCmdBeginRenderPass, rpb.command_buffer, &info, sbc);
 }
 
 export inline auto cmd_bind_descriptor_set(VkCommandBuffer cb,
