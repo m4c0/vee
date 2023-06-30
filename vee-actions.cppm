@@ -227,7 +227,8 @@ export inline auto end_cmd_buf(VkCommandBuffer cb) {
 
 export template <typename Tp>
 inline void map_memory(VkDeviceMemory m, auto &&fn) {
-  fn(mapmem<Tp>{m}.begin());
+  mapmem mm{m};
+  fn(static_cast<Tp *>(*mm));
 }
 
 export struct present_info {

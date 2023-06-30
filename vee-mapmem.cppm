@@ -15,13 +15,12 @@ void unmap(VkDeviceMemory m) { calls::call(vkUnmapMemory, m); }
 } // namespace vee::memimpl
 
 namespace vee {
-export template <typename Tp> class mapmem {
+export class mapmem {
   VkDeviceMemory m_dm;
-  Tp *m_ptr;
+  void *m_ptr;
 
 public:
-  explicit mapmem(VkDeviceMemory m)
-      : m_dm{m}, m_ptr{static_cast<Tp *>(memimpl::map(m))} {}
+  explicit mapmem(VkDeviceMemory m) : m_dm{m}, m_ptr{memimpl::map(m)} {}
   ~mapmem() { memimpl::unmap(m_dm); }
 
   mapmem(const mapmem &) = delete;
@@ -29,9 +28,6 @@ public:
   mapmem &operator=(const mapmem &) = delete;
   mapmem &operator=(mapmem &&) = delete;
 
-  [[nodiscard]] constexpr Tp &operator[](unsigned idx) noexcept {
-    return m_ptr[idx];
-  }
-  [[nodiscard]] constexpr Tp *begin() noexcept { return m_ptr; }
+  [[nodiscard]] constexpr auto *operator*() noexcept { return m_ptr; }
 };
 } // namespace vee

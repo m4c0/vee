@@ -197,9 +197,10 @@ extern "C" void casein_handle(const casein::event &e) {
         vs[2] = {1, -1};
       });
       {
-        vee::mapmem<rgba> p{*ext->ts_mem};
+        vee::mapmem p{*ext->ts_mem};
         for (auto i = 0; i < 16 * 16; i++) {
-          p[i] = {255, 255, 255, static_cast<unsigned char>(i)};
+          static_cast<rgba *>(*p)[i] = {255, 255, 255,
+                                        static_cast<unsigned char>(i)};
         }
       }
 
