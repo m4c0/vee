@@ -9,27 +9,6 @@ import jute;
 import silog;
 
 namespace vee {
-template <typename Tp> class vec {
-  hai::holder<Tp[]> m_data;
-  unsigned m_max;
-  unsigned m_size{};
-
-public:
-  constexpr explicit vec(unsigned max)
-      : m_data{hai::holder<Tp[]>::make(max)}, m_max{max} {}
-
-  constexpr void push_back(Tp v) {
-    if (m_size >= m_max) {
-      silog::log(silog::error, "Vector overflow");
-      return;
-    }
-    (*m_data)[m_size++] = v;
-  }
-
-  [[nodiscard]] constexpr auto data() const noexcept { return *m_data; }
-  [[nodiscard]] constexpr auto size() const noexcept { return m_size; }
-};
-
 static bool is_api_dump_requested() {
   const char *env = getenv("VEE_VULKAN_API_DUMP");
   if (env != nullptr) {
@@ -47,7 +26,7 @@ static constexpr const auto enum_instance_ext_props =
 static auto get_layers() {
   auto api_dump = is_api_dump_requested();
 
-  vec<const char *> res{2};
+  hai::varray<const char *> res{2};
   for (auto &lp : enum_instance_layer_props()) {
     auto layer_name = jute::view::unsafe(lp.layerName);
     if (layer_name == "VK_LAYER_KHRONOS_validation") {
@@ -62,7 +41,7 @@ static auto get_layers() {
 }
 
 static auto get_extensions() {
-  vec<const char *> res{5};
+  hai::varray<const char *> res{5};
   res.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
   res.push_back(VEE_VULKAN_PLATFORM_EXT);
 
@@ -97,8 +76,8 @@ export inline auto create_instance(const char *app_name) {
   create_info.enabledExtensionCount = extensions.size();
   create_info.enabledLayerCount = layers.size();
   create_info.pApplicationInfo = &app_info;
-  create_info.ppEnabledExtensionNames = extensions.data();
-  create_info.ppEnabledLayerNames = layers.data();
+  create_info.ppEnabledExtensionNames = extensions.begin();
+  create_info.ppEnabledLayerNames = layers.begin();
 
 #ifdef __APPLE__
   // TODO: decide if support for other non-conformant Vulkan devices
