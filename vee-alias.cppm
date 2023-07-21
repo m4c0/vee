@@ -3,10 +3,10 @@ module;
 
 export module vee:alias;
 
-namespace vee {
-export using command_buffer = VkCommandBuffer;
-export using descriptor_set = VkDescriptorSet;
-export using extent = VkExtent2D;
-export using physical_device = VkPhysicalDevice;
-export using queue = VkQueue;
+export namespace vee {
+using command_buffer = VkCommandBuffer;
+using descriptor_set = VkDescriptorSet;
+using extent = VkExtent2D;
+using physical_device = VkPhysicalDevice;
+using queue = VkQueue;
 } // namespace vee
