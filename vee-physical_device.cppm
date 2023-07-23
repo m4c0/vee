@@ -33,7 +33,7 @@ static bool get_queue_family(VkPhysicalDevice pd, VkSurfaceKHR s,
                              unsigned *idx) {
   auto queues = get_pd_queue_family_props(pd);
   for (*idx = 0; *idx < queues.size(); (*idx)++) {
-    auto q = (queues.data())[*idx];
+    auto q = queues[*idx];
 
     if ((q.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0) {
       continue;

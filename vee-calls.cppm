@@ -159,31 +159,12 @@ public:
 };
 
 template <auto *Fn, typename Ret> consteval auto enumerate() {
-  class vec {
-    hai::holder<Ret[]> m_data;
-    unsigned m_size;
-
-  public:
-    constexpr explicit vec(unsigned count)
-        : m_data{hai::holder<Ret[]>::make(count)}, m_size{count} {}
-
-    [[nodiscard]] constexpr auto data() noexcept { return *m_data; }
-    [[nodiscard]] constexpr auto data() const noexcept { return *m_data; }
-    [[nodiscard]] constexpr auto size() const noexcept { return m_size; }
-
-    [[nodiscard]] constexpr auto begin() noexcept { return *m_data; }
-    [[nodiscard]] constexpr auto begin() const noexcept { return *m_data; }
-    [[nodiscard]] constexpr auto end() noexcept { return *m_data + m_size; }
-    [[nodiscard]] constexpr auto end() const noexcept {
-      return *m_data + m_size;
-    }
-  };
   return [](auto... args) {
     unsigned count{};
     call(*Fn, args..., &count, nullptr);
 
-    vec res{count};
-    call(*Fn, args..., &count, res.data());
+    hai::array<Ret> res{count};
+    call(*Fn, args..., &count, res.begin());
     return res;
   };
 }
