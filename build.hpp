@@ -22,7 +22,7 @@ class spirv : public ecow::unit {
     if (std::system(cmd.c_str()) != 0)
       throw std::runtime_error("Failed to compile shader");
   }
-  void create_self_cdb(std::ostream &) const override {}
+  void generate_self_deps() const override {}
   [[nodiscard]] pathset self_objects() const override { return {}; }
 
 public:
@@ -30,7 +30,7 @@ public:
 };
 class xcframework : public ecow::unit {
   void build_self() const override {}
-  void create_self_cdb(std::ostream &) const override {}
+  void generate_self_deps() const override {}
 
   [[nodiscard]] std::string xcfolder_for_target() const {
     auto id = ecow::impl::current_target()->build_subfolder();
