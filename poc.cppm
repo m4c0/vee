@@ -184,7 +184,7 @@ extern "C" void casein_handle(const casein::event &e) {
       auto imgs = vee::get_swapchain_images(*ext->swc);
       frms = decltype(frms)::make(imgs.size());
       for (auto i = 0; i < imgs.size(); i++) {
-        auto img = (imgs.data())[i];
+        auto img = imgs[i];
         vee::image_view iv = vee::create_rgba_image_view(img, ext->pd, *ext->s);
         (*frms)[i] = hai::uptr<frame_stuff>::make(&*ext, traits::move(iv));
       }
