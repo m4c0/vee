@@ -73,7 +73,7 @@ export struct render_pass_begin {
   VkRenderPass render_pass;
   VkFramebuffer framebuffer;
   VkExtent2D extent;
-  VkClearColorValue clear_color{1.0f, 0.0f, 1.0f, 1.0f};
+  VkClearColorValue clear_color{{1.0f, 0.0f, 1.0f, 1.0f}};
   bool use_secondary_cmd_buf = true;
 };
 export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
