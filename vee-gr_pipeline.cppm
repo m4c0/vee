@@ -82,8 +82,8 @@ create_graphics_pipeline(VkPipelineLayout pl, VkRenderPass rp,
   VkPipelineDepthStencilStateCreateInfo depth_stencil{};
   depth_stencil.sType =
       VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-  depth_stencil.depthTestEnable = VK_TRUE;
-  depth_stencil.depthWriteEnable = VK_TRUE;
+  depth_stencil.depthTestEnable = vk_true;
+  depth_stencil.depthWriteEnable = vk_true;
   depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
 
   VkPipelineInputAssemblyStateCreateInfo in_asm{};
@@ -133,6 +133,6 @@ create_graphics_pipeline(VkPipelineLayout pl, VkRenderPass rp,
   info.pViewportState = &viewport;
   info.renderPass = rp;
   info.stageCount = S;
-  return gr_pipeline(VK_NULL_HANDLE, 1, &info);
+  return gr_pipeline(vk_null_handle, 1, &info);
 }
 } // namespace vee

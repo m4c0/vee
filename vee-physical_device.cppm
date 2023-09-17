@@ -14,7 +14,7 @@ static constexpr const auto get_pd_queue_family_props =
                      VkQueueFamilyProperties>();
 
 static bool is_surface_compatible(VkPhysicalDevice pd, VkSurfaceKHR s) {
-  uint32_t count{};
+  auto count = 0U;
 
   vkGetPhysicalDeviceSurfaceFormatsKHR(pd, s, &count, nullptr);
   if (count == 0)
@@ -26,7 +26,7 @@ static bool is_surface_compatible(VkPhysicalDevice pd, VkSurfaceKHR s) {
 
   VkPhysicalDeviceFeatures f{};
   vkGetPhysicalDeviceFeatures(pd, &f);
-  return f.samplerAnisotropy == VK_TRUE;
+  return f.samplerAnisotropy == vk_true;
 }
 
 static bool get_queue_family(VkPhysicalDevice pd, VkSurfaceKHR s,
@@ -44,7 +44,7 @@ static bool get_queue_family(VkPhysicalDevice pd, VkSurfaceKHR s,
 
     VkBool32 surf_support{};
     vkGetPhysicalDeviceSurfaceSupportKHR(pd, *idx, s, &surf_support);
-    if (surf_support == VK_TRUE) {
+    if (surf_support == vk_true) {
       return true;
     }
   }

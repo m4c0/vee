@@ -36,7 +36,7 @@ export inline auto create_swapchain(VkPhysicalDevice pd, VkSurfaceKHR s) {
 
   VkSwapchainCreateInfoKHR info{};
   info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-  info.clipped = VK_TRUE;
+  info.clipped = vk_true;
   info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
   info.imageArrayLayers = 1;
   info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;

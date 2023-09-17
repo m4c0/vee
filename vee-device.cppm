@@ -12,7 +12,7 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
   const float priority = 1.0f;
 
   constexpr const auto ext_count = 1;
-  const char *ext[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+  const char *ext[] = {vk_khr_swapchain_extension_name};
 
   VkDeviceQueueCreateInfo queue_create_info{};
   queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -21,7 +21,7 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
   queue_create_info.pQueuePriorities = &priority;
 
   VkPhysicalDeviceFeatures feats{};
-  feats.samplerAnisotropy = VK_TRUE;
+  feats.samplerAnisotropy = vk_true;
 
   VkDeviceCreateInfo ci{};
   ci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -33,7 +33,7 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
   ci.enabledLayerCount = 0; // device layer is legacy
 
   auto res = device(pd, &ci);
-  volkLoadDevice(*res);
+  wagen::device() = *res;
   return res;
 }
 

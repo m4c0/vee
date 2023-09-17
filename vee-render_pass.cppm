@@ -57,7 +57,7 @@ static constexpr auto create_subpass(const VkAttachmentReference *color,
 static constexpr auto create_color_dependency() {
   VkSubpassDependency dep{};
 
-  dep.srcSubpass = VK_SUBPASS_EXTERNAL;
+  dep.srcSubpass = vk_subpass_external;
   dep.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
   dep.srcAccessMask = 0;
 
@@ -71,7 +71,7 @@ static constexpr auto create_color_dependency() {
 static constexpr auto create_depth_dependency() {
   VkSubpassDependency dep{};
 
-  dep.srcSubpass = VK_SUBPASS_EXTERNAL;
+  dep.srcSubpass = vk_subpass_external;
   dep.srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
                      VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
   dep.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
