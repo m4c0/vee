@@ -1,7 +1,9 @@
-
 export module vee:render_pass;
 import :calls;
 import :surface_format;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 static constexpr auto create_color_attachment(VkFormat format) {

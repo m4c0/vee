@@ -1,7 +1,9 @@
-
 export module vee:framebuffer;
 import :calls;
 import :surface_capabilities;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export struct fb_params {

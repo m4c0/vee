@@ -1,6 +1,8 @@
-
 export module vee:pipeline_layout;
 import :calls;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export template <typename Tp>

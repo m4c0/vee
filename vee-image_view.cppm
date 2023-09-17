@@ -1,7 +1,9 @@
-
 export module vee:image_view;
 import :calls;
 import :surface_format;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 static auto create_info_for_aspect_mask(VkImageAspectFlags aspect_mask) {

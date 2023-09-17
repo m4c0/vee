@@ -1,6 +1,8 @@
-
 export module vee:surface_format;
 import :calls;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 static constexpr const auto get_pd_surf_fmts =

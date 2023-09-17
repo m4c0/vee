@@ -1,6 +1,8 @@
-
 export module vee:android;
 import :calls;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export using surface = calls::handle<VkSurfaceKHR, &::vkCreateAndroidSurfaceKHR,

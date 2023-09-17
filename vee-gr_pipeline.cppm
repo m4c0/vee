@@ -1,6 +1,8 @@
-
 export module vee:gr_pipeline;
 import :calls;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export auto pipeline_frag_stage(VkShaderModule s, const char *fn) {

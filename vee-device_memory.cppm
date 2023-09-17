@@ -1,7 +1,9 @@
-
 export module vee:device_memory;
 import :calls;
 import silog;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 inline unsigned find_memory_type_index(VkPhysicalDevice pd, unsigned type_bits,

@@ -1,7 +1,9 @@
-
 export module vee:image;
 import :calls;
 import :surface_capabilities;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 inline auto create_info_for_extent(VkExtent2D ext) {

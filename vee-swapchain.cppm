@@ -1,8 +1,10 @@
-
 export module vee:swapchain;
 import :calls;
 import :surface_capabilities;
 import :surface_format;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 static constexpr const auto get_pd_surf_present_modes =

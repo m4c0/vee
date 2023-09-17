@@ -1,10 +1,12 @@
-
 export module vee:shader_module;
 import :calls;
 import jute;
 import hai;
 import sires;
 import traits;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export using shader_module =

@@ -1,6 +1,8 @@
-
 export module vee:surface_capabilities;
 import :calls;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export inline auto get_surface_capabilities(VkPhysicalDevice pd,

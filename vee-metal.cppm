@@ -1,6 +1,8 @@
-
 export module vee:metal; // 🤘
 import :calls;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export using surface = calls::handle<VkSurfaceKHR, &::vkCreateMetalSurfaceEXT,

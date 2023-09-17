@@ -1,6 +1,8 @@
-
 export module vee:fence;
 import :calls;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export using fence =

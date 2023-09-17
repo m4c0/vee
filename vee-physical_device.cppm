@@ -1,8 +1,10 @@
-
 export module vee:physical_device;
 import :calls;
 import jute;
 import silog;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 static constexpr const auto enum_physical_devices =

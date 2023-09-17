@@ -1,7 +1,8 @@
-
 export module vee:sampler;
-
 import :calls;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export using sampler =

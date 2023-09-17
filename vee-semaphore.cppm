@@ -1,6 +1,8 @@
-
 export module vee:semaphore;
 import :calls;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export using semaphore =
