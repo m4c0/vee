@@ -1,9 +1,9 @@
-module;
-#include "vulkan.hpp"
-
 export module vee:actions;
 import :calls;
 import :mapmem;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export inline auto bind_buffer_memory(VkBuffer buf, VkDeviceMemory mem,
@@ -19,7 +19,7 @@ export inline auto bind_image_memory(VkImage img, VkDeviceMemory mem,
 
 export inline auto acquire_next_image(VkSwapchainKHR swc, VkSemaphore sema) {
   return calls::create<unsigned, &::vkAcquireNextImageKHR>(swc, ~0UL, sema,
-                                                           VK_NULL_HANDLE);
+                                                           vk_null_handle);
 }
 
 export inline auto allocate_descriptor_set(VkDescriptorPool pool,

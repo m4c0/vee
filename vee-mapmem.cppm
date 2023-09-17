@@ -1,15 +1,13 @@
-module;
-#include "vulkan.hpp"
-
 export module vee:mapmem;
 import :calls;
+import wagen;
 
 // clang <=16 has a bug on Windows when we instantiate a exported symbol which
 // relies on non-exported symbols. i.e. it blows up when it tries to instantiate
 // `calls::create` inside any form of template method/class
 export namespace vee::memimpl {
 [[nodiscard]] void *map(VkDeviceMemory m) {
-  return calls::create<void *, &::vkMapMemory>(m, 0, VK_WHOLE_SIZE, 0);
+  return calls::create<void *, &::vkMapMemory>(m, 0, vk_whole_size, 0);
 }
 void unmap(VkDeviceMemory m) { calls::call(vkUnmapMemory, m); }
 } // namespace vee::memimpl

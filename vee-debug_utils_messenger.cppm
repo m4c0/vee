@@ -1,5 +1,3 @@
-module;
-#include "vulkan.hpp"
 
 export module vee:debug_utils_messenger;
 import :calls;

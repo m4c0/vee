@@ -1,5 +1,3 @@
-module;
-#include "vulkan.hpp"
 
 export module vee:buffer;
 import :calls;

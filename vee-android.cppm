@@ -1,5 +1,3 @@
-module;
-#include "vulkan.hpp"
 
 export module vee:android;
 import :calls;

@@ -1,7 +1,3 @@
-module;
-#include "vulkan.hpp"
-#include <windows.h>
-
 export module vee:windows;
 import :calls;
 

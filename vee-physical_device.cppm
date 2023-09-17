@@ -1,5 +1,3 @@
-module;
-#include "vulkan.hpp"
 
 export module vee:physical_device;
 import :calls;

@@ -1,5 +1,3 @@
-module;
-#include "vulkan.hpp"
 
 export module vee:framebuffer;
 import :calls;

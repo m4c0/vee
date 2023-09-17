@@ -1,12 +1,12 @@
-module;
-#include "vulkan.hpp"
-extern "C" char *getenv(const char *);
-
 export module vee:instance;
 import :calls;
 import hai;
 import jute;
 import silog;
+import wagen;
+
+using namespace wagen;
+extern "C" char *getenv(const char *);
 
 namespace vee {
 static bool is_api_dump_requested() {
@@ -42,13 +42,13 @@ static auto get_layers() {
 
 static auto get_extensions() {
   hai::varray<const char *> res{5};
-  res.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
-  res.push_back(VEE_VULKAN_PLATFORM_EXT);
+  res.push_back(vk_khr_surface_extension_name);
+  res.push_back(vk_vulkan_platform_ext);
 
   for (auto &lp : enum_instance_ext_props(nullptr)) {
     auto name = jute::view::unsafe(lp.extensionName);
-    if (name == jute::view{VK_EXT_DEBUG_UTILS_EXTENSION_NAME}) {
-      res.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    if (name == jute::view::unsafe(vk_ext_debug_utils_extension_name)) {
+      res.push_back(vk_ext_debug_utils_extension_name);
       silog::log(silog::info, "Enabling debug utils");
     }
   }
@@ -58,8 +58,6 @@ static auto get_extensions() {
 export using instance =
     calls::handle<VkInstance, &::vkCreateInstance, &::vkDestroyInstance>;
 export inline auto create_instance(const char *app_name) {
-  vee::calls::call(volkInitialize);
-
   auto layers = get_layers();
   auto extensions = get_extensions();
 
@@ -69,7 +67,7 @@ export inline auto create_instance(const char *app_name) {
   app_info.applicationVersion = 1;
   app_info.pEngineName = "m4c0/vee";
   app_info.engineVersion = 1;
-  app_info.apiVersion = VK_API_VERSION_1_0;
+  app_info.apiVersion = vk_api_version_1_0;
 
   VkInstanceCreateInfo create_info{};
   create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -85,7 +83,7 @@ export inline auto create_instance(const char *app_name) {
 #endif
 
   instance res{&create_info};
-  volkLoadInstance(*res);
+  wagen::instance() = *res;
   silog::log(silog::info, "Vulkan instance created");
   return res;
 }

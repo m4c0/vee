@@ -1,10 +1,10 @@
-module;
-#include "vulkan.hpp"
-
 export module vee:calls;
 import hai;
 import silog;
 import traits;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export struct api_failure {};
@@ -117,7 +117,7 @@ constexpr void call(Fn &&fn, Args &&...args) {
   case VK_ERROR_OUT_OF_DATE_KHR:
     // The exception might destroy RAII handles as unwinding happens. Since some
     // of these might be in-flight, let's wait until the device idle first
-    vkDeviceWaitIdle(volkGetLoadedDevice());
+    vkDeviceWaitIdle(device());
     throw out_of_date_error{};
   default:
     silog::log(silog::error, "%s", message_for_result(res));
@@ -127,12 +127,12 @@ constexpr void call(Fn &&fn, Args &&...args) {
 template <typename Fn, typename... Args>
   requires requires(Fn fn, VkInstance i, Args... args) { fn(i, args...); }
 constexpr void call(Fn &&fn, Args &&...args) {
-  call(fn, volkGetLoadedInstance(), args...);
+  call(fn, instance(), args...);
 }
 template <typename Fn, typename... Args>
   requires requires(Fn fn, VkDevice d, Args... args) { fn(d, args...); }
 constexpr void call(Fn &&fn, Args &&...args) {
-  call(fn, volkGetLoadedDevice(), args...);
+  call(fn, device(), args...);
 }
 
 template <typename Tp, auto *Fn, typename... Args>

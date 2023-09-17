@@ -1,5 +1,3 @@
-module;
-#include "vulkan.hpp"
 
 export module vee:shader_module;
 import :calls;
