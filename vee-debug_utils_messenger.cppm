@@ -1,9 +1,9 @@
-
 export module vee:debug_utils_messenger;
 import :calls;
 import jute;
 import silog;
 import traits;
+import wagen;
 
 static jute::view message_type(VkDebugUtilsMessageTypeFlagsEXT type) {
   switch (type) {
@@ -39,14 +39,13 @@ constexpr inline auto level_for_severity(auto severity) {
   }
 }
 
-static VKAPI_ATTR VkBool32 VKAPI_CALL
-debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-               VkDebugUtilsMessageTypeFlagsEXT type,
-               const VkDebugUtilsMessengerCallbackDataEXT *data,
-               [[maybe_unused]] void *user_data) {
+static VkBool32 debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+                               VkDebugUtilsMessageTypeFlagsEXT type,
+                               const VkDebugUtilsMessengerCallbackDataEXT *data,
+                               [[maybe_unused]] void *user_data) {
   silog::log(level_for_severity(severity), "%s",
              message(type, data).cstr().data());
-  return VK_FALSE;
+  return vk_false;
 }
 
 namespace vee {
@@ -61,7 +60,7 @@ export inline auto create_debug_utils_messenger() {
 
   VkDebugUtilsMessengerCreateInfoEXT info{};
   info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-  info.pfnUserCallback = debug_callback;
+  info.pfnUserCallback = callback<debug_callback>;
   info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
                          VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
                          VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
