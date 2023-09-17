@@ -1,6 +1,8 @@
-
 export module vee:descriptor_set_layout;
 import :calls;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export using descriptor_set_layout =

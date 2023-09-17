@@ -149,8 +149,8 @@ export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkImage img,
                                         barrier_type bt) {
   VkImageMemoryBarrier imb{};
   imb.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-  imb.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-  imb.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+  imb.srcQueueFamilyIndex = vk_queue_family_ignored;
+  imb.dstQueueFamilyIndex = vk_queue_family_ignored;
   imb.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
   imb.subresourceRange.levelCount = 1;
   imb.subresourceRange.layerCount = 1;
@@ -276,7 +276,7 @@ export inline auto update_descriptor_set_with_storage(VkDescriptorSet set,
   VkDescriptorBufferInfo ii{};
   ii.buffer = b;
   ii.offset = 0;
-  ii.range = VK_WHOLE_SIZE;
+  ii.range = vk_whole_size;
 
   VkWriteDescriptorSet w{};
   w.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -306,7 +306,7 @@ export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding,
 }
 
 export inline auto wait_and_reset_fence(VkFence fence) {
-  calls::call(vkWaitForFences, 1, &fence, VK_TRUE, ~0UL);
+  calls::call(vkWaitForFences, 1, &fence, vk_true, ~0UL);
   calls::call(vkResetFences, 1, &fence);
 }
 } // namespace vee

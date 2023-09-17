@@ -1,6 +1,8 @@
-
 export module vee:command_pool;
 import :calls;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export using command_pool = calls::handle<VkCommandPool, &::vkCreateCommandPool,

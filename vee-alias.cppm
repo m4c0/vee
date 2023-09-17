@@ -1,7 +1,7 @@
-module;
-#include "vulkan.hpp"
-
 export module vee:alias;
+import wagen;
+
+using namespace wagen;
 
 export namespace vee {
 using command_buffer = VkCommandBuffer;

@@ -1,6 +1,8 @@
-
 export module vee:descriptor_pool;
 import :calls;
+import wagen;
+
+using namespace wagen;
 
 namespace vee {
 export using descriptor_pool =
