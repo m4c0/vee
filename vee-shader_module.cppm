@@ -2,6 +2,7 @@ export module vee:shader_module;
 import :calls;
 import jute;
 import hai;
+import silog;
 import sires;
 import traits;
 import wagen;
@@ -31,7 +32,10 @@ inline auto slurp(hai::uptr<yoyo::reader> &rdr) {
 
 struct resource_unavailable {};
 export inline shader_module create_shader_module_from_resource(jute::view res) {
-  return sires::open(res).fmap(slurp).take(
-      [](auto) { throw resource_unavailable{}; });
+  return sires::open(res).fmap(slurp).take([res](auto e) {
+    silog::log(silog::error, "Failed to load shader [%s]: %s",
+               res.cstr().data(), e);
+    throw resource_unavailable{};
+  });
 }
 } // namespace vee
