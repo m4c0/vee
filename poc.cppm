@@ -244,7 +244,7 @@ extern "C" void casein_handle(const casein::event &e) {
               .render_pass = *ext->rp,
               .framebuffer = *frame->fb,
               .extent = ext->extent,
-              .clear_color = {0.1, 0.2, 0.3, 1.0},
+              .clear_color = {{0.1, 0.2, 0.3, 1.0}},
           });
           vee::cmd_execute_command(frame->cb, inf.cb);
           vee::cmd_end_render_pass(frame->cb);
