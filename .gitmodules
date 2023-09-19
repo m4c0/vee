@@ -1,6 +1,0 @@
-[submodule "vulkan-headers"]
-	path = vulkan-headers
-	url = git@github.com:KhronosGroup/Vulkan-Headers.git
-[submodule "volk"]
-	path = volk
-	url = git@github.com:zeux/volk.git
