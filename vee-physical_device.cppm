@@ -42,6 +42,9 @@ static bool get_queue_family(VkPhysicalDevice pd, VkSurfaceKHR s,
       continue;
     }
 
+    if (s == nullptr)
+      return true;
+
     VkBool32 surf_support{};
     vkGetPhysicalDeviceSurfaceSupportKHR(pd, *idx, s, &surf_support);
     if (surf_support == vk_true) {
@@ -74,7 +77,7 @@ export inline auto find_physical_device_with_universal_queue(VkSurfaceKHR s) {
       continue;
     }
 
-    if (!is_surface_compatible(pd, s)) {
+    if (s != nullptr && !is_surface_compatible(pd, s)) {
       log_rejected_device(pd, "Missing compatible surface");
       continue;
     }
