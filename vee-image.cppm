@@ -37,4 +37,10 @@ export inline auto create_srgba_image(VkExtent2D ext) {
   info.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
   return image{&info};
 }
+export inline auto create_readable_srgba_image(VkExtent2D ext) {
+  auto info = create_info_for_extent(ext);
+  info.format = VK_FORMAT_R8G8B8A8_SRGB;
+  info.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+  return image{&info};
+}
 } // namespace vee
