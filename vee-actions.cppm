@@ -263,10 +263,14 @@ export inline auto queue_submit(const submit_info &si) {
   info.commandBufferCount = 1;
   info.pCommandBuffers = &si.command_buffer;
   info.pWaitDstStageMask = &stage;
-  info.waitSemaphoreCount = 1;
-  info.pWaitSemaphores = &si.wait_semaphore;
-  info.signalSemaphoreCount = 1;
-  info.pSignalSemaphores = &si.signal_semaphore;
+  if (si.wait_semaphore != nullptr) {
+    info.waitSemaphoreCount = 1;
+    info.pWaitSemaphores = &si.wait_semaphore;
+  }
+  if (si.signal_semaphore != nullptr) {
+    info.signalSemaphoreCount = 1;
+    info.pSignalSemaphores = &si.signal_semaphore;
+  }
   calls::call(vkQueueSubmit, si.queue, 1, &info, si.fence);
 }
 
