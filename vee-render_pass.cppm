@@ -6,7 +6,8 @@ import wagen;
 using namespace wagen;
 
 namespace vee {
-static constexpr auto create_color_attachment(VkFormat format) {
+static constexpr auto create_color_attachment(VkFormat format,
+                                              VkImageLayout final_il) {
   VkAttachmentDescription res{};
   res.format = format;
   res.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -15,7 +16,7 @@ static constexpr auto create_color_attachment(VkFormat format) {
   res.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
   res.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
   res.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-  res.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+  res.finalLayout = final_il;
   return res;
 }
 static constexpr auto create_depth_attachment() {
@@ -90,9 +91,11 @@ export using render_pass =
 export inline auto create_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
   const VkFormat sfmt = s == nullptr ? VK_FORMAT_R8G8B8A8_SRGB
                                      : find_best_surface_format(pd, s).format;
+  const VkImageLayout il = s == nullptr ? VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL
+                                        : VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
-  const VkAttachmentDescription attachments[2]{create_color_attachment(sfmt),
-                                               create_depth_attachment()};
+  const VkAttachmentDescription attachments[2]{
+      create_color_attachment(sfmt, il), create_depth_attachment()};
 
   const auto color_attachment_ref = create_color_attachment_ref();
   const auto depth_attachment_ref = create_depth_attachment_ref();
