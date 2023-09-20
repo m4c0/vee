@@ -7,13 +7,13 @@ using namespace wagen;
 
 namespace vee {
 export inline auto bind_buffer_memory(VkBuffer buf, VkDeviceMemory mem,
-                                      VkDeviceSize sz = 0) {
-  calls::call(vkBindBufferMemory, buf, mem, sz);
+                                      VkDeviceSize offs = 0) {
+  calls::call(vkBindBufferMemory, buf, mem, offs);
   return nullptr; // Returns "something" to allow binding via RAII
 }
 export inline auto bind_image_memory(VkImage img, VkDeviceMemory mem,
-                                     VkDeviceSize sz = 0) {
-  calls::call(vkBindImageMemory, img, mem, sz);
+                                     VkDeviceSize offs = 0) {
+  calls::call(vkBindImageMemory, img, mem, offs);
   return nullptr; // Returns "something" to allow binding via RAII
 }
 
