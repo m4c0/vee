@@ -126,6 +126,18 @@ export inline auto cmd_copy_buffer_to_image(VkCommandBuffer cb, VkExtent2D ext,
   calls::call(vkCmdCopyBufferToImage, cb, buf, img,
               VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &r);
 }
+export inline auto cmd_copy_image_to_buffer(VkCommandBuffer cb, VkExtent2D ext,
+                                            VkImage img, VkBuffer buf) {
+  VkBufferImageCopy r{};
+  r.bufferOffset = 0;
+  r.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+  r.imageSubresource.layerCount = 1;
+  r.imageExtent.width = ext.width;
+  r.imageExtent.height = ext.height;
+  r.imageExtent.depth = 1;
+  calls::call(vkCmdCopyImageToBuffer, cb, img,
+              VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buf, 1, &r);
+}
 
 export inline auto cmd_draw(VkCommandBuffer cb, unsigned vtx,
                             unsigned inst = 1) {
@@ -144,6 +156,7 @@ export inline auto cmd_execute_command(VkCommandBuffer pri_cb,
 export enum barrier_type {
   from_host_to_transfer,
   from_transfer_to_fragment,
+  from_pipeline_to_host,
 };
 export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkImage img,
                                         barrier_type bt) {
@@ -177,6 +190,18 @@ export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkImage img,
 
     constexpr const auto src_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
     constexpr const auto dst_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    calls::call(vkCmdPipelineBarrier, cb, src_stage, dst_stage, 0, 0, nullptr,
+                0, nullptr, 1, &imb);
+    break;
+  }
+  case from_pipeline_to_host: {
+    imb.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    imb.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+    imb.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+    imb.dstAccessMask = VK_ACCESS_HOST_READ_BIT;
+
+    constexpr const auto src_stage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    constexpr const auto dst_stage = VK_PIPELINE_STAGE_HOST_BIT;
     calls::call(vkCmdPipelineBarrier, cb, src_stage, dst_stage, 0, 0, nullptr,
                 0, nullptr, 1, &imb);
     break;
