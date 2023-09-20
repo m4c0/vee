@@ -88,10 +88,11 @@ static constexpr auto create_depth_dependency() {
 export using render_pass =
     calls::handle<VkRenderPass, &::vkCreateRenderPass, &::vkDestroyRenderPass>;
 export inline auto create_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
-  static auto sfmt = find_best_surface_format(pd, s);
+  const VkFormat sfmt = s == nullptr ? VK_FORMAT_R8G8B8A8_SRGB
+                                     : find_best_surface_format(pd, s).format;
 
-  const VkAttachmentDescription attachments[2]{
-      create_color_attachment(sfmt.format), create_depth_attachment()};
+  const VkAttachmentDescription attachments[2]{create_color_attachment(sfmt),
+                                               create_depth_attachment()};
 
   const auto color_attachment_ref = create_color_attachment_ref();
   const auto depth_attachment_ref = create_depth_attachment_ref();
