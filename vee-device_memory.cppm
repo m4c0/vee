@@ -12,7 +12,7 @@ inline unsigned find_memory_type_index(VkPhysicalDevice pd, unsigned type_bits,
                              &::vkGetPhysicalDeviceMemoryProperties>(pd);
 
   for (unsigned i = 0; i < props.memoryTypeCount; i++) {
-    if ((type_bits & (1U << i)) == 0) {
+    if (type_bits != 0 && (type_bits & (1U << i)) == 0) {
       continue;
     }
     if ((props.memoryTypes[i].propertyFlags & flags) != flags) {
@@ -66,5 +66,15 @@ export inline auto create_host_image_memory(VkPhysicalDevice pd, VkImage buf) {
   auto mr =
       calls::create<VkMemoryRequirements, &::vkGetImageMemoryRequirements>(buf);
   return create_memory(pd, mr, flags);
+}
+
+export inline auto create_host_buffer_memory(VkPhysicalDevice pd, unsigned sz) {
+  constexpr const auto flags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
+                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+  VkMemoryAllocateInfo info{};
+  info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+  info.allocationSize = sz;
+  info.memoryTypeIndex = find_memory_type_index(pd, 0, flags);
+  return device_memory(&info);
 }
 } // namespace vee
