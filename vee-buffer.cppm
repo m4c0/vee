@@ -24,6 +24,14 @@ export inline auto create_storage_buffer(unsigned size) {
   return buffer{&info};
 }
 
+export inline auto create_transfer_dst_buffer(unsigned size) {
+  VkBufferCreateInfo info{};
+  info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+  info.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+  info.size = size;
+  return buffer{&info};
+}
+
 export inline auto create_transfer_src_buffer(unsigned size) {
   VkBufferCreateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
