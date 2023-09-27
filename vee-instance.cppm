@@ -44,6 +44,9 @@ static auto get_extensions() {
   hai::varray<const char *> res{5};
   res.push_back(vk_khr_surface_extension_name);
   res.push_back(vk_vulkan_platform_ext);
+#ifdef LECO_TARGET_MACOSX
+  res.push_back(vk_khr_portability_enumeration_extension_name);
+#endif
 
   for (auto &lp : enum_instance_ext_props(nullptr)) {
     auto name = jute::view::unsafe(lp.extensionName);
