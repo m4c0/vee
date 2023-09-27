@@ -44,9 +44,6 @@ static auto get_extensions() {
   hai::varray<const char *> res{5};
   res.push_back(vk_khr_surface_extension_name);
   res.push_back(vk_vulkan_platform_ext);
-#ifdef LECO_TARGET_MACOSX
-  res.push_back(vk_khr_portability_enumeration_extension_name);
-#endif
 
   for (auto &lp : enum_instance_ext_props(nullptr)) {
     auto name = jute::view::unsafe(lp.extensionName);
@@ -54,6 +51,13 @@ static auto get_extensions() {
       res.push_back(vk_ext_debug_utils_extension_name);
       silog::log(silog::info, "Enabling debug utils");
     }
+#ifdef LECO_TARGET_MACOSX
+    if (name ==
+        jute::view::unsafe(vk_khr_portability_enumeration_extension_name)) {
+      res.push_back(vk_khr_portability_enumeration_extension_name);
+      silog::log(silog::info, "Enabling portability extension");
+    }
+#endif
   }
   return res;
 }
