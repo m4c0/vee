@@ -20,11 +20,17 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
   queue_create_info.queueCount = 1;
   queue_create_info.pQueuePriorities = &priority;
 
+  VkPhysicalDeviceSamplerYcbcrConversionFeatures smp_feats{};
+  smp_feats.sType =
+      VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES;
+  smp_feats.samplerYcbcrConversion = vk_true;
+
   VkPhysicalDeviceFeatures feats{};
   feats.samplerAnisotropy = vk_true;
 
   VkDeviceCreateInfo ci{};
   ci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  ci.pNext = &smp_feats;
   ci.pQueueCreateInfos = &queue_create_info;
   ci.queueCreateInfoCount = 1;
   ci.pEnabledFeatures = &feats;
