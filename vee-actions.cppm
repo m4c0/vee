@@ -318,6 +318,22 @@ export inline auto update_descriptor_set_with_storage(VkDescriptorSet set,
 }
 
 export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding,
+                                         VkImageView iv) {
+  VkDescriptorImageInfo ii{};
+  ii.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+  ii.imageView = iv;
+
+  VkWriteDescriptorSet w{};
+  w.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  w.dstSet = set;
+  w.dstBinding = binding;
+  w.descriptorCount = 1;
+  w.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+  w.pImageInfo = &ii;
+  calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
+}
+
+export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding,
                                          VkImageView iv, VkSampler s) {
   VkDescriptorImageInfo ii{};
   ii.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
