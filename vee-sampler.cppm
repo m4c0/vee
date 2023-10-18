@@ -64,4 +64,32 @@ export inline auto create_sampler_yuv420p_conversion(VkPhysicalDevice pd) {
   info.yChromaOffset = coff;
   return sampler_ycbcr_conversion{&info};
 }
+export inline auto create_yuv_sampler(sampler_type st,
+                                      VkSamplerYcbcrConversion conv) {
+  VkSamplerYcbcrConversionInfo yuv{};
+  yuv.sType = VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_INFO;
+  yuv.conversion = conv;
+
+  VkSamplerCreateInfo info{};
+  info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+  info.pNext = &yuv;
+  info.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+  info.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+  info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+  info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+  info.unnormalizedCoordinates = vk_false; // [0, 1) v [0, w)
+  info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+
+  switch (st) {
+  case linear_sampler:
+    info.magFilter = VK_FILTER_LINEAR;
+    info.minFilter = VK_FILTER_LINEAR;
+    break;
+  case nearest_sampler:
+    info.magFilter = VK_FILTER_NEAREST;
+    info.minFilter = VK_FILTER_NEAREST;
+    break;
+  }
+  return sampler{&info};
+}
 } // namespace vee
