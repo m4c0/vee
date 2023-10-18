@@ -16,6 +16,16 @@ export constexpr VkDescriptorSetLayoutBinding dsl_fragment_sampler() {
   b.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
   return b;
 }
+export template <unsigned N>
+constexpr VkDescriptorSetLayoutBinding
+dsl_fragment_samplers(VkSampler (&&smp)[N]) {
+  VkDescriptorSetLayoutBinding b{};
+  b.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+  b.descriptorCount = N;
+  b.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+  b.pImmutableSamplers = smp;
+  return b;
+}
 export constexpr VkDescriptorSetLayoutBinding dsl_fragment_storage() {
   VkDescriptorSetLayoutBinding b{};
   b.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
