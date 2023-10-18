@@ -30,6 +30,12 @@ export inline auto create_srgba_image_view(VkImage img) {
   info.format = VK_FORMAT_R8G8B8A8_SRGB;
   return image_view{&info};
 }
+export inline auto create_yuv420p_image_view(VkImage img) {
+  auto info = create_info_for_aspect_mask(VK_IMAGE_ASPECT_COLOR_BIT);
+  info.image = img;
+  info.format = VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM;
+  return image_view{&info};
+}
 export inline auto create_rgba_image_view(VkImage img,
                                           VkSurfaceFormatKHR sfmt) {
   auto info = create_info_for_aspect_mask(VK_IMAGE_ASPECT_COLOR_BIT);
