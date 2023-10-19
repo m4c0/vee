@@ -114,29 +114,45 @@ export inline auto cmd_bind_vertex_buffers(VkCommandBuffer cb, unsigned idx,
   calls::call(vkCmdBindVertexBuffers, cb, idx, 1, &buf, &offs);
 }
 
-export inline auto cmd_copy_buffer_to_image(VkCommandBuffer cb, VkExtent2D ext,
-                                            VkBuffer buf, VkImage img) {
+constexpr auto vk_buffer_image_copy(VkImageAspectFlags aspect, VkExtent2D ext) {
   VkBufferImageCopy r{};
   r.bufferOffset = 0;
-  r.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+  r.imageSubresource.aspectMask = aspect;
   r.imageSubresource.layerCount = 1;
   r.imageExtent.width = ext.width;
   r.imageExtent.height = ext.height;
   r.imageExtent.depth = 1;
+  return r;
+}
+export inline auto cmd_copy_buffer_to_image(VkCommandBuffer cb, VkExtent2D ext,
+                                            VkBuffer buf, VkImage img) {
+  auto r = vk_buffer_image_copy(VK_IMAGE_ASPECT_COLOR_BIT, ext);
   calls::call(vkCmdCopyBufferToImage, cb, buf, img,
               VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &r);
 }
 export inline auto cmd_copy_image_to_buffer(VkCommandBuffer cb, VkExtent2D ext,
                                             VkImage img, VkBuffer buf) {
-  VkBufferImageCopy r{};
-  r.bufferOffset = 0;
-  r.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-  r.imageSubresource.layerCount = 1;
-  r.imageExtent.width = ext.width;
-  r.imageExtent.height = ext.height;
-  r.imageExtent.depth = 1;
+  auto r = vk_buffer_image_copy(VK_IMAGE_ASPECT_COLOR_BIT, ext);
   calls::call(vkCmdCopyImageToBuffer, cb, img,
               VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buf, 1, &r);
+}
+export inline auto cmd_copy_yuv420p_buffers_to_image(VkCommandBuffer cb,
+                                                     VkExtent2D ext, VkBuffer y,
+                                                     VkBuffer u, VkBuffer v,
+                                                     VkImage img) {
+  auto yy = vk_buffer_image_copy(VK_IMAGE_ASPECT_PLANE_0_BIT, ext);
+  calls::call(vkCmdCopyBufferToImage, cb, y, img,
+              VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &yy);
+
+  VkExtent2D half_ext{ext.width / 2, ext.height / 2};
+
+  auto uu = vk_buffer_image_copy(VK_IMAGE_ASPECT_PLANE_1_BIT, half_ext);
+  calls::call(vkCmdCopyBufferToImage, cb, u, img,
+              VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &uu);
+
+  auto vv = vk_buffer_image_copy(VK_IMAGE_ASPECT_PLANE_2_BIT, half_ext);
+  calls::call(vkCmdCopyBufferToImage, cb, v, img,
+              VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &vv);
 }
 
 export inline auto cmd_draw(VkCommandBuffer cb, unsigned vtx,
