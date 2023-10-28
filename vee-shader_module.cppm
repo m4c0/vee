@@ -4,7 +4,6 @@ import jute;
 import hai;
 import silog;
 import sires;
-import traits;
 import wagen;
 
 using namespace wagen;
