@@ -103,7 +103,7 @@ create_graphics_pipeline(VkPipelineLayout pl, VkRenderPass rp,
 
   VkPipelineRasterizationStateCreateInfo raster{};
   raster.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-  raster.cullMode = VK_CULL_MODE_BACK_BIT;
+  // raster.cullMode = VK_CULL_MODE_BACK_BIT;
   raster.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
   raster.lineWidth = 1;
   raster.polygonMode = VK_POLYGON_MODE_FILL;
