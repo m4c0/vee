@@ -1,5 +1,7 @@
 export module vee:gr_pipeline;
 import :calls;
+import :span;
+import traits;
 import wagen;
 
 using namespace wagen;
@@ -51,17 +53,20 @@ export auto vertex_attribute_vec4(unsigned binding, unsigned offset) {
 export using gr_pipeline =
     calls::handle<VkPipeline, &::vkCreateGraphicsPipelines,
                   &::vkDestroyPipeline>;
-export template <unsigned S, unsigned B, unsigned A>
-inline auto
-create_graphics_pipeline(VkPipelineLayout pl, VkRenderPass rp,
-                         const VkPipelineShaderStageCreateInfo (&shd)[S],
-                         VkVertexInputBindingDescription (&&vb)[B],
-                         VkVertexInputAttributeDescription (&&va)[A]) {
-  for (unsigned i = 0; i < B; i++) {
-    vb[i].binding = i;
+export struct gr_pipeline_params {
+  VkPipelineLayout pipeline_layout;
+  VkRenderPass render_pass;
+  bool back_face_cull{true};
+  span<VkPipelineShaderStageCreateInfo> shaders;
+  span<VkVertexInputBindingDescription> bindings;
+  span<VkVertexInputAttributeDescription> attributes;
+};
+export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
+  for (unsigned i = 0; i < gpp.bindings.size(); i++) {
+    gpp.bindings[i].binding = i;
   }
-  for (unsigned i = 0; i < A; i++) {
-    va[i].location = i;
+  for (unsigned i = 0; i < gpp.attributes.size(); i++) {
+    gpp.attributes[i].location = i;
   }
 
   VkPipelineColorBlendAttachmentState color_blend_attachment{};
@@ -84,7 +89,7 @@ create_graphics_pipeline(VkPipelineLayout pl, VkRenderPass rp,
       VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
   depth_stencil.depthTestEnable = vk_true;
   depth_stencil.depthWriteEnable = vk_true;
-  depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+  depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS;
 
   VkPipelineInputAssemblyStateCreateInfo in_asm{};
   in_asm.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -92,10 +97,10 @@ create_graphics_pipeline(VkPipelineLayout pl, VkRenderPass rp,
 
   VkPipelineVertexInputStateCreateInfo vtx_in{};
   vtx_in.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-  vtx_in.pVertexBindingDescriptions = vb;
-  vtx_in.vertexBindingDescriptionCount = B;
-  vtx_in.pVertexAttributeDescriptions = va;
-  vtx_in.vertexAttributeDescriptionCount = A;
+  vtx_in.pVertexBindingDescriptions = gpp.bindings.data();
+  vtx_in.vertexBindingDescriptionCount = gpp.bindings.size();
+  vtx_in.pVertexAttributeDescriptions = gpp.attributes.data();
+  vtx_in.vertexAttributeDescriptionCount = gpp.attributes.size();
 
   VkPipelineMultisampleStateCreateInfo multisample{};
   multisample.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -103,7 +108,8 @@ create_graphics_pipeline(VkPipelineLayout pl, VkRenderPass rp,
 
   VkPipelineRasterizationStateCreateInfo raster{};
   raster.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-  // raster.cullMode = VK_CULL_MODE_BACK_BIT;
+  if (gpp.back_face_cull)
+    raster.cullMode = VK_CULL_MODE_BACK_BIT;
   raster.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
   raster.lineWidth = 1;
   raster.polygonMode = VK_POLYGON_MODE_FILL;
@@ -121,18 +127,32 @@ create_graphics_pipeline(VkPipelineLayout pl, VkRenderPass rp,
 
   VkGraphicsPipelineCreateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-  info.layout = pl;
+  info.layout = gpp.pipeline_layout;
   info.pColorBlendState = &color_blend;
   info.pDepthStencilState = &depth_stencil;
   info.pDynamicState = &dynamic_state;
   info.pInputAssemblyState = &in_asm;
   info.pMultisampleState = &multisample;
   info.pRasterizationState = &raster;
-  info.pStages = shd;
+  info.pStages = gpp.shaders.data();
   info.pVertexInputState = &vtx_in;
   info.pViewportState = &viewport;
-  info.renderPass = rp;
-  info.stageCount = S;
+  info.renderPass = gpp.render_pass;
+  info.stageCount = gpp.shaders.size();
   return gr_pipeline(vk_null_handle, 1, &info);
+}
+export template <unsigned S, unsigned B, unsigned A>
+inline auto
+create_graphics_pipeline(VkPipelineLayout pl, VkRenderPass rp,
+                         const VkPipelineShaderStageCreateInfo (&shd)[S],
+                         VkVertexInputBindingDescription (&&vb)[B],
+                         VkVertexInputAttributeDescription (&&va)[A]) {
+  return create_graphics_pipeline(gr_pipeline_params{
+      .pipeline_layout = pl,
+      .render_pass = rp,
+      .shaders = shd,
+      .bindings = vb,
+      .attributes = va,
+  });
 }
 } // namespace vee

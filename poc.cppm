@@ -63,18 +63,20 @@ struct extent_stuff {
       vee::create_shader_module_from_resource("poc.vert.spv");
   vee::shader_module frag =
       vee::create_shader_module_from_resource("poc.frag.spv");
-  vee::gr_pipeline gp =
-      vee::create_graphics_pipeline(*pl, *rp,
-                                    {
-                                        vee::pipeline_vert_stage(*vert, "main"),
-                                        vee::pipeline_frag_stage(*frag, "main"),
-                                    },
-                                    {
-                                        vee::vertex_input_bind(sizeof(point)),
-                                    },
-                                    {
-                                        vee::vertex_attribute_vec2(0, 0),
-                                    });
+  vee::gr_pipeline gp = vee::create_graphics_pipeline({
+      .pipeline_layout = *pl,
+      .render_pass = *rp,
+      .shaders{
+          vee::pipeline_vert_stage(*vert, "main"),
+          vee::pipeline_frag_stage(*frag, "main"),
+      },
+      .bindings{
+          vee::vertex_input_bind(sizeof(point)),
+      },
+      .attributes{
+          vee::vertex_attribute_vec2(0, 0),
+      },
+  });
 
   vee::descriptor_pool desc_pool =
       vee::create_descriptor_pool(1, {vee::combined_image_sampler()});
