@@ -141,18 +141,4 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   info.stageCount = gpp.shaders.size();
   return gr_pipeline(vk_null_handle, 1, &info);
 }
-export template <unsigned S, unsigned B, unsigned A>
-inline auto
-create_graphics_pipeline(VkPipelineLayout pl, VkRenderPass rp,
-                         const VkPipelineShaderStageCreateInfo (&shd)[S],
-                         VkVertexInputBindingDescription (&&vb)[B],
-                         VkVertexInputAttributeDescription (&&va)[A]) {
-  return create_graphics_pipeline(gr_pipeline_params{
-      .pipeline_layout = pl,
-      .render_pass = rp,
-      .shaders = shd,
-      .bindings = vb,
-      .attributes = va,
-  });
-}
 } // namespace vee
