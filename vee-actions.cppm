@@ -115,9 +115,9 @@ export inline auto cmd_bind_vertex_buffers(VkCommandBuffer cb, unsigned idx,
 }
 
 export inline auto cmd_copy_buffer(VkCommandBuffer cb, VkBuffer src,
-                                   VkBuffer dst) {
+                                   VkBuffer dst, unsigned sz) {
   VkBufferCopy r{};
-  r.size = vk_whole_size;
+  r.size = sz;
   calls::call(vkCmdCopyBuffer, cb, src, dst, 1, &r);
 }
 
