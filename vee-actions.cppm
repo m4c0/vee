@@ -114,6 +114,13 @@ export inline auto cmd_bind_vertex_buffers(VkCommandBuffer cb, unsigned idx,
   calls::call(vkCmdBindVertexBuffers, cb, idx, 1, &buf, &offs);
 }
 
+export inline auto cmd_copy_buffer(VkCommandBuffer cb, VkBuffer src,
+                                   VkBuffer dst) {
+  VkBufferCopy r{};
+  r.size = vk_whole_size;
+  calls::call(vkCmdCopyBuffer, cb, src, dst, 1, &r);
+}
+
 constexpr auto vk_buffer_image_copy(VkImageAspectFlags aspect, VkExtent2D ext) {
   VkBufferImageCopy r{};
   r.bufferOffset = 0;
@@ -174,6 +181,49 @@ export enum barrier_type {
   from_transfer_to_fragment,
   from_pipeline_to_host,
 };
+export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkBuffer buf,
+                                        barrier_type bt) {
+  VkBufferMemoryBarrier imb{};
+  imb.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+  imb.srcQueueFamilyIndex = vk_queue_family_ignored;
+  imb.dstQueueFamilyIndex = vk_queue_family_ignored;
+  imb.buffer = buf;
+  imb.size = vk_whole_size;
+
+  switch (bt) {
+  case from_host_to_transfer: {
+    imb.srcAccessMask = 0;
+    imb.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+    constexpr const auto src_stage = VK_PIPELINE_STAGE_HOST_BIT;
+    constexpr const auto dst_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    calls::call(vkCmdPipelineBarrier, cb, src_stage, dst_stage, 0, 0, nullptr,
+                1, &imb, 0, nullptr);
+    break;
+  }
+  case from_transfer_to_fragment: {
+    imb.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    imb.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+    constexpr const auto src_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    constexpr const auto dst_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    calls::call(vkCmdPipelineBarrier, cb, src_stage, dst_stage, 0, 0, nullptr,
+                1, &imb, 0, nullptr);
+    break;
+  }
+  case from_pipeline_to_host: {
+    imb.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+    imb.dstAccessMask = VK_ACCESS_HOST_READ_BIT;
+
+    constexpr const auto src_stage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    constexpr const auto dst_stage = VK_PIPELINE_STAGE_HOST_BIT;
+    calls::call(vkCmdPipelineBarrier, cb, src_stage, dst_stage, 0, 0, nullptr,
+                1, &imb, 0, nullptr);
+    break;
+  }
+  }
+}
+
 export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkImage img,
                                         barrier_type bt) {
   VkImageMemoryBarrier imb{};
