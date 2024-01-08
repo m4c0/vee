@@ -439,6 +439,10 @@ export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding,
   calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
 }
 
+export inline auto wait_and_reset_fence(VkFence fence, unsigned millis) {
+  calls::call(vkWaitForFences, 1, &fence, vk_true, millis * 1000UL);
+  calls::call(vkResetFences, 1, &fence);
+}
 export inline auto wait_and_reset_fence(VkFence fence) {
   calls::call(vkWaitForFences, 1, &fence, vk_true, ~0UL);
   calls::call(vkResetFences, 1, &fence);
