@@ -9,6 +9,7 @@ using namespace wagen;
 namespace vee {
 export struct api_failure {};
 export struct out_of_date_error {};
+export struct timeout {};
 
 inline constexpr const auto message_for_result(VkResult res) {
   switch (res) {
@@ -119,6 +120,8 @@ constexpr void call(Fn &&fn, Args &&...args) {
     // of these might be in-flight, let's wait until the device idle first
     vkDeviceWaitIdle(device());
     throw out_of_date_error{};
+  case VK_TIMEOUT:
+    throw timeout{};
   default:
     silog::log(silog::error, "%s", message_for_result(res));
     throw api_failure{};
