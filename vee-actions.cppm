@@ -440,7 +440,7 @@ export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding,
 }
 
 export inline auto wait_and_reset_fence(VkFence fence, unsigned millis) {
-  calls::call(vkWaitForFences, 1, &fence, vk_true, millis * 1000UL);
+  calls::call(vkWaitForFences, 1, &fence, vk_true, millis * 1000000UL);
   calls::call(vkResetFences, 1, &fence);
 }
 export inline auto wait_and_reset_fence(VkFence fence) {
