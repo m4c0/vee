@@ -67,7 +67,7 @@ export inline auto begin_cmd_buf_one_time_submit(VkCommandBuffer cb) {
   info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
   calls::call(vkBeginCommandBuffer, cb, &info);
 }
-export inline auto begin_cmd_buf_simulteanous_use(VkCommandBuffer cb) {
+export inline auto begin_cmd_buf_sim_use(VkCommandBuffer cb) {
   VkCommandBufferBeginInfo info{};
   info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
   info.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
