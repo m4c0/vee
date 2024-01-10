@@ -24,6 +24,17 @@ export inline auto create_depth_image_view(VkImage img) {
   info.format = VK_FORMAT_D32_SFLOAT;
   return image_view{&info};
 }
+
+export inline auto create_r8_image_view(VkImage img) {
+  auto info = create_info_for_aspect_mask(VK_IMAGE_ASPECT_COLOR_BIT);
+  info.image = img;
+  info.format = VK_FORMAT_R8_UNORM;
+  info.components.r = VK_COMPONENT_SWIZZLE_ONE;
+  info.components.g = VK_COMPONENT_SWIZZLE_ONE;
+  info.components.b = VK_COMPONENT_SWIZZLE_ONE;
+  info.components.a = VK_COMPONENT_SWIZZLE_R;
+  return image_view{&info};
+}
 export inline auto create_srgba_image_view(VkImage img) {
   auto info = create_info_for_aspect_mask(VK_IMAGE_ASPECT_COLOR_BIT);
   info.image = img;
