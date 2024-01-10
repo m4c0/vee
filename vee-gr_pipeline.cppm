@@ -57,6 +57,7 @@ export struct gr_pipeline_params {
   VkPipelineLayout pipeline_layout;
   VkRenderPass render_pass;
   bool back_face_cull{true};
+  bool depth_test{true};
   span<VkPipelineShaderStageCreateInfo> shaders;
   span<VkVertexInputBindingDescription> bindings;
   span<VkVertexInputAttributeDescription> attributes;
@@ -87,7 +88,7 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   VkPipelineDepthStencilStateCreateInfo depth_stencil{};
   depth_stencil.sType =
       VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-  depth_stencil.depthTestEnable = vk_true;
+  depth_stencil.depthTestEnable = gpp.depth_test ? vk_true : vk_false;
   depth_stencil.depthWriteEnable = vk_true;
   depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS;
 
