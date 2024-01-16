@@ -13,4 +13,24 @@ export inline auto create_fence_signaled() {
   info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
   return fence{&info};
 }
+
+export inline auto wait_for_fence(VkFence fence, unsigned millis) {
+  calls::call(vkWaitForFences, 1, &fence, vk_true, millis * 1000000UL);
+}
+export inline auto wait_for_fence(VkFence fence) {
+  calls::call(vkWaitForFences, 1, &fence, vk_true, ~0UL);
+}
+
+export inline auto reset_fence(VkFence fence) {
+  calls::call(vkResetFences, 1, &fence);
+}
+
+export inline auto wait_and_reset_fence(VkFence fence, unsigned millis) {
+  wait_for_fence(fence, millis);
+  reset_fence(fence);
+}
+export inline auto wait_and_reset_fence(VkFence fence) {
+  wait_for_fence(fence);
+  reset_fence(fence);
+}
 } // namespace vee
