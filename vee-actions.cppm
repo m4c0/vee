@@ -80,7 +80,7 @@ export struct render_pass_begin {
   VkFramebuffer framebuffer;
   VkExtent2D extent;
   VkClearColorValue clear_color{{1.0f, 0.0f, 1.0f, 1.0f}};
-  bool use_secondary_cmd_buf = true;
+  bool use_secondary_cmd_buf = false;
 };
 export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
   // Using sensible defaults. The magenta color is a visible marker for pixels
