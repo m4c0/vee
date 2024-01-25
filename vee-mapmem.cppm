@@ -19,12 +19,16 @@ export class mapmem {
 
 public:
   explicit mapmem(VkDeviceMemory m) : m_dm{m}, m_ptr{memimpl::map(m)} {}
-  ~mapmem() { memimpl::unmap(m_dm); }
+  ~mapmem() {
+    if (m_ptr != nullptr)
+      memimpl::unmap(m_dm);
+  }
 
   mapmem(const mapmem &) = delete;
-  mapmem(mapmem &&) = delete;
   mapmem &operator=(const mapmem &) = delete;
-  mapmem &operator=(mapmem &&) = delete;
+
+  mapmem(mapmem &&o) : m_dm{o.m_dm}, m_ptr{o.m_ptr} { o.m_ptr = nullptr; }
+  mapmem &operator=(mapmem &&o) = delete;
 
   [[nodiscard]] constexpr auto *operator*() noexcept { return m_ptr; }
 };
