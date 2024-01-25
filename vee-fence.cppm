@@ -1,5 +1,6 @@
 export module vee:fence;
 import :calls;
+import silog;
 import wagen;
 
 using namespace wagen;
@@ -19,6 +20,18 @@ export inline auto wait_for_fence(VkFence fence, unsigned millis) {
 }
 export inline auto wait_for_fence(VkFence fence) {
   calls::call(vkWaitForFences, 1, &fence, vk_true, ~0UL);
+}
+
+export inline auto get_fence_status(VkFence fence) {
+  switch (auto res = vkGetFenceStatus(device(), fence)) {
+  case VK_SUCCESS:
+    return true;
+  case VK_NOT_READY:
+    return false;
+  default:
+    silog::log(silog::error, "%s", message_for_result(res));
+    throw api_failure{};
+  }
 }
 
 export inline auto reset_fence(VkFence fence) {
