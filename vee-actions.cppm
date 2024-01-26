@@ -1,6 +1,5 @@
 export module vee:actions;
 import :calls;
-import :mapmem;
 import wagen;
 
 using namespace wagen;
@@ -345,10 +344,11 @@ export inline auto end_cmd_buf(VkCommandBuffer cb) {
   calls::call(vkEndCommandBuffer, cb);
 }
 
-export template <typename Tp>
-inline void map_memory(VkDeviceMemory m, auto &&fn) {
-  mapmem mm{m};
-  fn(static_cast<Tp *>(*mm));
+export inline void *map_memory(VkDeviceMemory m) {
+  return calls::create<void *, &::vkMapMemory>(m, 0, vk_whole_size, 0);
+}
+export inline void unmap_memory(VkDeviceMemory m) {
+  return calls::call(vkUnmapMemory, m);
 }
 
 export struct present_info {
