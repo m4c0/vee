@@ -196,11 +196,11 @@ extern "C" void casein_handle(const casein::event &e) {
 
       vee::update_descriptor_set(ext->desc_set, 0, *ext->t_iv, *ext->smp);
 
-      vee::map_memory<point>(*ext->v_mem, [](auto *vs) {
-        vs[0] = {-1, -1};
-        vs[1] = {0, 1};
-        vs[2] = {1, -1};
-      });
+      auto vs = static_cast<point *>(vee::map_memory(*ext->v_mem));
+      vs[0] = {-1, -1};
+      vs[1] = {0, 1};
+      vs[2] = {1, -1};
+      vee::unmap_memory(*ext->v_mem);
       {
         vee::mapmem p{*ext->ts_mem};
         for (auto i = 0; i < 16 * 16; i++) {

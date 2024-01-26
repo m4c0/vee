@@ -1,16 +1,6 @@
 export module vee:mapmem;
-import :calls;
+import :actions;
 import wagen;
-
-// clang <=16 has a bug on Windows when we instantiate a exported symbol which
-// relies on non-exported symbols. i.e. it blows up when it tries to instantiate
-// `calls::create` inside any form of template method/class
-export namespace vee::memimpl {
-[[nodiscard]] void *map(VkDeviceMemory m) {
-  return calls::create<void *, &::vkMapMemory>(m, 0, vk_whole_size, 0);
-}
-void unmap(VkDeviceMemory m) { calls::call(vkUnmapMemory, m); }
-} // namespace vee::memimpl
 
 namespace vee {
 export class mapmem {
@@ -19,10 +9,10 @@ export class mapmem {
 
 public:
   mapmem() = default;
-  explicit mapmem(VkDeviceMemory m) : m_dm{m}, m_ptr{memimpl::map(m)} {}
+  explicit mapmem(VkDeviceMemory m) : m_dm{m}, m_ptr{map_memory(m)} {}
   ~mapmem() {
     if (m_ptr != nullptr)
-      memimpl::unmap(m_dm);
+      unmap_memory(m_dm);
   }
 
   mapmem(const mapmem &) = delete;
