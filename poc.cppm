@@ -201,13 +201,12 @@ extern "C" void casein_handle(const casein::event &e) {
       vs[1] = {0, 1};
       vs[2] = {1, -1};
       vee::unmap_memory(*ext->v_mem);
-      {
-        vee::mapmem p{*ext->ts_mem};
-        for (auto i = 0; i < 16 * 16; i++) {
-          static_cast<rgba *>(*p)[i] = {255, 255, 255,
-                                        static_cast<unsigned char>(i)};
-        }
+
+      auto ps = static_cast<rgba *>(vee::map_memory(*ext->ts_mem));
+      for (auto i = 0; i < 16 * 16; i++) {
+        ps[i] = {255, 255, 255, static_cast<unsigned char>(i)};
       }
+      vee::unmap_memory(*ext->ts_mem);
 
       pc.vert_scale = 0.8;
 
