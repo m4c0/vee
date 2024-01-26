@@ -14,10 +14,11 @@ void unmap(VkDeviceMemory m) { calls::call(vkUnmapMemory, m); }
 
 namespace vee {
 export class mapmem {
-  VkDeviceMemory m_dm;
-  void *m_ptr;
+  VkDeviceMemory m_dm{};
+  void *m_ptr{};
 
 public:
+  mapmem() = default;
   explicit mapmem(VkDeviceMemory m) : m_dm{m}, m_ptr{memimpl::map(m)} {}
   ~mapmem() {
     if (m_ptr != nullptr)
