@@ -248,6 +248,7 @@ extern "C" void casein_handle(const casein::event &e) {
               .framebuffer = *frame->fb,
               .extent = ext->extent,
               .clear_color = {{0.1, 0.2, 0.3, 1.0}},
+              .use_secondary_cmd_buf = true,
           });
           vee::cmd_execute_command(frame->cb, inf.cb);
           vee::cmd_end_render_pass(frame->cb);
