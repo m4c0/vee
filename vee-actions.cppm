@@ -167,9 +167,9 @@ export inline auto cmd_copy_yuv420p_buffers_to_image(VkCommandBuffer cb,
               VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &vv);
 }
 
-export inline auto cmd_draw(VkCommandBuffer cb, unsigned vtx,
-                            unsigned inst = 1) {
-  calls::call(vkCmdDraw, cb, vtx, inst, 0U, 0U);
+export inline auto cmd_draw(VkCommandBuffer cb, unsigned vtx, unsigned inst = 1,
+                            unsigned first_inst = 0) {
+  calls::call(vkCmdDraw, cb, vtx, inst, 0U, first_inst);
 }
 
 export inline auto cmd_end_render_pass(VkCommandBuffer cb) {
