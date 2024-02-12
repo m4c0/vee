@@ -63,6 +63,7 @@ export using gr_pipeline =
 export struct gr_pipeline_params {
   VkPipelineLayout pipeline_layout;
   VkRenderPass render_pass;
+  VkPrimitiveTopology topology{VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST};
   bool back_face_cull{true};
   bool depth_test{true};
   span<VkPipelineShaderStageCreateInfo> shaders;
@@ -101,7 +102,7 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
 
   VkPipelineInputAssemblyStateCreateInfo in_asm{};
   in_asm.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-  in_asm.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+  in_asm.topology = gpp.topology;
 
   VkPipelineVertexInputStateCreateInfo vtx_in{};
   vtx_in.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
