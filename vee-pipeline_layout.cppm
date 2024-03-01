@@ -60,6 +60,16 @@ inline auto create_pipeline_layout(const VkPushConstantRange (&pcr)[P]) {
   info.pPushConstantRanges = pcr;
   return pipeline_layout{&info};
 }
+export inline auto create_pipeline_layout(const VkDescriptorSetLayout &dsl,
+                                          const VkPushConstantRange &pcr) {
+  VkPipelineLayoutCreateInfo info{};
+  info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+  info.pushConstantRangeCount = 1;
+  info.pPushConstantRanges = &pcr;
+  info.setLayoutCount = 1;
+  info.pSetLayouts = &dsl;
+  return pipeline_layout{&info};
+}
 export inline auto create_pipeline_layout() {
   VkPipelineLayoutCreateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
