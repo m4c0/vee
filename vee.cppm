@@ -30,4 +30,6 @@ export import :metal;
 export import :android;
 #elif defined(_WIN32)
 export import :windows;
+#elif __linux__
+export import :linux;
 #endif
