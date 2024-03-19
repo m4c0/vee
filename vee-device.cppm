@@ -30,7 +30,9 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
 
   VkDeviceCreateInfo ci{};
   ci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+#ifndef LECO_TARGET_LINUX
   ci.pNext = &smp_feats;
+#endif
   ci.pQueueCreateInfos = &queue_create_info;
   ci.queueCreateInfoCount = 1;
   ci.pEnabledFeatures = &feats;
