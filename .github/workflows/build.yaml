@@ -10,17 +10,16 @@ jobs:
       matrix:
         os:
           - macos-latest
+          - ubuntu-latest
           - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
       - name: 🧰 Setup
-        uses: m4c0/ecow/.github/actions/setup@main
+        uses: m4c0/leco/.github/actions/setup@main
       - name: 🧀 Prepare Deps
         uses: m4c0/vee/.github/actions/deps@main
       - name: 🖖 Install glslang
         uses: m4c0/vee/.github/actions/glslang@main
       - name: 🔨 Build
-        uses: m4c0/ecow/.github/actions/compile@main
-        with:
-          project: vee
+        run: ./leco/leco.exe -C vee
 
