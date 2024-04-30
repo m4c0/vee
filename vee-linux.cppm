@@ -1,3 +1,10 @@
+module;
+#include <X11/Xlib.h>
+struct casein_native_handle {
+  Display * display;
+  Window window;
+};
+
 export module vee:linux;
 import :calls;
 import wagen;
