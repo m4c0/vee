@@ -150,149 +150,149 @@ enum states {
   failed_to_start,
 };
 
-extern "C" void casein_handle(const casein::event &e) {
-  static volatile casein::native_handle_t nptr{};
-  static hai::uptr<device_stuff> dev{};
-  static hai::uptr<extent_stuff> ext{};
-  static hai::uptr<inflights> infs{};
-  static hai::holder<hai::uptr<frame_stuff>[]> frms{};
-  static states state = waiting_nptr;
-  static upc pc{};
+static hai::uptr<device_stuff> dev{};
+static hai::uptr<extent_stuff> ext{};
+static hai::uptr<inflights> infs{};
+static hai::holder<hai::uptr<frame_stuff>[]> frms{};
+static states state = waiting_nptr;
+static upc pc{};
 
-  switch (e.type()) {
-  case casein::CREATE_WINDOW:
-    switch (state) {
-    case waiting_nptr:
-      nptr = *(e.as<casein::events::create_window>());
-      dev = hai::uptr<device_stuff>::make(nptr);
-      break;
-    default:
-      break;
-    }
-    state = sires::open("poc.vert.spv")
-                .map([](auto &&) { return setup_stuff; })
-                .unwrap(failed_to_start);
-    break;
-  case casein::MOUSE_MOVE: {
-    const auto &[x, y] = *e.as<casein::events::mouse_move>();
-    pc.mouse_x = x;
-    pc.mouse_y = y;
-    break;
-  }
-  case casein::REPAINT:
-    switch (state) {
-    case setup_stuff: {
-      const auto &[pd, qf] = dev->pdqf;
-      ext = hai::uptr<extent_stuff>::make(pd, dev->s, qf);
-      infs = hai::uptr<inflights>::make(qf);
-
-      auto imgs = vee::get_swapchain_images(*ext->swc);
-      frms = decltype(frms)::make(imgs.size());
-      for (auto i = 0; i < imgs.size(); i++) {
-        auto img = imgs[i];
-        vee::image_view iv = vee::create_rgba_image_view(img, ext->pd, *ext->s);
-        (*frms)[i] = hai::uptr<frame_stuff>::make(&*ext, traits::move(iv));
-      }
-
-      vee::update_descriptor_set(ext->desc_set, 0, *ext->t_iv, *ext->smp);
-
-      auto vs = static_cast<point *>(vee::map_memory(*ext->v_mem));
-      vs[0] = {-1, -1};
-      vs[1] = {0, 1};
-      vs[2] = {1, -1};
-      vee::unmap_memory(*ext->v_mem);
-
-      auto ps = static_cast<rgba *>(vee::map_memory(*ext->ts_mem));
-      for (auto i = 0; i < 16 * 16; i++) {
-        ps[i] = {255, 255, 255, static_cast<unsigned char>(i)};
-      }
-      vee::unmap_memory(*ext->ts_mem);
-
-      pc.vert_scale = 0.8;
-
-      state = ready_to_paint;
-      break;
-    }
-    case ready_to_paint: {
-      try {
-        flip(*infs);
-
-        auto &inf = infs->back;
-        vee::wait_and_reset_fence(*inf.f);
-
-        auto idx = vee::acquire_next_image(*ext->swc, *inf.img_available_sema);
-        auto &frame = (*frms)[idx];
-
-        {
-          vee::begin_cmd_buf_render_pass_continue(inf.cb, *ext->rp);
-          vee::cmd_set_scissor(inf.cb, ext->extent);
-          vee::cmd_set_viewport(inf.cb, ext->extent);
-          vee::cmd_push_vert_frag_constants(inf.cb, *ext->pl, &pc);
-          vee::cmd_bind_descriptor_set(inf.cb, *ext->pl, 0, ext->desc_set);
-          vee::cmd_bind_gr_pipeline(inf.cb, *ext->gp);
-          vee::cmd_bind_vertex_buffers(inf.cb, 0, *ext->v_buf);
-          vee::cmd_draw(inf.cb, 3);
-          vee::end_cmd_buf(inf.cb);
-        }
-        {
-          vee::begin_cmd_buf_one_time_submit(frame->cb);
-          vee::cmd_pipeline_barrier(frame->cb, *ext->t_img,
-                                    vee::from_host_to_transfer);
-          vee::cmd_copy_buffer_to_image(frame->cb, {16, 16}, *ext->ts_buf,
-                                        *ext->t_img);
-          vee::cmd_pipeline_barrier(frame->cb, *ext->t_img,
-                                    vee::from_transfer_to_fragment);
-          vee::cmd_begin_render_pass({
-              .command_buffer = frame->cb,
-              .render_pass = *ext->rp,
-              .framebuffer = *frame->fb,
-              .extent = ext->extent,
-              .clear_color = {{0.1, 0.2, 0.3, 1.0}},
-              .use_secondary_cmd_buf = true,
-          });
-          vee::cmd_execute_command(frame->cb, inf.cb);
-          vee::cmd_end_render_pass(frame->cb);
-          vee::end_cmd_buf(frame->cb);
-        }
-
-        vee::queue_submit({
-            .queue = dev->q,
-            .fence = *inf.f,
-            .command_buffer = frame->cb,
-            .wait_semaphore = *inf.img_available_sema,
-            .signal_semaphore = *inf.rnd_finished_sema,
-        });
-        vee::queue_present({
-            .queue = dev->q,
-            .swapchain = *ext->swc,
-            .wait_semaphore = *inf.rnd_finished_sema,
-            .image_index = idx,
-        });
-      } catch (vee::out_of_date_error) {
-        state = setup_stuff;
-        vee::device_wait_idle();
-      }
-      break;
-    }
-    default:
-      break;
-    }
-    break;
-  case casein::RESIZE_WINDOW: {
-    pc.factor = (*e.as<casein::events::resize_window>()).scale_factor;
-    vee::device_wait_idle();
-    state = setup_stuff;
-    break;
-  }
-  case casein::QUIT:
-    vee::device_wait_idle();
-    frms = {};
-    infs = {};
-    ext = {};
-    dev = {};
-    state = done;
+static void create_window() {
+  switch (state) {
+  case waiting_nptr:
+    dev = hai::uptr<device_stuff>::make();
     break;
   default:
     break;
   }
+  state = sires::open("poc.vert.spv")
+              .map([](auto &&) { return setup_stuff; })
+              .unwrap(failed_to_start);
 }
+static void mouse_move() {
+  pc.mouse_x = casein::mouse_pos.x;
+  pc.mouse_y = casein::mouse_pos.y;
+}
+static void repaint() {
+  switch (state) {
+  case setup_stuff: {
+    const auto &[pd, qf] = dev->pdqf;
+    ext = hai::uptr<extent_stuff>::make(pd, dev->s, qf);
+    infs = hai::uptr<inflights>::make(qf);
+
+    auto imgs = vee::get_swapchain_images(*ext->swc);
+    frms = decltype(frms)::make(imgs.size());
+    for (auto i = 0; i < imgs.size(); i++) {
+      auto img = imgs[i];
+      vee::image_view iv = vee::create_rgba_image_view(img, ext->pd, *ext->s);
+      (*frms)[i] = hai::uptr<frame_stuff>::make(&*ext, traits::move(iv));
+    }
+
+    vee::update_descriptor_set(ext->desc_set, 0, *ext->t_iv, *ext->smp);
+
+    auto vs = static_cast<point *>(vee::map_memory(*ext->v_mem));
+    vs[0] = {-1, -1};
+    vs[1] = {0, 1};
+    vs[2] = {1, -1};
+    vee::unmap_memory(*ext->v_mem);
+
+    auto ps = static_cast<rgba *>(vee::map_memory(*ext->ts_mem));
+    for (auto i = 0; i < 16 * 16; i++) {
+      ps[i] = {255, 255, 255, static_cast<unsigned char>(i)};
+    }
+    vee::unmap_memory(*ext->ts_mem);
+
+    pc.vert_scale = 0.8;
+
+    state = ready_to_paint;
+    break;
+  }
+  case ready_to_paint: {
+    try {
+      flip(*infs);
+
+      auto &inf = infs->back;
+      vee::wait_and_reset_fence(*inf.f);
+
+      auto idx = vee::acquire_next_image(*ext->swc, *inf.img_available_sema);
+      auto &frame = (*frms)[idx];
+
+      {
+        vee::begin_cmd_buf_render_pass_continue(inf.cb, *ext->rp);
+        vee::cmd_set_scissor(inf.cb, ext->extent);
+        vee::cmd_set_viewport(inf.cb, ext->extent);
+        vee::cmd_push_vert_frag_constants(inf.cb, *ext->pl, &pc);
+        vee::cmd_bind_descriptor_set(inf.cb, *ext->pl, 0, ext->desc_set);
+        vee::cmd_bind_gr_pipeline(inf.cb, *ext->gp);
+        vee::cmd_bind_vertex_buffers(inf.cb, 0, *ext->v_buf);
+        vee::cmd_draw(inf.cb, 3);
+        vee::end_cmd_buf(inf.cb);
+      }
+      {
+        vee::begin_cmd_buf_one_time_submit(frame->cb);
+        vee::cmd_pipeline_barrier(frame->cb, *ext->t_img,
+                                  vee::from_host_to_transfer);
+        vee::cmd_copy_buffer_to_image(frame->cb, {16, 16}, *ext->ts_buf,
+                                      *ext->t_img);
+        vee::cmd_pipeline_barrier(frame->cb, *ext->t_img,
+                                  vee::from_transfer_to_fragment);
+        vee::cmd_begin_render_pass({
+            .command_buffer = frame->cb,
+            .render_pass = *ext->rp,
+            .framebuffer = *frame->fb,
+            .extent = ext->extent,
+            .clear_color = {{0.1, 0.2, 0.3, 1.0}},
+            .use_secondary_cmd_buf = true,
+        });
+        vee::cmd_execute_command(frame->cb, inf.cb);
+        vee::cmd_end_render_pass(frame->cb);
+        vee::end_cmd_buf(frame->cb);
+      }
+
+      vee::queue_submit({
+          .queue = dev->q,
+          .fence = *inf.f,
+          .command_buffer = frame->cb,
+          .wait_semaphore = *inf.img_available_sema,
+          .signal_semaphore = *inf.rnd_finished_sema,
+      });
+      vee::queue_present({
+          .queue = dev->q,
+          .swapchain = *ext->swc,
+          .wait_semaphore = *inf.rnd_finished_sema,
+          .image_index = idx,
+      });
+    } catch (vee::out_of_date_error) {
+      state = setup_stuff;
+      vee::device_wait_idle();
+    }
+    break;
+  }
+  default:
+    break;
+  }
+}
+static void resize_window() {
+  pc.factor = casein::screen_scale_factor;
+  vee::device_wait_idle();
+  state = setup_stuff;
+}
+static void quit() {
+  vee::device_wait_idle();
+  frms = {};
+  infs = {};
+  ext = {};
+  dev = {};
+  state = done;
+}
+
+struct init {
+  init() {
+    using namespace casein;
+    handle(CREATE_WINDOW, create_window);
+    handle(MOUSE_MOVE, mouse_move);
+    handle(REPAINT, repaint);
+    handle(RESIZE_WINDOW, resize_window);
+    handle(QUIT, quit);
+  }
+} i;
