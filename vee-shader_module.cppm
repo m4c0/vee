@@ -33,7 +33,7 @@ struct resource_unavailable {};
 export inline shader_module create_shader_module_from_resource(jute::view res) {
   return sires::open(res).fmap(slurp).take([res](auto e) {
     silog::log(silog::error, "Failed to load shader [%s]: %s",
-               res.cstr().data(), e);
+               res.cstr().data(), e.cstr().data());
     throw resource_unavailable{};
   });
 }
