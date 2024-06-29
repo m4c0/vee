@@ -21,20 +21,16 @@ export inline auto create_shader_module(void *data, unsigned size) {
   return shader_module{&info};
 }
 
-inline auto slurp(hai::uptr<yoyo::reader> &rdr) {
-  return rdr->size().fmap([&](auto sz) {
-    auto buf = hai::holder<char[]>::make(sz);
-    return rdr->read(*buf, sz).map(
-        [&] { return create_shader_module(*buf, sz); });
-  });
-}
-
 struct resource_unavailable {};
 export inline shader_module create_shader_module_from_resource(jute::view res) {
-  return sires::open(res).fmap(slurp).take([res](auto e) {
-    silog::log(silog::error, "Failed to load shader [%s]: %s",
-               res.cstr().data(), e.cstr().data());
-    throw resource_unavailable{};
-  });
+  return sires::slurp(res)
+      .map([](auto &data) {
+        return create_shader_module(data.begin(), data.size());
+      })
+      .take([res](auto e) {
+        silog::log(silog::error, "Failed to load shader [%s]: %s",
+                   res.cstr().data(), e.cstr().data());
+        throw resource_unavailable{};
+      });
 }
 } // namespace vee
