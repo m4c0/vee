@@ -60,7 +60,8 @@ static void mouse_move() {
 static volatile bool gv_resized {};
 static void resize_window() {
   pc.factor = casein::screen_scale_factor;
-  gv_resized = true;
+
+  if (!casein::window_live_resize) gv_resized = true;
 }
 
 static class thread : public sith::thread {
