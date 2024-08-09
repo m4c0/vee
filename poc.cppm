@@ -5,8 +5,9 @@ export module poc;
 
 import casein;
 import hai;
-import sith;
+import silog;
 import sires;
+import sith;
 import traits;
 import vee;
 
@@ -55,7 +56,9 @@ static void mouse_move() {
   pc.mouse_x = casein::mouse_pos.x;
   pc.mouse_y = casein::mouse_pos.y;
 }
-static void resize_window() { pc.factor = casein::screen_scale_factor; }
+
+static volatile bool gv_resized{};
+static void resize_window() { pc.factor = casein::screen_scale_factor; gv_resized = true; }
 
 static class thread : public sith::thread {
 public:
@@ -157,7 +160,7 @@ public:
 
       pc.vert_scale = 0.8;
 
-      while (!interrupted()) {
+      while (!interrupted() && !gv_resized) {
         try {
           auto tmp = traits::move(front);
           front = traits::move(back);
@@ -212,10 +215,12 @@ public:
               .image_index = idx,
           });
         } catch (vee::out_of_date_error) {
-          vee::device_wait_idle();
+          silog::log(silog::info, "extent is outdated");
           break;
         }
       }
+      gv_resized = false;
+      vee::device_wait_idle();
     }
   }
 } t;
