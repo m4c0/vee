@@ -324,6 +324,9 @@ inline auto cmd_push_vert_frag_constants(VkCommandBuffer cb,
               sizeof(Tp), v);
 }
 
+export inline auto cmd_set_scissor(VkCommandBuffer cb, VkRect2D r) {
+  calls::call(vkCmdSetScissor, cb, 0, 1, &r);
+}
 export inline auto cmd_set_scissor(VkCommandBuffer cb, VkExtent2D ext) {
   VkRect2D rect{};
   rect.extent = ext;
