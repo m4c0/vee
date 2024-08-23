@@ -9,4 +9,5 @@ using descriptor_set = VkDescriptorSet;
 using extent = VkExtent2D;
 using physical_device = VkPhysicalDevice;
 using queue = VkQueue;
+using rect = VkRect2D;
 } // namespace vee
