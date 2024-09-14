@@ -1,5 +1,6 @@
 export module vee:image_view;
 import :calls;
+import :image;
 import :surface_format;
 import wagen;
 
@@ -25,21 +26,26 @@ export inline auto create_depth_image_view(VkImage img) {
   return image_view{&info};
 }
 
-export inline auto create_r8_image_view(VkImage img) {
+export inline auto create_image_view(VkImage img, vee::image_format fmt) {
   auto info = create_info_for_aspect_mask(VK_IMAGE_ASPECT_COLOR_BIT);
   info.image = img;
-  info.format = VK_FORMAT_R8_UNORM;
-  info.components.r = VK_COMPONENT_SWIZZLE_ONE;
-  info.components.g = VK_COMPONENT_SWIZZLE_ONE;
-  info.components.b = VK_COMPONENT_SWIZZLE_ONE;
-  info.components.a = VK_COMPONENT_SWIZZLE_R;
+  info.format = static_cast<VkFormat>(fmt);
+  if (fmt == vee::image_format_r8) {
+    info.components.r = VK_COMPONENT_SWIZZLE_ONE;
+    info.components.g = VK_COMPONENT_SWIZZLE_ONE;
+    info.components.b = VK_COMPONENT_SWIZZLE_ONE;
+    info.components.a = VK_COMPONENT_SWIZZLE_R;
+  }
   return image_view{&info};
 }
+export inline auto create_r8_image_view(VkImage img) {
+  return create_image_view(img, vee::image_format_r8);
+}
+export inline auto create_unorm_rgba_image_view(VkImage img) {
+  return create_image_view(img, image_format_rgba_unorm);
+}
 export inline auto create_srgba_image_view(VkImage img) {
-  auto info = create_info_for_aspect_mask(VK_IMAGE_ASPECT_COLOR_BIT);
-  info.image = img;
-  info.format = VK_FORMAT_R8G8B8A8_SRGB;
-  return image_view{&info};
+  return create_image_view(img, image_format_srgba);
 }
 export inline auto create_yuv420p_image_view(VkImage img,
                                              VkSamplerYcbcrConversion conv) {
