@@ -34,7 +34,9 @@ export inline auto create_depth_image(VkPhysicalDevice pd, VkSurfaceKHR s) {
 export enum image_format {
   image_format_r8 = VK_FORMAT_R8_UNORM,
   image_format_srgba = VK_FORMAT_R8G8B8A8_SRGB,
+  image_format_rgba_uint = VK_FORMAT_R8G8B8A8_UINT,
   image_format_rgba_unorm = VK_FORMAT_R8G8B8A8_UNORM,
+  image_format_rgba_uscaled = VK_FORMAT_R8G8B8A8_USCALED,
   image_format_yuv420p = VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM,
 };
 export inline auto create_image(VkExtent2D ext, image_format fmt) {
