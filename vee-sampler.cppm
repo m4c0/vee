@@ -21,14 +21,15 @@ export inline auto create_sampler(sampler_type st) {
   info.maxAnisotropy = max_anisotropy_ever;
   info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
   info.unnormalizedCoordinates = vk_false; // [0, 1) v [0, w)
-  info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
   switch (st) {
   case linear_sampler:
+    info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
     info.magFilter = VK_FILTER_LINEAR;
     info.minFilter = VK_FILTER_LINEAR;
     break;
   case nearest_sampler:
+    info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
     info.magFilter = VK_FILTER_NEAREST;
     info.minFilter = VK_FILTER_NEAREST;
     break;
