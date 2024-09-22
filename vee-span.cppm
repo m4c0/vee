@@ -10,10 +10,10 @@ public:
 
   constexpr span(auto... args) : m_data{hai::array<Tp>::make(args...)} {}
 
-  [[nodiscard]] constexpr auto *data() const noexcept { return m_data.begin(); }
-  [[nodiscard]] constexpr auto &operator[](unsigned idx) noexcept {
+  [[nodiscard]] constexpr auto *data() const { return m_data.begin(); }
+  [[nodiscard]] constexpr auto &operator[](unsigned idx) {
     return m_data[idx];
   }
-  [[nodiscard]] constexpr auto size() const noexcept { return m_data.size(); };
+  [[nodiscard]] constexpr auto size() const { return m_data.size(); };
 };
 } // namespace vee
