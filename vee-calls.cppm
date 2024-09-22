@@ -158,7 +158,7 @@ public:
   constexpr explicit handle(const auto... in)
       : m_h{create<Tp, CFn>(in..., nullptr)} {}
 
-  [[nodiscard]] constexpr auto operator*() const noexcept { return *m_h; }
+  [[nodiscard]] constexpr auto operator*() const { return *m_h; }
 };
 
 template <auto *Fn, typename Ret> consteval auto enumerate() {
