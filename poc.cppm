@@ -30,25 +30,11 @@ struct upc {
   float vert_scale;
 };
 
-struct inflight_stuff {
-  vee::command_pool * pool;
-  vee::command_buffer cb = vee::allocate_secondary_command_buffer(**pool);
-
-  vee::semaphore img_available_sema = vee::create_semaphore();
-  vee::semaphore rnd_finished_sema = vee::create_semaphore();
-  vee::fence f = vee::create_fence_signaled();
-};
-struct inflights {
-  unsigned qf;
-};
-
 struct frame_stuff {
   vee::image_view iv;
   vee::command_buffer cb;
   vee::framebuffer fb;
 };
-
-inline void flip(inflights & i) {}
 
 static upc pc {};
 
@@ -119,9 +105,11 @@ public:
 
     vee::update_descriptor_set(desc_set, 0, *t_iv, *smp);
 
-    vee::command_pool ifcp = vee::create_command_pool(qf);
-    inflight_stuff front { &ifcp };
-    inflight_stuff back { &ifcp };
+    vee::command_buffer cb = vee::allocate_secondary_command_buffer(*cp);
+
+    vee::semaphore img_available_sema = vee::create_semaphore();
+    vee::semaphore rnd_finished_sema = vee::create_semaphore();
+    vee::fence f = vee::create_fence_signaled();
 
     auto vs = static_cast<point *>(vee::map_memory(*v_mem));
     vs[0] = { -1, -1 };
@@ -166,26 +154,21 @@ public:
       vee::extent extent = vee::get_surface_capabilities(pd, *s).currentExtent;
       while (!interrupted() && !gv_resized) {
         try {
-          auto tmp = traits::move(front);
-          front = traits::move(back);
-          back = traits::move(tmp);
+          vee::wait_and_reset_fence(*f);
 
-          auto & inf = back;
-          vee::wait_and_reset_fence(*inf.f);
-
-          auto idx = vee::acquire_next_image(*swc, *inf.img_available_sema);
+          auto idx = vee::acquire_next_image(*swc, *img_available_sema);
           auto & frame = frms[idx];
 
           {
-            vee::begin_cmd_buf_render_pass_continue(inf.cb, *rp);
-            vee::cmd_set_scissor(inf.cb, extent);
-            vee::cmd_set_viewport(inf.cb, extent);
-            vee::cmd_push_vert_frag_constants(inf.cb, *pl, &pc);
-            vee::cmd_bind_descriptor_set(inf.cb, *pl, 0, desc_set);
-            vee::cmd_bind_gr_pipeline(inf.cb, *gp);
-            vee::cmd_bind_vertex_buffers(inf.cb, 0, *v_buf);
-            vee::cmd_draw(inf.cb, 3);
-            vee::end_cmd_buf(inf.cb);
+            vee::begin_cmd_buf_render_pass_continue(cb, *rp);
+            vee::cmd_set_scissor(cb, extent);
+            vee::cmd_set_viewport(cb, extent);
+            vee::cmd_push_vert_frag_constants(cb, *pl, &pc);
+            vee::cmd_bind_descriptor_set(cb, *pl, 0, desc_set);
+            vee::cmd_bind_gr_pipeline(cb, *gp);
+            vee::cmd_bind_vertex_buffers(cb, 0, *v_buf);
+            vee::cmd_draw(cb, 3);
+            vee::end_cmd_buf(cb);
           }
           {
             vee::begin_cmd_buf_one_time_submit(frame->cb);
@@ -200,22 +183,22 @@ public:
                 .clear_color = { { 0.1, 0.2, 0.3, 1.0 } },
                 .use_secondary_cmd_buf = true,
             });
-            vee::cmd_execute_command(frame->cb, inf.cb);
+            vee::cmd_execute_command(frame->cb, cb);
             vee::cmd_end_render_pass(frame->cb);
             vee::end_cmd_buf(frame->cb);
           }
 
           vee::queue_submit({
               .queue = q,
-              .fence = *inf.f,
+              .fence = *f,
               .command_buffer = frame->cb,
-              .wait_semaphore = *inf.img_available_sema,
-              .signal_semaphore = *inf.rnd_finished_sema,
+              .wait_semaphore = *img_available_sema,
+              .signal_semaphore = *rnd_finished_sema,
           });
           vee::queue_present({
               .queue = q,
               .swapchain = *swc,
-              .wait_semaphore = *inf.rnd_finished_sema,
+              .wait_semaphore = *rnd_finished_sema,
               .image_index = idx,
           });
         } catch (vee::out_of_date_error) {
