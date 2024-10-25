@@ -19,10 +19,10 @@ static constexpr auto create_color_attachment(VkFormat format,
   res.finalLayout = final_il;
   return res;
 }
-static constexpr auto create_color_attachment() {
+export [[nodiscard]] constexpr auto create_colour_attachment() {
   return create_color_attachment(VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 }
-static constexpr auto create_color_attachment(VkPhysicalDevice pd, VkSurfaceKHR s) {
+export [[nodiscard]] constexpr auto create_colour_attachment(VkPhysicalDevice pd, VkSurfaceKHR s) {
   return create_color_attachment(find_best_surface_format(pd, s).format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 }
 
@@ -39,16 +39,10 @@ static constexpr auto create_depth_attachment() {
   return res;
 }
 
-static constexpr auto create_color_attachment_ref() {
+static constexpr auto create_ref(unsigned att, VkImageLayout il) {
   VkAttachmentReference ref{};
-  ref.attachment = 0;
-  ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-  return ref;
-}
-static constexpr auto create_depth_attachment_ref() {
-  VkAttachmentReference ref{};
-  ref.attachment = 1;
-  ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+  ref.attachment = att;
+  ref.layout = il;
   return ref;
 }
 
@@ -97,17 +91,18 @@ export using render_pass =
     calls::handle<VkRenderPass, &::vkCreateRenderPass, &::vkDestroyRenderPass>;
 export inline auto create_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
   const VkAttachmentDescription attachments[2] {
-    s ? create_color_attachment(pd, s) : create_color_attachment(),
-    create_depth_attachment()
+    s ? create_colour_attachment(pd, s) : create_colour_attachment(),
+    create_depth_attachment(),
   };
 
-  const auto color_attachment_ref = create_color_attachment_ref();
-  const auto depth_attachment_ref = create_depth_attachment_ref();
-  const auto subpass =
-      create_subpass(&color_attachment_ref, &depth_attachment_ref);
+  const auto color_attachment_ref = create_ref(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+  const auto depth_attachment_ref = create_ref(1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+  const auto subpass = create_subpass(&color_attachment_ref, &depth_attachment_ref);
 
-  const VkSubpassDependency deps[2]{create_color_dependency(),
-                                    create_depth_dependency()};
+  const VkSubpassDependency deps[2] {
+    create_color_dependency(),
+    create_depth_dependency(),
+  };
 
   VkRenderPassCreateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
