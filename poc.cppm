@@ -141,8 +141,7 @@ public:
           .physical_device = pd,
           .surface = *s,
           .render_pass = *rp,
-          .image_buffer = *iv,
-          .depth_buffer = *d_iv,
+          .attachments {{ *iv, *d_iv }},
         };
         frms[i] = hai::uptr { new frame_stuff {
             .iv = traits::move(iv),
