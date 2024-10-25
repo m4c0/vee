@@ -19,6 +19,13 @@ static constexpr auto create_color_attachment(VkFormat format,
   res.finalLayout = final_il;
   return res;
 }
+static constexpr auto create_color_attachment() {
+  return create_color_attachment(VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+}
+static constexpr auto create_color_attachment(VkPhysicalDevice pd, VkSurfaceKHR s) {
+  return create_color_attachment(find_best_surface_format(pd, s).format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+}
+
 static constexpr auto create_depth_attachment() {
   VkAttachmentDescription res{};
   res.format = VK_FORMAT_D32_SFLOAT;
@@ -89,13 +96,10 @@ static constexpr auto create_depth_dependency() {
 export using render_pass =
     calls::handle<VkRenderPass, &::vkCreateRenderPass, &::vkDestroyRenderPass>;
 export inline auto create_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
-  const VkFormat sfmt = s == nullptr ? VK_FORMAT_R8G8B8A8_SRGB
-                                     : find_best_surface_format(pd, s).format;
-  const VkImageLayout il = s == nullptr ? VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL
-                                        : VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-  const VkAttachmentDescription attachments[2]{
-      create_color_attachment(sfmt, il), create_depth_attachment()};
+  const VkAttachmentDescription attachments[2] {
+    s ? create_color_attachment(pd, s) : create_color_attachment(),
+    create_depth_attachment()
+  };
 
   const auto color_attachment_ref = create_color_attachment_ref();
   const auto depth_attachment_ref = create_depth_attachment_ref();
