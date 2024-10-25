@@ -1,6 +1,7 @@
 export module vee:framebuffer;
 import :calls;
 import :surface_capabilities;
+import hai;
 import wagen;
 
 using namespace wagen;
@@ -10,8 +11,7 @@ export struct fb_params {
   VkPhysicalDevice physical_device;
   VkSurfaceKHR surface;
   VkRenderPass render_pass;
-  VkImageView image_buffer;
-  VkImageView depth_buffer;
+  hai::array<VkImageView> attachments;
   VkExtent2D extent;
 };
 export using framebuffer = calls::handle<VkFramebuffer, &::vkCreateFramebuffer,
@@ -20,8 +20,8 @@ export inline auto create_framebuffer(const fb_params &p) {
   VkFramebufferCreateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
   info.renderPass = p.render_pass;
-  info.attachmentCount = 2;
-  info.pAttachments = &p.image_buffer;
+  info.attachmentCount = p.attachments.size();
+  info.pAttachments = p.attachments.begin();
   info.layers = 1;
 
   if (p.surface != nullptr) {
