@@ -54,11 +54,10 @@ export inline auto create_yuv420p_image(VkExtent2D ext) {
   return create_image(ext, image_format_yuv420p);
 }
 
-export inline auto create_renderable_image(VkExtent2D ext) {
+export inline auto create_renderable_image(VkExtent2D ext, image_format fmt = image_format_srgba) {
   auto info = create_info_for_extent(ext);
-  info.format = VK_FORMAT_R8G8B8A8_SRGB;
-  info.usage =
-      VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+  info.format = static_cast<VkFormat>(fmt);
+  info.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
   return image{&info};
 }
 } // namespace vee
