@@ -1,6 +1,7 @@
 export module vee:gr_pipeline;
 import :calls;
 import :span;
+import hai;
 import traits;
 import wagen;
 
@@ -64,6 +65,7 @@ export struct gr_pipeline_params {
   VkPipelineLayout pipeline_layout;
   VkRenderPass render_pass;
   VkPrimitiveTopology topology{VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST};
+  unsigned attachment_count { 1 };
   bool back_face_cull{true};
   bool depth_test{true};
   span<VkPipelineShaderStageCreateInfo> shaders;
@@ -78,20 +80,21 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
     gpp.attributes[i].location = i;
   }
 
-  VkPipelineColorBlendAttachmentState color_blend_attachment{};
-  color_blend_attachment.blendEnable = true;
-  color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-  color_blend_attachment.dstColorBlendFactor =
-      VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-  color_blend_attachment.colorWriteMask =
-      VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-      VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+  hai::array<VkPipelineColorBlendAttachmentState> blends { gpp.attachment_count };
+  for (auto & b : blends) {
+    b.blendEnable = true;
+    b.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    b.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    b.colorWriteMask =
+        VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+        VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+  }
 
   VkPipelineColorBlendStateCreateInfo color_blend{};
   color_blend.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
   color_blend.logicOp = VK_LOGIC_OP_COPY;
-  color_blend.attachmentCount = 1;
-  color_blend.pAttachments = &color_blend_attachment;
+  color_blend.attachmentCount = blends.size();
+  color_blend.pAttachments = blends.begin();
 
   VkPipelineDepthStencilStateCreateInfo depth_stencil{};
   depth_stencil.sType =
