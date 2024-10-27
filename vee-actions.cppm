@@ -1,5 +1,6 @@
 export module vee:actions;
 import :calls;
+import hai;
 import wagen;
 
 using namespace wagen;
@@ -78,15 +79,19 @@ export struct render_pass_begin {
   VkRenderPass render_pass;
   VkFramebuffer framebuffer;
   VkExtent2D extent;
-  VkClearColorValue clear_color{{1.0f, 0.0f, 1.0f, 1.0f}};
+  hai::array<VkClearColorValue> clear_colours {{
+    {{ 1.0f, 0.0f, 1.0f, 1.0f }}
+  }};
   bool use_secondary_cmd_buf = false;
 };
 export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
   // Using sensible defaults. The magenta color is a visible marker for pixels
   // missing rendering
-  VkClearValue values[2];
-  values[0].color = rpb.clear_color;
-  values[1].depthStencil = {1.0f, 0};
+  hai::array<VkClearValue> values { rpb.clear_colours.size() + 1 };
+  for (auto i = 0; i < rpb.clear_colours.size(); i++) {
+    values[i].color = rpb.clear_colours[i];
+  }
+  values[values.size() - 1].depthStencil = {1.0f, 0};
 
   VkSubpassContents sbc = rpb.use_secondary_cmd_buf
                               ? VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS
@@ -97,8 +102,8 @@ export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
   info.renderPass = rpb.render_pass;
   info.framebuffer = rpb.framebuffer;
   info.renderArea.extent = rpb.extent;
-  info.clearValueCount = 2;
-  info.pClearValues = values;
+  info.clearValueCount = values.size();
+  info.pClearValues = values.begin();
   calls::call(vkCmdBeginRenderPass, rpb.command_buffer, &info, sbc);
 }
 
