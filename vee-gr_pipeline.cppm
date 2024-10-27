@@ -1,6 +1,5 @@
 export module vee:gr_pipeline;
 import :calls;
-import :span;
 import hai;
 import traits;
 import wagen;
@@ -58,6 +57,24 @@ export auto vertex_attribute_vec4(unsigned binding, unsigned offset) {
   return a;
 }
 
+export auto colour_blend_none() {
+  VkPipelineColorBlendAttachmentState b {};
+  b.colorWriteMask =
+      VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+      VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+  return b;
+}
+export auto colour_blend_classic() {
+  VkPipelineColorBlendAttachmentState b {};
+  b.blendEnable = true;
+  b.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+  b.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+  b.colorWriteMask =
+      VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+      VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+  return b;
+}
+
 export using gr_pipeline =
     calls::handle<VkPipeline, &::vkCreateGraphicsPipelines,
                   &::vkDestroyPipeline>;
@@ -65,12 +82,12 @@ export struct gr_pipeline_params {
   VkPipelineLayout pipeline_layout;
   VkRenderPass render_pass;
   VkPrimitiveTopology topology{VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST};
-  unsigned attachment_count { 1 };
   bool back_face_cull{true};
   bool depth_test{true};
-  span<VkPipelineShaderStageCreateInfo> shaders;
-  span<VkVertexInputBindingDescription> bindings;
-  span<VkVertexInputAttributeDescription> attributes;
+  hai::view<VkPipelineColorBlendAttachmentState> blends { colour_blend_classic() };
+  hai::view<VkPipelineShaderStageCreateInfo> shaders;
+  hai::view<VkVertexInputBindingDescription> bindings;
+  hai::view<VkVertexInputAttributeDescription> attributes;
 };
 export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   for (unsigned i = 0; i < gpp.bindings.size(); i++) {
@@ -80,21 +97,11 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
     gpp.attributes[i].location = i;
   }
 
-  hai::array<VkPipelineColorBlendAttachmentState> blends { gpp.attachment_count };
-  for (auto & b : blends) {
-    b.blendEnable = true;
-    b.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-    b.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    b.colorWriteMask =
-        VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-        VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-  }
-
   VkPipelineColorBlendStateCreateInfo color_blend{};
   color_blend.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
   color_blend.logicOp = VK_LOGIC_OP_COPY;
-  color_blend.attachmentCount = blends.size();
-  color_blend.pAttachments = blends.begin();
+  color_blend.attachmentCount = gpp.blends.size();
+  color_blend.pAttachments = gpp.blends.begin();
 
   VkPipelineDepthStencilStateCreateInfo depth_stencil{};
   depth_stencil.sType =
@@ -109,9 +116,9 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
 
   VkPipelineVertexInputStateCreateInfo vtx_in{};
   vtx_in.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-  vtx_in.pVertexBindingDescriptions = gpp.bindings.data();
+  vtx_in.pVertexBindingDescriptions = gpp.bindings.begin();
   vtx_in.vertexBindingDescriptionCount = gpp.bindings.size();
-  vtx_in.pVertexAttributeDescriptions = gpp.attributes.data();
+  vtx_in.pVertexAttributeDescriptions = gpp.attributes.begin();
   vtx_in.vertexAttributeDescriptionCount = gpp.attributes.size();
 
   VkPipelineMultisampleStateCreateInfo multisample{};
@@ -146,7 +153,7 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   info.pInputAssemblyState = &in_asm;
   info.pMultisampleState = &multisample;
   info.pRasterizationState = &raster;
-  info.pStages = gpp.shaders.data();
+  info.pStages = gpp.shaders.begin();
   info.pVertexInputState = &vtx_in;
   info.pViewportState = &viewport;
   info.renderPass = gpp.render_pass;

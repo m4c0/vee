@@ -179,7 +179,7 @@ public:
                 .render_pass = *rp,
                 .framebuffer = *frame->fb,
                 .extent = extent,
-                .clear_color = { { 0.1, 0.2, 0.3, 1.0 } },
+                .clear_colours = { vee::clear_colour(0.1, 0.2, 0.3, 1.0) },
                 .use_secondary_cmd_buf = true,
             });
             vee::cmd_execute_command(frame->cb, cb);

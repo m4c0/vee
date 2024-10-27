@@ -74,14 +74,15 @@ export inline auto begin_cmd_buf_sim_use(VkCommandBuffer cb) {
   calls::call(vkBeginCommandBuffer, cb, &info);
 }
 
+export inline auto clear_colour(float r, float g, float b, float a) {
+  return VkClearColorValue {{ r, g, b, a }};
+}
 export struct render_pass_begin {
   VkCommandBuffer command_buffer;
   VkRenderPass render_pass;
   VkFramebuffer framebuffer;
   VkExtent2D extent;
-  hai::array<VkClearColorValue> clear_colours {{
-    {{ 1.0f, 0.0f, 1.0f, 1.0f }}
-  }};
+  hai::view<VkClearColorValue> clear_colours { clear_colour(1, 0, 1, 1) };
   bool use_secondary_cmd_buf = false;
 };
 export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
