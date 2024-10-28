@@ -1,5 +1,6 @@
 export module vee:actions;
 import :calls;
+import dotz;
 import hai;
 import wagen;
 
@@ -76,6 +77,9 @@ export inline auto begin_cmd_buf_sim_use(VkCommandBuffer cb) {
 
 export inline auto clear_colour(float r, float g, float b, float a) {
   return VkClearColorValue {{ r, g, b, a }};
+}
+export inline auto clear_colour(dotz::vec4 c) {
+  return VkClearColorValue {{ c.x, c.y, c.z, c.w }};
 }
 export struct render_pass_begin {
   VkCommandBuffer command_buffer;
