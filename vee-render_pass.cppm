@@ -1,5 +1,6 @@
 export module vee:render_pass;
 import :calls;
+import :image;
 import :surface_format;
 import hai;
 import wagen;
@@ -20,8 +21,8 @@ static constexpr auto create_color_attachment(VkFormat format,
   res.finalLayout = final_il;
   return res;
 }
-export [[nodiscard]] constexpr auto create_colour_attachment() {
-  return create_color_attachment(VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+export [[nodiscard]] constexpr auto create_colour_attachment(vee::image_format fmt = vee::image_format_srgba) {
+  return create_color_attachment(static_cast<VkFormat>(fmt), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 }
 export [[nodiscard]] constexpr auto create_colour_attachment(VkPhysicalDevice pd, VkSurfaceKHR s) {
   return create_color_attachment(find_best_surface_format(pd, s).format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
