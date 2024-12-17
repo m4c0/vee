@@ -13,7 +13,7 @@ int main() try {
   auto pl = vee::create_pipeline_layout();
 
   auto kern = vee::create_shader_module_from_resource("poc.comp.spv");
-  auto pipeline = vee::create_compute_pipeline(*pl, *kern, "main");
+  auto p = vee::create_compute_pipeline(*pl, *kern, "main");
 
   auto cp = vee::create_command_pool(qf);
   auto cb = vee::allocate_primary_command_buffer(*cp);
@@ -21,6 +21,7 @@ int main() try {
 
   {
     vee::begin_cmd_buf_one_time_submit(cb);
+    vee::cmd_bind_c_pipeline(cb, *p);
     vee::cmd_dispatch(cb, 1, 1, 1);
     vee::end_cmd_buf(cb);
   }
