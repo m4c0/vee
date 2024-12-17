@@ -41,6 +41,9 @@ static bool get_queue_family(VkPhysicalDevice pd, VkSurfaceKHR s,
     if ((q.queueFlags & VK_QUEUE_TRANSFER_BIT) == 0) {
       continue;
     }
+    if ((q.queueFlags & VK_QUEUE_COMPUTE_BIT) == 0) {
+      continue;
+    }
 
     if (s == nullptr)
       return true;
