@@ -9,6 +9,13 @@ export using descriptor_set_layout =
     calls::handle<VkDescriptorSetLayout, &::vkCreateDescriptorSetLayout,
                   &::vkDestroyDescriptorSetLayout>;
 
+export constexpr VkDescriptorSetLayoutBinding dsl_compute_storage() {
+  VkDescriptorSetLayoutBinding b{};
+  b.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+  b.descriptorCount = 1;
+  b.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+  return b;
+}
 export constexpr VkDescriptorSetLayoutBinding dsl_fragment_sampler() {
   VkDescriptorSetLayoutBinding b{};
   b.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
