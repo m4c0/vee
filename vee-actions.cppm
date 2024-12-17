@@ -118,7 +118,14 @@ export inline auto cmd_bind_descriptor_set(VkCommandBuffer cb,
   calls::call(vkCmdBindDescriptorSets, cb, VK_PIPELINE_BIND_POINT_GRAPHICS, pl,
               idx, 1, &ds, 0, nullptr);
 }
+export inline auto cmd_bind_c_descriptor_set(
+    VkCommandBuffer cb, VkPipelineLayout pl, unsigned idx, VkDescriptorSet ds) {
+  calls::call(vkCmdBindDescriptorSets, cb, VK_PIPELINE_BIND_POINT_COMPUTE, pl, idx, 1, &ds, 0, nullptr);
+}
 
+export inline auto cmd_bind_c_pipeline(VkCommandBuffer cb, VkPipeline p) {
+  calls::call(vkCmdBindPipeline, cb, VK_PIPELINE_BIND_POINT_COMPUTE, p);
+}
 export inline auto cmd_bind_gr_pipeline(VkCommandBuffer cb, VkPipeline p) {
   calls::call(vkCmdBindPipeline, cb, VK_PIPELINE_BIND_POINT_GRAPHICS, p);
 }
@@ -174,6 +181,10 @@ export inline auto cmd_copy_yuv420p_buffers_to_image(VkCommandBuffer cb,
 
   auto vv = vk_buffer_image_copy(VK_IMAGE_ASPECT_PLANE_2_BIT, {}, half_ext);
   calls::call(vkCmdCopyBufferToImage, cb, v, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &vv);
+}
+
+export inline auto cmd_dispatch(VkCommandBuffer cb, unsigned count_x, unsigned count_y, unsigned count_z) {
+  calls::call(vkCmdDispatch, cb, count_x, count_y, count_z);
 }
 
 export inline auto cmd_draw(VkCommandBuffer cb, unsigned vtx, unsigned inst = 1,

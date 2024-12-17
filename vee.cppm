@@ -4,6 +4,7 @@ export import :alias;
 export import :buffer;
 export import :calls;
 export import :command_pool;
+export import :c_pipeline;
 export import :debug_utils_messenger;
 export import :descriptor_pool;
 export import :descriptor_set_layout;
