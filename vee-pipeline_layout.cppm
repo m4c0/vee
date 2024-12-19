@@ -6,6 +6,14 @@ using namespace wagen;
 
 namespace vee {
 export template <typename Tp>
+inline auto compute_push_constant_range(unsigned offset = 0) {
+  VkPushConstantRange r;
+  r.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+  r.offset = offset;
+  r.size = sizeof(Tp);
+  return r;
+}
+export template <typename Tp>
 inline auto fragment_push_constant_range(unsigned offset = 0) {
   VkPushConstantRange r;
   r.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
