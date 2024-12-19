@@ -31,11 +31,11 @@ int main() try {
   vee::update_descriptor_set_with_storage(ds, 0, *buf0);
 
   auto buf1 = vee::create_buffer(buf_sz, vee::buffer_usage::storage_buffer);
-  vee::bind_buffer_memory(*buf0, *mem, buf_sz);
+  vee::bind_buffer_memory(*buf1, *mem, buf_sz);
   vee::update_descriptor_set_with_storage(ds, 1, *buf1);
 
   auto buf2 = vee::create_buffer(buf_sz, vee::buffer_usage::storage_buffer);
-  vee::bind_buffer_memory(*buf0, *mem, buf_sz * 2);
+  vee::bind_buffer_memory(*buf2, *mem, buf_sz * 2);
   vee::update_descriptor_set_with_storage(ds, 2, *buf2);
 
   auto kern = vee::create_shader_module_from_resource("poc.comp.spv");
