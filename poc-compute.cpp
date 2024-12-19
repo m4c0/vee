@@ -43,7 +43,7 @@ int main() try {
 
   auto cp = vee::create_command_pool(qf);
   auto cb = vee::allocate_primary_command_buffer(*cp);
-  auto f = vee::create_fence_signaled();
+  auto f = vee::create_fence_reset();
 
   {
     auto p = static_cast<float *>(vee::map_memory(*mem));
@@ -56,7 +56,7 @@ int main() try {
   {
     vee::begin_cmd_buf_one_time_submit(cb);
     vee::cmd_bind_c_pipeline(cb, *p);
-    vee::cmd_bind_descriptor_set(cb, *pl, 0, ds);
+    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds);
     vee::cmd_dispatch(cb, 1024, 1024, 1);
     vee::end_cmd_buf(cb);
   }
