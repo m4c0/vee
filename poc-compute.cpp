@@ -2,6 +2,7 @@
 #pragma leco add_shader "poc.comp"
 
 import vee;
+import silog;
 
 int main() try {
   auto i = vee::create_instance("vee-poc-compute");
@@ -10,8 +11,9 @@ int main() try {
   auto d = vee::create_single_queue_device(pd, qf);
   auto q = vee::get_queue_for_family(qf);
 
-  constexpr const auto buf_sz = 1024 * 1024 * 4;
-  vee::device_memory mem = vee::create_host_buffer_memory(pd, buf_sz * 3);
+  constexpr const auto buf_sz = 1024 * 1024 * sizeof(float);
+  constexpr const auto mem_sz = buf_sz * 3;
+  vee::device_memory mem = vee::create_host_buffer_memory(pd, mem_sz);
 
   auto dsl = vee::create_descriptor_set_layout({
     vee::dsl_compute_storage(),
@@ -45,7 +47,7 @@ int main() try {
 
   {
     auto p = static_cast<float *>(vee::map_memory(*mem));
-    for (auto i = 0; i < buf_sz / 4; i++) {
+    for (auto i = 0; i < mem_sz / 4; i++) {
       p[i] = 1;
     }
     vee::unmap_memory(*mem);
@@ -66,10 +68,16 @@ int main() try {
   vee::device_wait_idle();
 
   {
+    int counts[4] {};
     auto p = static_cast<float *>(vee::map_memory(*mem));
-    for (auto i = 0; i < buf_sz; i++) {
+    for (auto i = 0; i < buf_sz / 4; i++) {
+      int c = p[i];
+      if (c >= 3) c = 3;
+      counts[c]++;
     }
     vee::unmap_memory(*mem);
+
+    silog::log(silog::info, ">>>>> 0=%d 1=%d 2=%d others=%d", counts[0], counts[1], counts[2], counts[3]);
   }
 } catch (...) {
   return 1;
