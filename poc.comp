@@ -4,10 +4,6 @@ layout(binding = 0) readonly buffer in_a { float a[]; };
 layout(binding = 1) readonly buffer in_b { float b[]; };
 layout(binding = 2) buffer in_c { float c[]; };
 
-const int len = 1024;
-
 void main() {
-  for (int x = 0; x < len; x++) {
-    c[x] = a[x] * b[x] + 1;
-  }
+  c[0] = a[0] + b[0];
 }

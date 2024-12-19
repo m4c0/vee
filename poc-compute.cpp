@@ -70,7 +70,7 @@ int main() try {
   {
     int counts[4] {};
     auto p = static_cast<float *>(vee::map_memory(*mem));
-    for (auto i = 0; i < buf_sz / 4; i++) {
+    for (auto i = 0; i < mem_sz / 4; i++) {
       int c = p[i];
       if (c >= 3) c = 3;
       counts[c]++;
