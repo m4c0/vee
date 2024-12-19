@@ -14,6 +14,11 @@ export inline auto create_fence_signaled() {
   info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
   return fence{&info};
 }
+export inline auto create_fence_reset() {
+  VkFenceCreateInfo info{};
+  info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+  return fence{&info};
+}
 
 export inline auto wait_for_fence(VkFence fence, unsigned millis) {
   calls::call(vkWaitForFences, 1, &fence, vk_true, millis * 1000000UL);
