@@ -111,19 +111,21 @@ template <typename Fn, typename... Args>
     { fn(args...) } -> traits::not_same_as<void>;
   }
 constexpr void call(Fn &&fn, Args &&...args) {
+  // Exceptions might destroy RAII handles as unwinding happens. Since some of
+  // these might be in-flight, let's wait until the device idle first
   switch (auto res = fn(args...)) {
   case VK_SUCCESS:
   case VK_SUBOPTIMAL_KHR:
     break;
   case VK_ERROR_OUT_OF_DATE_KHR:
-    // The exception might destroy RAII handles as unwinding happens. Since some
-    // of these might be in-flight, let's wait until the device idle first
     vkDeviceWaitIdle(device());
     throw out_of_date_error{};
   case VK_TIMEOUT:
+    vkDeviceWaitIdle(device());
     throw timeout{};
   default:
     silog::log(silog::error, "%s", message_for_result(res));
+    vkDeviceWaitIdle(device());
     throw api_failure{};
   }
 }
