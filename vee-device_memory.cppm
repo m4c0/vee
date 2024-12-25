@@ -77,4 +77,12 @@ export inline auto create_host_buffer_memory(VkPhysicalDevice pd, unsigned sz) {
   info.memoryTypeIndex = find_memory_type_index(pd, 0, flags);
   return device_memory(&info);
 }
+export inline auto create_local_buffer_memory(VkPhysicalDevice pd, unsigned sz) {
+  constexpr const auto flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+  VkMemoryAllocateInfo info{};
+  info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+  info.allocationSize = sz;
+  info.memoryTypeIndex = find_memory_type_index(pd, 0, flags);
+  return device_memory(&info);
+}
 } // namespace vee
