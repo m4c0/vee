@@ -1,21 +1,25 @@
 export module vee:gr_pipeline;
 import :calls;
 import hai;
+import silog;
 import traits;
 import wagen;
 
 using namespace wagen;
 
 namespace vee {
-  export auto specialisation_map_entry(unsigned ofs, unsigned sz) {
+  export template<typename T>
+  auto specialisation_map_entry() {
     VkSpecializationMapEntry res {};
-    res.offset = ofs;
-    res.size = sz;
+    res.size = sizeof(T);
     return res;
   }
   export template<typename K> auto specialisation_info(K * data, hai::view<VkSpecializationMapEntry> map) {
+    unsigned sz = 0;
     for (auto i = 0; i < map.size(); i++) {
       map[i].constantID = i;
+      map[i].offset = sz;
+      sz += map[i].size;
     }
     VkSpecializationInfo res {};
     res.mapEntryCount = map.size();

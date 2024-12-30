@@ -68,14 +68,17 @@ public:
 
     vee::pipeline_layout pl = vee::create_pipeline_layout({ *dsl }, { vee::vert_frag_push_constant_range<upc>() });
 
+    float k = 1;
     vee::shader_module vert = vee::create_shader_module_from_resource("poc.vert.spv");
     vee::shader_module frag = vee::create_shader_module_from_resource("poc.frag.spv");
+    auto ks = hai::view { vee::specialisation_map_entry<float>() };
+    auto frag_k = vee::specialisation_info(&k, ks);
     vee::gr_pipeline gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = *rp,
         .shaders {
             vee::pipeline_vert_stage(*vert, "main"),
-            vee::pipeline_frag_stage(*frag, "main"),
+            vee::pipeline_frag_stage(*frag, "main", &frag_k),
         },
         .bindings {
             vee::vertex_input_bind(sizeof(point)),
