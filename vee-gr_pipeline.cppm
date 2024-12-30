@@ -7,20 +7,40 @@ import wagen;
 using namespace wagen;
 
 namespace vee {
-export auto pipeline_frag_stage(VkShaderModule s, const char *fn) {
+  export auto specialisation_map_entry(unsigned ofs, unsigned sz) {
+    VkSpecializationMapEntry res {};
+    res.offset = ofs;
+    res.size = sz;
+    return res;
+  }
+  export template<typename K> auto specialisation_info(K * data, hai::view<VkSpecializationMapEntry> map) {
+    for (auto i = 0; i < map.size(); i++) {
+      map[i].constantID = i;
+    }
+    VkSpecializationInfo res {};
+    res.mapEntryCount = map.size();
+    res.pMapEntries = map.begin();
+    res.pData = data;
+    res.dataSize = sizeof(K);
+    return res;
+  }
+
+export auto pipeline_frag_stage(VkShaderModule s, const char *fn, VkSpecializationInfo * si = {}) {
   VkPipelineShaderStageCreateInfo ci{};
   ci.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
   ci.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
   ci.module = s;
   ci.pName = fn;
+  ci.pSpecializationInfo = si;
   return ci;
 }
-export auto pipeline_vert_stage(VkShaderModule s, const char *fn) {
+export auto pipeline_vert_stage(VkShaderModule s, const char *fn, VkSpecializationInfo * si = {}) {
   VkPipelineShaderStageCreateInfo ci{};
   ci.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
   ci.stage = VK_SHADER_STAGE_VERTEX_BIT;
   ci.module = s;
   ci.pName = fn;
+  ci.pSpecializationInfo = si;
   return ci;
 }
 
