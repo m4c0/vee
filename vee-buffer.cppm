@@ -32,6 +32,10 @@ export inline auto create_storage_buffer(unsigned size) {
   return create_buffer(size, buffer_usage::storage_buffer);
 }
 
+export inline auto create_transfer_buffer(unsigned size) {
+  return create_buffer(size, buffer_usage::transfer_src_buffer, buffer_usage::transfer_dst_buffer);
+}
+
 export inline auto create_transfer_dst_buffer(unsigned size) {
   return create_buffer(size, buffer_usage::transfer_dst_buffer);
 }
