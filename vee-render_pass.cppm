@@ -48,7 +48,7 @@ static constexpr auto create_ref(unsigned att, VkImageLayout il) {
   return ref;
 }
 
-static constexpr auto create_subpass(auto & colour, auto * depth) {
+static constexpr auto create_subpass(auto & colour, VkAttachmentReference * depth) {
   VkSubpassDescription subpass{};
   subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
   subpass.colorAttachmentCount = colour.size();
@@ -114,6 +114,27 @@ export inline auto create_render_pass(hai::array<VkAttachmentDescription> colour
   info.pSubpasses = &subpass;
   info.dependencyCount = 2;
   info.pDependencies = deps;
+  return render_pass{&info};
+}
+
+export inline auto create_depthless_render_pass(hai::array<VkAttachmentDescription> colour_attachments) {
+  hai::array<VkAttachmentDescription> attachments { colour_attachments.size() };
+  for (auto i = 0; i < colour_attachments.size(); i++) attachments[i] = colour_attachments[i];
+
+  hai::array<VkAttachmentReference> refs { colour_attachments.size() }; 
+  for (auto i = 0; i < colour_attachments.size(); i++) refs[i] = create_ref(i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+  const auto subpass = create_subpass(refs, nullptr);
+  const auto deps = create_color_dependency();
+
+  VkRenderPassCreateInfo info{};
+  info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+  info.attachmentCount = attachments.size();
+  info.pAttachments = attachments.begin();
+  info.subpassCount = 1;
+  info.pSubpasses = &subpass;
+  info.dependencyCount = 1;
+  info.pDependencies = &deps;
   return render_pass{&info};
 }
 
