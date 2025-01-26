@@ -39,11 +39,20 @@ export enum image_format {
   image_format_rgba_uscaled = VK_FORMAT_R8G8B8A8_USCALED,
   image_format_yuv420p = VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM,
 };
-export inline auto create_image(VkExtent2D ext, image_format fmt) {
+export enum image_usage {
+  image_usage_colour_attachment = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+  image_usage_sampled           = VK_IMAGE_USAGE_SAMPLED_BIT,
+  image_usage_transfer_dst      = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+  image_usage_transfer_src      = VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+};
+export inline auto create_image(VkExtent2D ext, image_format fmt, image_usage u, auto ... us) {
   auto info = create_info_for_extent(ext);
   info.format = static_cast<VkFormat>(fmt);
-  info.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+  info.usage = (static_cast<unsigned>(u) | ... | static_cast<unsigned>(us));
   return image{&info};
+}
+export inline auto create_image(VkExtent2D ext, image_format fmt) {
+  return create_image(ext, fmt, image_usage_sampled, image_usage_transfer_dst);
 }
 
 export inline auto create_srgba_image(VkExtent2D ext) {
