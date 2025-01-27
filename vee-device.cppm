@@ -11,8 +11,11 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
                                               unsigned qf) {
   const float priority = 1.0f;
 
-  constexpr const auto ext_count = 1;
-  const char *ext[] = {vk_khr_swapchain_extension_name};
+  constexpr const auto ext_count = 2;
+  const char * ext[] = {
+    vk_khr_swapchain_extension_name,
+    vk_khr_synchronization2_extension_name,
+  };
 
   VkDeviceQueueCreateInfo queue_create_info{};
   queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -20,10 +23,15 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
   queue_create_info.queueCount = 1;
   queue_create_info.pQueuePriorities = &priority;
 
+  VkPhysicalDeviceSynchronization2Features sync_feats {};
+  sync_feats.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
+  sync_feats.synchronization2 = vk_true;
+
   VkPhysicalDeviceSamplerYcbcrConversionFeatures smp_feats{};
   smp_feats.sType =
       VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES;
   smp_feats.samplerYcbcrConversion = vk_true;
+  smp_feats.pNext = &sync_feats;
 
   VkPhysicalDeviceFeatures feats{};
   feats.samplerAnisotropy = vk_true;
