@@ -28,25 +28,25 @@ public:
     vee::surface s = vee::create_surface(casein::native_ptr);
     const auto & [pd, qf] = vee::find_physical_device_with_universal_queue(*s);
     vee::device d = vee::create_single_queue_device(pd, qf);
-
     vee::queue q = vee::get_queue_for_family(qf);
-
     vee::command_pool cp = vee::create_command_pool(qf);
-    vee::render_pass rp = vee::create_render_pass(pd, *s);
+
+    auto refs = hai::array {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optional) }};
+    vee::render_pass rp = vee::create_render_pass({
+      .attachments {{ vee::create_colour_attachment(pd, *s) }},
+      .subpasses {{ vee::create_subpass(refs, nullptr) }},
+      .dependencies {{ vee::create_colour_dependency() }},
+    });
 
     vee::pipeline_layout pl = vee::create_pipeline_layout();
-
-    float k = 1;
     vee::shader_module vert = vee::create_shader_module_from_resource("poc-multipass.vert.spv");
     vee::shader_module frag = vee::create_shader_module_from_resource("poc-multipass.frag.spv");
-    auto ks = hai::view { vee::specialisation_map_entry<float>() };
-    auto frag_k = vee::specialisation_info(&k, ks);
     vee::gr_pipeline gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = *rp,
         .shaders {
             vee::pipeline_vert_stage(*vert, "main"),
-            vee::pipeline_frag_stage(*frag, "main", &frag_k),
+            vee::pipeline_frag_stage(*frag, "main"),
         },
         .bindings { vee::vertex_input_bind(sizeof(dotz::vec2)) },
         .attributes { vee::vertex_attribute_vec2(0, 0) },
@@ -68,11 +68,6 @@ public:
     while (!interrupted()) {
       vee::swapchain swc = vee::create_swapchain(pd, *s);
 
-      vee::image d_img = vee::create_depth_image(pd, *s);
-      vee::device_memory d_mem = vee::create_local_image_memory(pd, *d_img);
-      vee::bind_image_memory(*d_img, *d_mem);
-      vee::image_view d_iv = vee::create_depth_image_view(*d_img);
-
       auto imgs = vee::get_swapchain_images(*swc);
       auto frms = hai::array<hai::uptr<frame_stuff>> { imgs.size() };
       for (auto i = 0; i < imgs.size(); i++) {
@@ -81,7 +76,7 @@ public:
           .physical_device = pd,
           .surface = *s,
           .render_pass = *rp,
-          .attachments {{ *iv, *d_iv }},
+          .attachments {{ *iv }},
         };
         frms[i] = hai::uptr { new frame_stuff {
             .iv = traits::move(iv),

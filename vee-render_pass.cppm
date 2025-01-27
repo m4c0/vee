@@ -9,9 +9,10 @@ using namespace wagen;
 
 namespace vee {
   export enum image_layout {
-    image_layout_read_only_optimal        = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL,
-    image_layout_shader_read_only_optimal = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-    image_layout_transfer_src_optimal     = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+    image_layout_color_attachment_optional = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+    image_layout_read_only_optimal         = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL,
+    image_layout_shader_read_only_optimal  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+    image_layout_transfer_src_optimal      = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
   };
 
 static constexpr auto create_colour_attachment(VkFormat format, VkImageLayout final_il) {
@@ -46,14 +47,17 @@ static constexpr auto create_depth_attachment() {
   return res;
 }
 
-static constexpr auto create_ref(unsigned att, VkImageLayout il) {
+static constexpr auto create_attachment_ref(unsigned att, VkImageLayout il) {
   VkAttachmentReference ref{};
   ref.attachment = att;
   ref.layout = il;
   return ref;
 }
+  export inline constexpr auto create_attachment_ref(unsigned att, vee::image_layout il) {
+    return create_attachment_ref(att, static_cast<VkImageLayout>(il));
+  }
 
-static constexpr auto create_subpass(auto & colour, VkAttachmentReference * depth) {
+export inline constexpr auto create_subpass(auto & colour, VkAttachmentReference * depth) {
   VkSubpassDescription subpass{};
   subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
   subpass.colorAttachmentCount = colour.size();
@@ -62,7 +66,7 @@ static constexpr auto create_subpass(auto & colour, VkAttachmentReference * dept
   return subpass;
 }
 
-static constexpr auto create_colour_dependency() {
+export inline constexpr auto create_colour_dependency() {
   VkSubpassDependency dep{};
 
   dep.srcSubpass = vk_subpass_external;
@@ -114,8 +118,8 @@ export inline auto create_render_pass(const create_render_pass_params & p) {
 
 export inline auto create_render_pass(hai::array<VkAttachmentDescription> colour_attachments) {
   hai::array<VkAttachmentReference> refs { colour_attachments.size() }; 
-  for (auto i = 0; i < colour_attachments.size(); i++) refs[i] = create_ref(i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-  auto depth_ref = create_ref(colour_attachments.size(), VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+  for (auto i = 0; i < colour_attachments.size(); i++) refs[i] = create_attachment_ref(i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+  auto depth_ref = create_attachment_ref(colour_attachments.size(), VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
   create_render_pass_params p {
     .attachments { colour_attachments.size() + 1 },
@@ -134,7 +138,7 @@ export inline auto create_render_pass(hai::array<VkAttachmentDescription> colour
 
 export inline auto create_depthless_render_pass(hai::array<VkAttachmentDescription> colour_attachments) {
   hai::array<VkAttachmentReference> refs { colour_attachments.size() }; 
-  for (auto i = 0; i < colour_attachments.size(); i++) refs[i] = create_ref(i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+  for (auto i = 0; i < colour_attachments.size(); i++) refs[i] = create_attachment_ref(i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
   create_render_pass_params p {
     .attachments { colour_attachments.size() },
