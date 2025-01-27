@@ -9,8 +9,9 @@ using namespace wagen;
 
 namespace vee {
   export enum image_layout {
-    image_layout_read_only_optimal    = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL,
-    image_layout_transfer_src_optimal = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+    image_layout_read_only_optimal        = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL,
+    image_layout_shader_read_only_optimal = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+    image_layout_transfer_src_optimal     = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
   };
 
 static constexpr auto create_color_attachment(VkFormat format,
