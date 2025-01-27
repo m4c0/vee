@@ -14,8 +14,7 @@ namespace vee {
     image_layout_transfer_src_optimal     = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
   };
 
-static constexpr auto create_color_attachment(VkFormat format,
-                                              VkImageLayout final_il) {
+static constexpr auto create_colour_attachment(VkFormat format, VkImageLayout final_il) {
   VkAttachmentDescription res{};
   res.format = format;
   res.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -28,10 +27,10 @@ static constexpr auto create_color_attachment(VkFormat format,
   return res;
 }
 export [[nodiscard]] constexpr auto create_colour_attachment(vee::image_format fmt, vee::image_layout l) {
-  return create_color_attachment(static_cast<VkFormat>(fmt), static_cast<VkImageLayout>(l));
+  return create_colour_attachment(static_cast<VkFormat>(fmt), static_cast<VkImageLayout>(l));
 }
 export [[nodiscard]] constexpr auto create_colour_attachment(VkPhysicalDevice pd, VkSurfaceKHR s) {
-  return create_color_attachment(find_best_surface_format(pd, s).format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+  return create_colour_attachment(find_best_surface_format(pd, s).format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 }
 
 static constexpr auto create_depth_attachment() {
@@ -63,7 +62,7 @@ static constexpr auto create_subpass(auto & colour, VkAttachmentReference * dept
   return subpass;
 }
 
-static constexpr auto create_color_dependency() {
+static constexpr auto create_colour_dependency() {
   VkSubpassDependency dep{};
 
   dep.srcSubpass = vk_subpass_external;
@@ -122,7 +121,7 @@ export inline auto create_render_pass(hai::array<VkAttachmentDescription> colour
     .attachments { colour_attachments.size() + 1 },
     .subpasses {{ create_subpass(refs, &depth_ref) }},
     .dependencies {{
-      create_color_dependency(),
+      create_colour_dependency(),
       create_depth_dependency(),
     }},
   };
@@ -140,7 +139,7 @@ export inline auto create_depthless_render_pass(hai::array<VkAttachmentDescripti
   create_render_pass_params p {
     .attachments { colour_attachments.size() },
     .subpasses {{ create_subpass(refs, nullptr) }},
-    .dependencies {{ create_color_dependency() }},
+    .dependencies {{ create_colour_dependency() }},
   };
 
   for (auto i = 0; i < colour_attachments.size(); i++) p.attachments[i] = colour_attachments[i];
