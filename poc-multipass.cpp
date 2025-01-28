@@ -31,10 +31,13 @@ public:
     vee::queue q = vee::get_queue_for_family(qf);
     vee::command_pool cp = vee::create_command_pool(qf);
 
-    auto refs = hai::array {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optional) }};
     vee::render_pass rp = vee::create_render_pass({
       .attachments {{ vee::create_colour_attachment(pd, *s) }},
-      .subpasses {{ vee::create_subpass(refs, nullptr) }},
+      .subpasses {{ 
+        vee::create_subpass({
+          .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optional) }},
+        })
+      }},
       .dependencies {{ vee::create_colour_dependency() }},
     });
 

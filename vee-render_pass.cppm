@@ -57,12 +57,19 @@ static constexpr auto create_attachment_ref(unsigned att, VkImageLayout il) {
     return create_attachment_ref(att, static_cast<VkImageLayout>(il));
   }
 
-export inline constexpr auto create_subpass(auto & colour, VkAttachmentReference * depth) {
+export struct subpass_description {
+  hai::array<VkAttachmentReference> colours;
+  hai::array<VkAttachmentReference> inputs;
+  VkAttachmentReference depth_stencil;
+};
+export inline constexpr auto create_subpass(const subpass_description & d) {
   VkSubpassDescription subpass{};
   subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-  subpass.colorAttachmentCount = colour.size();
-  subpass.pColorAttachments = colour.begin();
-  subpass.pDepthStencilAttachment = depth;
+  subpass.colorAttachmentCount = d.colours.size();
+  subpass.pColorAttachments = d.colours.begin();
+  if (d.depth_stencil.layout) subpass.pDepthStencilAttachment = &d.depth_stencil;
+  subpass.inputAttachmentCount = d.inputs.size();
+  subpass.pInputAttachments = d.inputs.begin();
   return subpass;
 }
 
@@ -117,13 +124,16 @@ export inline auto create_render_pass(const create_render_pass_params & p) {
 }
 
 export inline auto create_render_pass(hai::array<VkAttachmentDescription> colour_attachments) {
-  hai::array<VkAttachmentReference> refs { colour_attachments.size() }; 
-  for (auto i = 0; i < colour_attachments.size(); i++) refs[i] = create_attachment_ref(i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
   auto depth_ref = create_attachment_ref(colour_attachments.size(), VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+  subpass_description s {
+    .colours { colour_attachments.size() },
+    .depth_stencil = depth_ref,
+  };
+  for (auto i = 0; i < colour_attachments.size(); i++) s.colours[i] = create_attachment_ref(i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
   create_render_pass_params p {
     .attachments { colour_attachments.size() + 1 },
-    .subpasses {{ create_subpass(refs, &depth_ref) }},
+    .subpasses {{ create_subpass(s) }},
     .dependencies {{
       create_colour_dependency(),
       create_depth_dependency(),
@@ -137,12 +147,14 @@ export inline auto create_render_pass(hai::array<VkAttachmentDescription> colour
 }
 
 export inline auto create_depthless_render_pass(hai::array<VkAttachmentDescription> colour_attachments) {
-  hai::array<VkAttachmentReference> refs { colour_attachments.size() }; 
-  for (auto i = 0; i < colour_attachments.size(); i++) refs[i] = create_attachment_ref(i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+  subpass_description s {
+    .colours { colour_attachments.size() },
+  };
+  for (auto i = 0; i < colour_attachments.size(); i++) s.colours[i] = create_attachment_ref(i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
   create_render_pass_params p {
     .attachments { colour_attachments.size() },
-    .subpasses {{ create_subpass(refs, nullptr) }},
+    .subpasses {{ create_subpass(s) }},
     .dependencies {{ create_colour_dependency() }},
   };
 
