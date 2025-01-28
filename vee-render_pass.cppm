@@ -9,30 +9,37 @@ using namespace wagen;
 
 namespace vee {
   export enum image_layout {
+    image_layout_undefined                 = VK_IMAGE_LAYOUT_UNDEFINED,
     image_layout_color_attachment_optional = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+    image_layout_present_src_khr           = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
     image_layout_read_only_optimal         = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL,
     image_layout_shader_read_only_optimal  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
     image_layout_transfer_src_optimal      = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
   };
 
-static constexpr auto create_colour_attachment(VkFormat format, VkImageLayout final_il) {
-  VkAttachmentDescription res{};
-  res.format = format;
-  res.samples = VK_SAMPLE_COUNT_1_BIT;
-  res.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-  res.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-  res.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-  res.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-  res.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-  res.finalLayout = final_il;
-  return res;
-}
-export [[nodiscard]] constexpr auto create_colour_attachment(vee::image_format fmt, vee::image_layout l) {
-  return create_colour_attachment(static_cast<VkFormat>(fmt), static_cast<VkImageLayout>(l));
-}
-export [[nodiscard]] constexpr auto create_colour_attachment(VkPhysicalDevice pd, VkSurfaceKHR s) {
-  return create_colour_attachment(find_best_surface_format(pd, s).format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
-}
+  export struct attachment_description {
+    vee::image_format format;
+    vee::image_layout initial_layout;
+    vee::image_layout final_layout;
+  };
+  export [[nodiscard]] constexpr auto create_colour_attachment(const attachment_description & d) {
+    VkAttachmentDescription res{};
+    res.format = static_cast<VkFormat>(d.format);
+    res.samples = VK_SAMPLE_COUNT_1_BIT;
+    res.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    res.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    res.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    res.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    res.initialLayout = static_cast<VkImageLayout>(d.initial_layout);
+    res.finalLayout = static_cast<VkImageLayout>(d.final_layout);
+    return res;
+  }
+  export [[nodiscard]] constexpr auto create_colour_attachment(VkPhysicalDevice pd, VkSurfaceKHR s) {
+    return create_colour_attachment({
+      .format = static_cast<vee::image_format>(find_best_surface_format(pd, s).format),
+      .final_layout = image_layout_present_src_khr,
+    });
+  }
 
 static constexpr auto create_depth_attachment() {
   VkAttachmentDescription res{};
