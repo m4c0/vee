@@ -57,21 +57,21 @@ static constexpr auto create_attachment_ref(unsigned att, VkImageLayout il) {
     return create_attachment_ref(att, static_cast<VkImageLayout>(il));
   }
 
-export struct subpass_description {
-  hai::array<VkAttachmentReference> colours;
-  hai::array<VkAttachmentReference> inputs;
-  VkAttachmentReference depth_stencil;
-};
-export inline constexpr auto create_subpass(const subpass_description & d) {
-  VkSubpassDescription subpass{};
-  subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-  subpass.colorAttachmentCount = d.colours.size();
-  subpass.pColorAttachments = d.colours.begin();
-  if (d.depth_stencil.layout) subpass.pDepthStencilAttachment = &d.depth_stencil;
-  subpass.inputAttachmentCount = d.inputs.size();
-  subpass.pInputAttachments = d.inputs.begin();
-  return subpass;
-}
+  export struct subpass_description {
+    hai::array<VkAttachmentReference> colours;
+    hai::array<VkAttachmentReference> inputs;
+    VkAttachmentReference depth_stencil;
+  };
+  export inline constexpr auto create_subpass(const subpass_description & d) {
+    VkSubpassDescription subpass{};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = d.colours.size();
+    subpass.pColorAttachments = d.colours.begin();
+    if (d.depth_stencil.layout) subpass.pDepthStencilAttachment = &d.depth_stencil;
+    subpass.inputAttachmentCount = d.inputs.size();
+    subpass.pInputAttachments = d.inputs.begin();
+    return subpass;
+  }
 
 export inline constexpr auto create_colour_dependency() {
   VkSubpassDependency dep{};
