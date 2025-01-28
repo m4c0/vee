@@ -32,11 +32,20 @@ public:
     vee::command_pool cp = vee::create_command_pool(qf);
 
     vee::render_pass rp = vee::create_render_pass({
-      .attachments {{ vee::create_colour_attachment(pd, *s) }},
+      .attachments {{
+        vee::create_colour_attachment({
+          .format = vee::find_best_surface_image_format(pd, *s),
+          .initial_layout = vee::image_layout_attachment_optimal,
+          .final_layout   = vee::image_layout_read_only_optimal,
+        }),
+      }},
       .subpasses {{ 
         vee::create_subpass({
-          .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optional) }},
-        })
+          .colours {{ vee::create_attachment_ref(0, vee::image_layout_attachment_optimal) }},
+        }),
+        vee::create_subpass({
+          .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal) }},
+        }),
       }},
       .dependencies {{ vee::create_colour_dependency() }},
     });

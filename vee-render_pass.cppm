@@ -10,6 +10,7 @@ using namespace wagen;
 namespace vee {
   export enum image_layout {
     image_layout_undefined                 = VK_IMAGE_LAYOUT_UNDEFINED,
+    image_layout_attachment_optimal        = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL,
     image_layout_color_attachment_optimal  = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
     image_layout_present_src_khr           = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
     image_layout_read_only_optimal         = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL,
