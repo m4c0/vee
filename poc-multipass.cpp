@@ -53,9 +53,20 @@ public:
     vee::pipeline_layout pl = vee::create_pipeline_layout();
     vee::shader_module vert = vee::create_shader_module_from_resource("poc-multipass.vert.spv");
     vee::shader_module frag = vee::create_shader_module_from_resource("poc-multipass.frag.spv");
-    vee::gr_pipeline gp = vee::create_graphics_pipeline({
+    vee::gr_pipeline gp0 = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = *rp,
+        .shaders {
+            vee::pipeline_vert_stage(*vert, "main"),
+            vee::pipeline_frag_stage(*frag, "main"),
+        },
+        .bindings { vee::vertex_input_bind(sizeof(dotz::vec2)) },
+        .attributes { vee::vertex_attribute_vec2(0, 0) },
+    });
+    vee::gr_pipeline gp1 = vee::create_graphics_pipeline({
+        .pipeline_layout = *pl,
+        .render_pass = *rp,
+        .subpass = 1,
         .shaders {
             vee::pipeline_vert_stage(*vert, "main"),
             vee::pipeline_frag_stage(*frag, "main"),
@@ -113,10 +124,11 @@ public:
         });
         vee::cmd_set_scissor(frame->cb, extent);
         vee::cmd_set_viewport(frame->cb, extent);
-        vee::cmd_bind_gr_pipeline(frame->cb, *gp);
+        vee::cmd_bind_gr_pipeline(frame->cb, *gp0);
         vee::cmd_bind_vertex_buffers(frame->cb, 0, *v_buf);
         vee::cmd_draw(frame->cb, 6);
         vee::cmd_next_subpass(frame->cb);
+        vee::cmd_bind_gr_pipeline(frame->cb, *gp1);
         vee::cmd_draw(frame->cb, 6);
         vee::cmd_end_render_pass(frame->cb);
         vee::end_cmd_buf(frame->cb);

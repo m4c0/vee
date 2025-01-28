@@ -108,6 +108,7 @@ export struct gr_pipeline_params {
   VkPrimitiveTopology topology{VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST};
   bool back_face_cull{true};
   bool depth_test{true};
+  unsigned subpass { 0 };
   hai::view<VkPipelineColorBlendAttachmentState> blends { colour_blend_classic() };
   hai::view<VkPipelineShaderStageCreateInfo> shaders;
   hai::view<VkVertexInputBindingDescription> bindings;
@@ -181,6 +182,7 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   info.pVertexInputState = &vtx_in;
   info.pViewportState = &viewport;
   info.renderPass = gpp.render_pass;
+  info.subpass = gpp.subpass;
   info.stageCount = gpp.shaders.size();
   return gr_pipeline(vk_null_handle, 1, &info);
 }
