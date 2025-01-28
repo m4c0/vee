@@ -116,6 +116,8 @@ public:
         vee::cmd_bind_gr_pipeline(frame->cb, *gp);
         vee::cmd_bind_vertex_buffers(frame->cb, 0, *v_buf);
         vee::cmd_draw(frame->cb, 6);
+        vee::cmd_next_subpass(frame->cb);
+        vee::cmd_draw(frame->cb, 6);
         vee::cmd_end_render_pass(frame->cb);
         vee::end_cmd_buf(frame->cb);
 

@@ -115,6 +115,13 @@ export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
   calls::call(vkCmdBeginRenderPass, rpb.command_buffer, &info, sbc);
 }
 
+export inline void cmd_next_subpass(VkCommandBuffer cb, bool use_secondaries = false) {
+  VkSubpassContents sbc = use_secondaries
+                              ? VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS
+                              : VK_SUBPASS_CONTENTS_INLINE;
+  calls::call(vkCmdNextSubpass, cb, sbc);
+}
+
 export inline auto cmd_bind_descriptor_set(VkCommandBuffer cb,
                                            VkPipelineLayout pl, unsigned idx,
                                            VkDescriptorSet ds) {
