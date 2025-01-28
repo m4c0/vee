@@ -34,6 +34,7 @@ export inline auto create_depth_image(VkPhysicalDevice pd, VkSurfaceKHR s) {
 
 export enum image_usage {
   image_usage_colour_attachment = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+  image_usage_input_attachment  = VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
   image_usage_sampled           = VK_IMAGE_USAGE_SAMPLED_BIT,
   image_usage_transfer_dst      = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
   image_usage_transfer_src      = VK_IMAGE_USAGE_TRANSFER_SRC_BIT,

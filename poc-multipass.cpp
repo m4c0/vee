@@ -93,7 +93,7 @@ public:
     vee::device_memory v_mem = vee::create_host_buffer_memory(pd, *v_buf);
     vee::bind_buffer_memory(*v_buf, *v_mem);
 
-    vee::image t_img = vee::create_image({ 128, 128 }, vee::image_format_srgba, vee::image_usage_colour_attachment);
+    vee::image t_img = vee::create_image({ 128, 128 }, vee::image_format_srgba, vee::image_usage_input_attachment);
     vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
     vee::bind_image_memory(*t_img, *t_mem);
     vee::image_view t_iv = vee::create_image_view(*t_img, vee::image_format_srgba);
