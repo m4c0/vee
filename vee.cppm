@@ -23,6 +23,7 @@ export import :sampler;
 export import :semaphore;
 export import :shader_module;
 export import :surface_capabilities;
+export import :surface_format;
 export import :swapchain;
 
 #ifdef __APPLE__

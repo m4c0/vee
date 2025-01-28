@@ -1,4 +1,5 @@
 export module vee:image;
+import :alias;
 import :calls;
 import :surface_capabilities;
 import wagen;
@@ -31,14 +32,6 @@ export inline auto create_depth_image(VkPhysicalDevice pd, VkSurfaceKHR s) {
   return create_depth_image(get_surface_capabilities(pd, s).currentExtent);
 }
 
-export enum image_format {
-  image_format_r8 = VK_FORMAT_R8_UNORM,
-  image_format_srgba = VK_FORMAT_R8G8B8A8_SRGB,
-  image_format_rgba_uint = VK_FORMAT_R8G8B8A8_UINT,
-  image_format_rgba_unorm = VK_FORMAT_R8G8B8A8_UNORM,
-  image_format_rgba_uscaled = VK_FORMAT_R8G8B8A8_USCALED,
-  image_format_yuv420p = VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM,
-};
 export enum image_usage {
   image_usage_colour_attachment = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
   image_usage_sampled           = VK_IMAGE_USAGE_SAMPLED_BIT,
