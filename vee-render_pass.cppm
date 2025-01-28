@@ -9,13 +9,14 @@ using namespace wagen;
 
 namespace vee {
   export enum image_layout {
-    image_layout_undefined                 = VK_IMAGE_LAYOUT_UNDEFINED,
-    image_layout_attachment_optimal        = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL,
-    image_layout_color_attachment_optimal  = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-    image_layout_present_src_khr           = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-    image_layout_read_only_optimal         = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL,
-    image_layout_shader_read_only_optimal  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-    image_layout_transfer_src_optimal      = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+    image_layout_undefined                        = VK_IMAGE_LAYOUT_UNDEFINED,
+    image_layout_attachment_optimal               = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL,
+    image_layout_color_attachment_optimal         = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+    image_layout_depth_stencil_attachment_optimal = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+    image_layout_present_src_khr                  = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+    image_layout_read_only_optimal                = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL,
+    image_layout_shader_read_only_optimal         = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+    image_layout_transfer_src_optimal             = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
   };
 
   export struct attachment_description {
@@ -42,25 +43,25 @@ namespace vee {
     });
   }
 
-static constexpr auto create_depth_attachment() {
-  VkAttachmentDescription res{};
-  res.format = VK_FORMAT_D32_SFLOAT;
-  res.samples = VK_SAMPLE_COUNT_1_BIT;
-  res.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-  res.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-  res.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-  res.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-  res.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-  res.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-  return res;
-}
+  static constexpr auto create_depth_attachment() {
+    VkAttachmentDescription res{};
+    res.format = VK_FORMAT_D32_SFLOAT;
+    res.samples = VK_SAMPLE_COUNT_1_BIT;
+    res.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    res.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    res.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    res.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    res.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    res.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    return res;
+  }
 
-static constexpr auto create_attachment_ref(unsigned att, VkImageLayout il) {
-  VkAttachmentReference ref{};
-  ref.attachment = att;
-  ref.layout = il;
-  return ref;
-}
+  static constexpr auto create_attachment_ref(unsigned att, VkImageLayout il) {
+    VkAttachmentReference ref{};
+    ref.attachment = att;
+    ref.layout = il;
+    return ref;
+  }
   export inline constexpr auto create_attachment_ref(unsigned att, vee::image_layout il) {
     return create_attachment_ref(att, static_cast<VkImageLayout>(il));
   }
@@ -112,66 +113,41 @@ static constexpr auto create_depth_dependency() {
   return dep;
 }
 
-export using render_pass = calls::handle<VkRenderPass, &::vkCreateRenderPass, &::vkDestroyRenderPass>;
-
-export struct create_render_pass_params {
-  hai::array<VkAttachmentDescription> attachments;
-  hai::array<VkSubpassDescription> subpasses;
-  hai::array<VkSubpassDependency> dependencies;
-};
-export inline auto create_render_pass(const create_render_pass_params & p) {
-  VkRenderPassCreateInfo info{};
-  info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-  info.attachmentCount = p.attachments.size();
-  info.pAttachments = p.attachments.begin();
-  info.subpassCount = p.subpasses.size();
-  info.pSubpasses = p.subpasses.begin();
-  info.dependencyCount = p.dependencies.size();
-  info.pDependencies = p.dependencies.begin();
-  return render_pass { &info };
-}
-
-export inline auto create_render_pass(hai::array<VkAttachmentDescription> colour_attachments) {
-  auto depth_ref = create_attachment_ref(colour_attachments.size(), VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
-  subpass_description s {
-    .colours { colour_attachments.size() },
-    .depth_stencil = depth_ref,
+  export using render_pass = calls::handle<VkRenderPass, &::vkCreateRenderPass, &::vkDestroyRenderPass>;
+  
+  export struct create_render_pass_params {
+    hai::array<VkAttachmentDescription> attachments;
+    hai::array<VkSubpassDescription> subpasses;
+    hai::array<VkSubpassDependency> dependencies;
   };
-  for (auto i = 0; i < colour_attachments.size(); i++) s.colours[i] = create_attachment_ref(i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+  export inline auto create_render_pass(const create_render_pass_params & p) {
+    VkRenderPassCreateInfo info{};
+    info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    info.attachmentCount = p.attachments.size();
+    info.pAttachments = p.attachments.begin();
+    info.subpassCount = p.subpasses.size();
+    info.pSubpasses = p.subpasses.begin();
+    info.dependencyCount = p.dependencies.size();
+    info.pDependencies = p.dependencies.begin();
+    return render_pass { &info };
+  }
 
-  create_render_pass_params p {
-    .attachments { colour_attachments.size() + 1 },
-    .subpasses {{ create_subpass(s) }},
-    .dependencies {{
-      create_colour_dependency(),
-      create_depth_dependency(),
-    }},
-  };
-
-  for (auto i = 0; i < colour_attachments.size(); i++) p.attachments[i] = colour_attachments[i];
-  p.attachments[colour_attachments.size()] = create_depth_attachment();
-
-  return create_render_pass(p);
-}
-
-export inline auto create_depthless_render_pass(hai::array<VkAttachmentDescription> colour_attachments) {
-  subpass_description s {
-    .colours { colour_attachments.size() },
-  };
-  for (auto i = 0; i < colour_attachments.size(); i++) s.colours[i] = create_attachment_ref(i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-
-  create_render_pass_params p {
-    .attachments { colour_attachments.size() },
-    .subpasses {{ create_subpass(s) }},
-    .dependencies {{ create_colour_dependency() }},
-  };
-
-  for (auto i = 0; i < colour_attachments.size(); i++) p.attachments[i] = colour_attachments[i];
-
-  return create_render_pass(p);
-}
-
-export inline auto create_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
-  return create_render_pass({{ create_colour_attachment(pd, s) }});
-}
+  export inline auto create_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
+    return create_render_pass({
+      .attachments {{
+        create_colour_attachment(pd, s),
+        create_depth_attachment(),
+      }},
+      .subpasses {{
+        create_subpass({
+          .colours {{ create_attachment_ref(0, image_layout_color_attachment_optimal) }},
+          .depth_stencil = create_attachment_ref(1, image_layout_depth_stencil_attachment_optimal),
+        }),
+      }},
+      .dependencies {{
+        create_colour_dependency(),
+        create_depth_dependency(),
+      }},
+    });
+  }
 } // namespace vee
