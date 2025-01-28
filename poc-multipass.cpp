@@ -31,12 +31,22 @@ public:
     vee::queue q = vee::get_queue_for_family(qf);
     vee::command_pool cp = vee::create_command_pool(qf);
 
+    // TODO: dependency
     vee::render_pass rp = vee::create_render_pass({
       .attachments {{
         vee::create_colour_attachment({
-          .format = vee::find_best_surface_image_format(pd, *s),
+          .format         = vee::image_format_srgba,
+          .load_op        = vee::attachment_load_op_clear,
+          .store_op       = vee::attachment_store_op_dont_care,
           .initial_layout = vee::image_layout_attachment_optimal,
           .final_layout   = vee::image_layout_read_only_optimal,
+        }),
+        vee::create_colour_attachment({
+          .format         = vee::find_best_surface_image_format(pd, *s),
+          .load_op        = vee::attachment_load_op_clear,
+          .store_op       = vee::attachment_store_op_store,
+          .initial_layout = vee::image_layout_undefined,
+          .final_layout   = vee::image_layout_color_attachment_optimal,
         }),
       }},
       .subpasses {{ 
@@ -44,10 +54,14 @@ public:
           .colours {{ vee::create_attachment_ref(0, vee::image_layout_attachment_optimal) }},
         }),
         vee::create_subpass({
-          .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal) }},
+          .colours {{ vee::create_attachment_ref(1, vee::image_layout_color_attachment_optimal) }},
+          .inputs {{ vee::create_attachment_ref(0, vee::image_layout_read_only_optimal) }},
         }),
       }},
-      .dependencies {{ vee::create_colour_dependency() }},
+      .dependencies {{
+        vee::create_colour_dependency(),
+        vee::create_colour_dependency(),
+      }},
     });
 
     vee::pipeline_layout pl = vee::create_pipeline_layout();
@@ -79,6 +93,11 @@ public:
     vee::device_memory v_mem = vee::create_host_buffer_memory(pd, *v_buf);
     vee::bind_buffer_memory(*v_buf, *v_mem);
 
+    vee::image t_img = vee::create_image({ 128, 128 }, vee::image_format_srgba, vee::image_usage_colour_attachment);
+    vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
+    vee::bind_image_memory(*t_img, *t_mem);
+    vee::image_view t_iv = vee::create_image_view(*t_img, vee::image_format_srgba);
+
     vee::semaphore img_available_sema = vee::create_semaphore();
     vee::semaphore rnd_finished_sema = vee::create_semaphore();
     vee::fence f = vee::create_fence_signaled();
@@ -99,7 +118,7 @@ public:
           .physical_device = pd,
           .surface = *s,
           .render_pass = *rp,
-          .attachments {{ *iv }},
+          .attachments {{ *t_iv, *iv }},
         };
         frms[i] = hai::uptr { new frame_stuff {
             .iv = traits::move(iv),
