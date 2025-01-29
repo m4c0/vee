@@ -95,25 +95,28 @@ namespace vee {
     return subpass;
   }
 
+  export constexpr const auto subpass_external = vk_subpass_external;
   export enum pipeline_stage_flags {
     pipeline_stage_color_attachment_output = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
     pipeline_stage_early_fragment_tests    = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+    pipeline_stage_fragment_shader         = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
     pipeline_stage_late_fragment_tests     = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
   };
   export enum access_flags {
     access_color_attachment_write         = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
     access_depth_stencil_attachment_read  = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT,
     access_depth_stencil_attachment_write = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+    access_input_attachment_read          = VK_ACCESS_INPUT_ATTACHMENT_READ_BIT,
   };
   export enum dependency_flags {
     dependency_by_region = VK_DEPENDENCY_BY_REGION_BIT,
   };
   export struct subpass_dependency {
     unsigned src_subpass;
-    unsigned dst_subpass;
     unsigned src_stage_mask;
-    unsigned dst_stage_mask;
     unsigned src_access_mask;
+    unsigned dst_subpass;
+    unsigned dst_stage_mask;
     unsigned dst_access_mask;
     unsigned dependency;
   };
@@ -141,9 +144,9 @@ namespace vee {
       .src_subpass = vk_subpass_external,
       .src_stage_mask = pipeline_stage_early_fragment_tests
                       | pipeline_stage_late_fragment_tests,
+      .src_access_mask = access_depth_stencil_attachment_write,
       .dst_stage_mask = pipeline_stage_early_fragment_tests
                       | pipeline_stage_late_fragment_tests,
-      .src_access_mask = access_depth_stencil_attachment_write,
       .dst_access_mask = access_depth_stencil_attachment_read
                        | access_depth_stencil_attachment_write,
     });
