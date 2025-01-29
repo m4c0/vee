@@ -33,6 +33,13 @@ dsl_fragment_samplers(VkSampler (&&smp)[N]) {
   b.pImmutableSamplers = smp;
   return b;
 }
+export constexpr VkDescriptorSetLayoutBinding dsl_fragment_input_attachment() {
+  VkDescriptorSetLayoutBinding b{};
+  b.descriptorType = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
+  b.descriptorCount = 1;
+  b.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+  return b;
+}
 export constexpr VkDescriptorSetLayoutBinding dsl_fragment_storage() {
   VkDescriptorSetLayoutBinding b{};
   b.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;

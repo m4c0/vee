@@ -15,6 +15,12 @@ export auto combined_image_sampler(unsigned qty = 1) {
   ps.descriptorCount = qty;
   return ps;
 }
+export auto input_attachment(unsigned qty = 1) {
+  VkDescriptorPoolSize ps{};
+  ps.type = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
+  ps.descriptorCount = qty;
+  return ps;
+}
 export auto storage_buffer(unsigned qty = 1) {
   VkDescriptorPoolSize ps{};
   ps.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
