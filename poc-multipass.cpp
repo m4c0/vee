@@ -1,5 +1,6 @@
 #pragma leco app
 #pragma leco add_shader "poc-multipass.frag"
+#pragma leco add_shader "poc-multipass-b.frag"
 #pragma leco add_shader "poc-multipass.vert"
 export module poc;
 
@@ -92,6 +93,7 @@ public:
         .bindings { vee::vertex_input_bind(sizeof(dotz::vec2)) },
         .attributes { vee::vertex_attribute_vec2(0, 0) },
     });
+    frag = vee::create_shader_module_from_resource("poc-multipass-b.frag.spv");
     vee::gr_pipeline gp1 = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = *rp,
