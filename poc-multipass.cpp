@@ -59,8 +59,23 @@ public:
         }),
       }},
       .dependencies {{
-        vee::create_colour_dependency(),
-        vee::create_colour_dependency(),
+        vee::create_dependency({
+          .src_subpass = vee::subpass_external,
+          .src_stage_mask = vee::pipeline_stage_color_attachment_output,
+
+          .dst_subpass = 1,
+          .dst_stage_mask = vee::pipeline_stage_color_attachment_output,
+          .dst_access_mask = vee::access_color_attachment_write,
+        }),
+        vee::create_dependency({
+          .src_subpass = 0,
+          .src_stage_mask = vee::pipeline_stage_color_attachment_output,
+          .src_access_mask = vee::access_color_attachment_write,
+
+          .dst_subpass = 1,
+          .dst_stage_mask = vee::pipeline_stage_fragment_shader,
+          .dst_access_mask = vee::access_input_attachment_read,
+        }),
       }},
     });
 
