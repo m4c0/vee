@@ -47,6 +47,14 @@ namespace vee {
     res.finalLayout = static_cast<VkImageLayout>(d.final_layout);
     return res;
   }
+  export [[nodiscard]] constexpr auto create_colour_attachment(vee::image_format fmt, vee::image_layout il) {
+    return create_colour_attachment({
+      .format = fmt,
+      .load_op = attachment_load_op_clear,
+      .store_op = attachment_store_op_store,
+      .final_layout = il,
+    });
+  }
   export [[nodiscard]] constexpr auto create_colour_attachment(VkPhysicalDevice pd, VkSurfaceKHR s) {
     return create_colour_attachment({
       .format = static_cast<vee::image_format>(find_best_surface_format(pd, s).format),
@@ -171,6 +179,24 @@ namespace vee {
     return render_pass { &info };
   }
 
+  export inline auto create_render_pass(vee::image_format fmt, vee::image_layout il) {
+    return create_render_pass({
+      .attachments {{
+        create_colour_attachment(fmt, il),
+        create_depth_attachment(),
+      }},
+      .subpasses {{
+        create_subpass({
+          .colours {{ create_attachment_ref(0, image_layout_color_attachment_optimal) }},
+          .depth_stencil = create_attachment_ref(1, image_layout_depth_stencil_attachment_optimal),
+        }),
+      }},
+      .dependencies {{
+        create_colour_dependency(),
+        create_depth_dependency(),
+      }},
+    });
+  }
   export inline auto create_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
     return create_render_pass({
       .attachments {{
