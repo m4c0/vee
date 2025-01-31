@@ -80,7 +80,15 @@ public:
       }},
     });
 
-    vee::pipeline_layout pl = vee::create_pipeline_layout();
+    vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({
+      vee::dsl_fragment_input_attachment(),
+    });
+    vee::descriptor_pool dpool = vee::create_descriptor_pool(1, {
+      vee::input_attachment(),
+    });
+    vee::descriptor_set dset = vee::allocate_descriptor_set(*dpool, *dsl);
+
+    vee::pipeline_layout pl = vee::create_pipeline_layout({ *dsl });
     vee::shader_module vert = vee::create_shader_module_from_resource("poc-multipass.vert.spv");
     vee::shader_module frag = vee::create_shader_module_from_resource("poc-multipass.frag.spv");
     vee::gr_pipeline gp0 = vee::create_graphics_pipeline({
@@ -128,6 +136,7 @@ public:
       vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
       vee::bind_image_memory(*t_img, *t_mem);
       vee::image_view t_iv = vee::create_image_view(*t_img, vee::image_format_srgba);
+      vee::update_descriptor_set(dset, 0, *t_iv);
 
       auto imgs = vee::get_swapchain_images(*swc);
       auto frms = hai::array<hai::uptr<frame_stuff>> { imgs.size() };
