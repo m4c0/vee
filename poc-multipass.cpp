@@ -10,6 +10,7 @@ import hai;
 import sith;
 import traits;
 import vee;
+import wagen;
 
 // Note: this is just an example of using a render pass with multiple
 // subpasses. It lacks some Vulkan infra, like restarting the swapchain when it
@@ -136,7 +137,13 @@ public:
       vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
       vee::bind_image_memory(*t_img, *t_mem);
       vee::image_view t_iv = vee::create_image_view(*t_img, vee::image_format_srgba);
-      vee::update_descriptor_set(dset, 0, *t_iv);
+      auto ii = vee::descriptor_image_info(*t_iv, nullptr);
+      vee::update_descriptor_set(vee::write_descriptor_set({
+        .dstSet = dset,
+        .descriptorCount = 1,
+        .descriptorType = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,
+        .pImageInfo = &ii,
+      }));
 
       auto imgs = vee::get_swapchain_images(*swc);
       auto frms = hai::array<hai::uptr<frame_stuff>> { imgs.size() };
