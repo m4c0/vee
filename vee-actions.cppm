@@ -459,7 +459,10 @@ export constexpr auto write_descriptor_set(VkWriteDescriptorSet w) {
   w.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
   return w;
 }
-export inline auto update_descriptor_set_with_storage(VkDescriptorSet set, unsigned binding, VkBuffer b) {
+export inline auto update_descriptor_set(const VkWriteDescriptorSet & w) {
+  calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
+}
+export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, VkBuffer b) {
   auto ii = descriptor_buffer_info(b);
   auto w = write_descriptor_set({
     .dstSet = set,
@@ -481,9 +484,7 @@ export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, 
   });
   calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
 }
-
-export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding,
-                                         VkImageView iv) {
+export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, VkImageView iv) {
   return update_descriptor_set(set, binding, iv, nullptr);
 }
 } // namespace vee
