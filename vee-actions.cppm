@@ -213,6 +213,7 @@ export inline auto cmd_execute_command(VkCommandBuffer pri_cb,
 
 export enum barrier_type {
   from_compute_to_compute,
+  from_fragment_to_fragment,
   from_host_to_transfer,
   from_transfer_to_fragment,
   from_transfer_to_vertex,
@@ -236,6 +237,7 @@ export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkBuffer buf,
     calls::call(vkCmdPipelineBarrier, cb, stage, stage, 0, 0, nullptr, 1, &imb, 0, nullptr);
     break;
   }
+  case from_fragment_to_fragment: silog::die("TBD: fragment-to-fragment barrier for images");
   case from_host_to_transfer: {
     imb.srcAccessMask = 0;
     imb.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -292,6 +294,14 @@ export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkImage img,
 
   switch (bt) {
     case from_compute_to_compute: silog::die("TBD: compute-to-compute barrier for images");
+    case from_fragment_to_fragment: {
+      imb.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+      imb.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+
+      constexpr const auto stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+      calls::call(vkCmdPipelineBarrier, cb, stage, stage, 0, 0, nullptr, 0, nullptr, 1, &imb);
+      break;
+    }
   case from_host_to_transfer: {
     imb.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     imb.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
