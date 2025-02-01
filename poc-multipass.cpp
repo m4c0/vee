@@ -40,7 +40,6 @@ public:
           .format         = vee::image_format_srgba,
           .load_op        = vee::attachment_load_op_clear,
           .store_op       = vee::attachment_store_op_dont_care,
-          .initial_layout = vee::image_layout_attachment_optimal,
           .final_layout   = vee::image_layout_read_only_optimal,
         }),
         vee::create_colour_attachment(pd, *s),
