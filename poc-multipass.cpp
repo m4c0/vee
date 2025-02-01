@@ -182,6 +182,7 @@ public:
         vee::cmd_draw(frame->cb, 6);
         vee::cmd_next_subpass(frame->cb);
         vee::cmd_bind_gr_pipeline(frame->cb, *gp1);
+        vee::cmd_bind_descriptor_set(frame->cb, *pl, 0, dset);
         vee::cmd_draw(frame->cb, 6);
         vee::cmd_end_render_pass(frame->cb);
         vee::end_cmd_buf(frame->cb);
