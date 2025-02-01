@@ -1,8 +1,8 @@
 #version 450
 
-//layout(location = 0) in vec4 inp;
-layout(location = 0) out vec4 colour;
+layout(input_attachment_index = 0, set = 0, binding = 0) uniform subpassInput in_c;
+layout(location = 0) out vec4 out_c;
 
 void main() {
-  colour = vec4(vec3(0.5), 1.0);
+  out_c = vec4(subpassLoad(in_c).rgb, 1.0);
 }
