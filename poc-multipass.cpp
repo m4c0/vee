@@ -43,13 +43,7 @@ public:
           .initial_layout = vee::image_layout_attachment_optimal,
           .final_layout   = vee::image_layout_read_only_optimal,
         }),
-        vee::create_colour_attachment({
-          .format         = vee::find_best_surface_image_format(pd, *s),
-          .load_op        = vee::attachment_load_op_clear,
-          .store_op       = vee::attachment_store_op_store,
-          .initial_layout = vee::image_layout_undefined,
-          .final_layout   = vee::image_layout_color_attachment_optimal,
-        }),
+        vee::create_colour_attachment(pd, *s),
       }},
       .subpasses {{ 
         vee::create_subpass({
