@@ -211,6 +211,11 @@ export inline auto cmd_execute_command(VkCommandBuffer pri_cb,
   calls::call(vkCmdExecuteCommands, pri_cb, 1, &sec_cb);
 }
 
+export inline auto cmd_fill_buffer(VkCommandBuffer cb, VkBuffer buf, unsigned data) {
+  // Remember: offset/size must be multiples of two
+  calls::call(vkCmdFillBuffer, cb, buf, 0, vk_whole_size, data);
+}
+
 export enum barrier_type {
   from_compute_to_compute,
   from_fragment_to_fragment,
