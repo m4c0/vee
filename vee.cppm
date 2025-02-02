@@ -1,6 +1,7 @@
 export module vee;
 export import :actions;
 export import :alias;
+export import :barrier;
 export import :buffer;
 export import :calls;
 export import :command_pool;
