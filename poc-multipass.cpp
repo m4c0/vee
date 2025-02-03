@@ -129,7 +129,7 @@ public:
       vee::image t_img = vee::create_image(extent, vee::image_format_srgba, vee::image_usage_colour_attachment, vee::image_usage_input_attachment);
       vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
       vee::bind_image_memory(*t_img, *t_mem);
-      vee::image_view t_iv = vee::create_image_view(*t_img, vee::image_format_srgba);
+      vee::image_view t_iv = vee::create_image_view(*t_img, VK_FORMAT_R8G8B8A8_SRGB);
       auto ii = vee::descriptor_image_info(*t_iv, nullptr);
       vee::update_descriptor_set(vee::write_descriptor_set({
         .dstSet = dset,
@@ -141,7 +141,7 @@ public:
       auto imgs = vee::get_swapchain_images(*swc);
       auto frms = hai::array<hai::uptr<frame_stuff>> { imgs.size() };
       for (auto i = 0; i < imgs.size(); i++) {
-        auto iv = vee::create_rgba_image_view(imgs[i], pd, *s);
+        auto iv = vee::create_image_view_for_surface(imgs[i], pd, *s);
         vee::fb_params fp {
           .physical_device = pd,
           .surface = *s,
