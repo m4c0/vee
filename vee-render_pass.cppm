@@ -29,7 +29,7 @@ namespace vee {
     attachment_store_op_store     = VK_ATTACHMENT_STORE_OP_STORE,
   };
   export struct attachment_description {
-    image_format format;
+    VkFormat format;
     attachment_load_op load_op   = attachment_load_op_clear;
     attachment_store_op store_op = attachment_store_op_store;
     image_layout initial_layout;
@@ -47,7 +47,7 @@ namespace vee {
     res.finalLayout = static_cast<VkImageLayout>(d.final_layout);
     return res;
   }
-  export [[nodiscard]] constexpr auto create_colour_attachment(vee::image_format fmt, vee::image_layout il) {
+  export [[nodiscard]] constexpr auto create_colour_attachment(VkFormat fmt, vee::image_layout il) {
     return create_colour_attachment({
       .format = fmt,
       .load_op = attachment_load_op_clear,
@@ -57,7 +57,7 @@ namespace vee {
   }
   export [[nodiscard]] constexpr auto create_colour_attachment(VkPhysicalDevice pd, VkSurfaceKHR s) {
     return create_colour_attachment({
-      .format = static_cast<vee::image_format>(find_best_surface_format(pd, s).format),
+      .format = find_best_surface_format(pd, s).format,
       .load_op = attachment_load_op_clear,
       .store_op = attachment_store_op_store,
       .final_layout = image_layout_present_src_khr,
@@ -179,7 +179,7 @@ namespace vee {
     return render_pass { &info };
   }
 
-  export inline auto create_render_pass(vee::image_format fmt, vee::image_layout il) {
+  export inline auto create_render_pass(VkFormat fmt, vee::image_layout il) {
     return create_render_pass({
       .attachments {{
         create_colour_attachment(fmt, il),

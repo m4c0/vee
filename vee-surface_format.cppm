@@ -25,7 +25,7 @@ inline auto find_best_surface_format(VkPhysicalDevice pd, VkSurfaceKHR surf) {
   }
   return *formats.begin();
 }
-export image_format find_best_surface_image_format(VkPhysicalDevice pd, VkSurfaceKHR s) {
-  return static_cast<image_format>(find_best_surface_format(pd, s).format);
+export VkFormat find_best_surface_image_format(VkPhysicalDevice pd, VkSurfaceKHR s) {
+  return find_best_surface_format(pd, s).format;
 }
 } // namespace vee

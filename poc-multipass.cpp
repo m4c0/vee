@@ -37,7 +37,7 @@ public:
     vee::render_pass rp = vee::create_render_pass({
       .attachments {{
         vee::create_colour_attachment({
-          .format         = vee::image_format_srgba,
+          .format         = VK_FORMAT_R8G8B8A8_SRGB,
           .load_op        = vee::attachment_load_op_clear,
           .store_op       = vee::attachment_store_op_dont_care,
           .final_layout   = vee::image_layout_read_only_optimal,
@@ -126,7 +126,7 @@ public:
 
       vee::extent extent = vee::get_surface_capabilities(pd, *s).currentExtent;
 
-      vee::image t_img = vee::create_image(extent, vee::image_format_srgba, vee::image_usage_colour_attachment, vee::image_usage_input_attachment);
+      vee::image t_img = vee::create_image(extent, VK_FORMAT_R8G8B8A8_SRGB, vee::image_usage_colour_attachment, vee::image_usage_input_attachment);
       vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
       vee::bind_image_memory(*t_img, *t_mem);
       vee::image_view t_iv = vee::create_image_view(*t_img, VK_FORMAT_R8G8B8A8_SRGB);

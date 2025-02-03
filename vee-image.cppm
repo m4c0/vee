@@ -39,28 +39,13 @@ export enum image_usage {
   image_usage_transfer_dst      = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
   image_usage_transfer_src      = VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
 };
-export inline auto create_image(VkExtent2D ext, image_format fmt, image_usage u, auto ... us) {
+export inline auto create_image(VkExtent2D ext, VkFormat fmt, image_usage u, auto ... us) {
   auto info = create_info_for_extent(ext);
-  info.format = static_cast<VkFormat>(fmt);
+  info.format = fmt;
   info.usage = (static_cast<unsigned>(u) | ... | static_cast<unsigned>(us));
   return image{&info};
 }
-export inline auto create_image(VkExtent2D ext, image_format fmt) {
+export inline auto create_image(VkExtent2D ext, VkFormat fmt) {
   return create_image(ext, fmt, image_usage_sampled, image_usage_transfer_dst);
-}
-
-export inline auto create_srgba_image(VkExtent2D ext) {
-  return create_image(ext, image_format_srgba);
-}
-
-export inline auto create_yuv420p_image(VkExtent2D ext) {
-  return create_image(ext, image_format_yuv420p);
-}
-
-export inline auto create_renderable_image(VkExtent2D ext, image_format fmt = image_format_srgba) {
-  auto info = create_info_for_extent(ext);
-  info.format = static_cast<VkFormat>(fmt);
-  info.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-  return image{&info};
 }
 } // namespace vee
