@@ -64,7 +64,7 @@ namespace vee {
     });
   }
 
-  static constexpr auto create_depth_attachment() {
+  export inline constexpr auto create_depth_attachment() {
     VkAttachmentDescription res{};
     res.format = VK_FORMAT_D32_SFLOAT;
     res.samples = VK_SAMPLE_COUNT_1_BIT;
