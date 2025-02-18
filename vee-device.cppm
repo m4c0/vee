@@ -34,6 +34,7 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
   smp_feats.pNext = &sync_feats;
 
   VkPhysicalDeviceFeatures feats{};
+  feats.independentBlend = vk_true;
   feats.samplerAnisotropy = vk_true;
 
   VkDeviceCreateInfo ci{};
