@@ -147,7 +147,7 @@ namespace vee {
       .dst_access_mask = access_color_attachment_write,
     });
   }
-  static constexpr auto create_depth_dependency() {
+  export inline constexpr auto create_depth_dependency() {
     return create_dependency({
       .src_subpass = vk_subpass_external,
       .src_stage_mask = pipeline_stage_early_fragment_tests
