@@ -71,4 +71,14 @@ export inline auto create_debug_utils_messenger() {
 
   return debug_utils_messenger{&info};
 }
+
+void set_debug_utils_object_name(VkObjectType type, traits::ints::uint64_t handle, const char * name) {
+  VkDebugUtilsObjectNameInfoEXT info {
+    .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+    .objectType = type,
+    .objectHandle = handle,
+    .pObjectName = name,
+  };
+  calls::call(vkSetDebugUtilsObjectNameEXT, &info);
+}
 } // namespace vee
