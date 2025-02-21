@@ -81,4 +81,7 @@ export void set_debug_utils_object_name(VkObjectType type, auto handle, const ch
   };
   calls::call(vkSetDebugUtilsObjectNameEXT, &info);
 }
+export void set_debug_utils_object_name(VkImage img, const char * name) {
+  set_debug_utils_object_name(VK_OBJECT_TYPE_IMAGE, img, name);
+}
 } // namespace vee
