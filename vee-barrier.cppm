@@ -73,6 +73,16 @@ namespace vee {
     }
   }
   
+  export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkPipelineStageFlags src_stage, VkPipelineStageFlags dst_stage, VkImageMemoryBarrier imb) {
+    imb.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    imb.srcQueueFamilyIndex = vk_queue_family_ignored;
+    imb.dstQueueFamilyIndex = vk_queue_family_ignored;
+    imb.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imb.subresourceRange.levelCount = 1;
+    imb.subresourceRange.layerCount = 1;
+
+    calls::call(vkCmdPipelineBarrier, cb, src_stage, dst_stage, 0, 0, nullptr, 0, nullptr, 1, &imb);
+  }
   export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkImage img,
                                           barrier_type bt) {
     VkImageMemoryBarrier imb{};
