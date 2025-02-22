@@ -59,6 +59,13 @@ export auto vertex_input_bind(unsigned stride) {
   b.stride = stride;
   return b;
 }
+export auto vertex_attribute_uint(unsigned binding, unsigned offset) {
+  VkVertexInputAttributeDescription a{};
+  a.binding = binding;
+  a.offset = offset;
+  a.format = VK_FORMAT_R32_UINT;
+  return a;
+}
 export auto vertex_attribute_float(unsigned binding, unsigned offset) {
   VkVertexInputAttributeDescription a{};
   a.binding = binding;
