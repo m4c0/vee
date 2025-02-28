@@ -143,10 +143,9 @@ public:
       for (auto i = 0; i < imgs.size(); i++) {
         auto iv = vee::create_image_view_for_surface(imgs[i], pd, *s);
         vee::fb_params fp {
-          .physical_device = pd,
-          .surface = *s,
           .render_pass = *rp,
           .attachments {{ *t_iv, *iv }},
+          .extent = extent,
         };
         frms[i] = hai::uptr { new frame_stuff {
             .iv = traits::move(iv),

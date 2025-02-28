@@ -138,13 +138,13 @@ public:
 
       auto imgs = vee::get_swapchain_images(*swc);
       auto frms = hai::array<hai::uptr<frame_stuff>> { imgs.size() };
+      auto extent = vee::get_surface_capabilities(pd, *s).currentExtent;
       for (auto i = 0; i < imgs.size(); i++) {
         auto iv = vee::create_image_view_for_surface(imgs[i], pd, *s);
         vee::fb_params fp {
-          .physical_device = pd,
-          .surface = *s,
           .render_pass = *rp,
           .attachments {{ *iv, *d_iv }},
+          .extent = extent,
         };
         frms[i] = hai::uptr { new frame_stuff {
             .iv = traits::move(iv),
@@ -153,7 +153,6 @@ public:
         } };
       }
 
-      vee::extent extent = vee::get_surface_capabilities(pd, *s).currentExtent;
       while (!interrupted() && !gv_resized) {
         try {
           vee::wait_and_reset_fence(*f);
