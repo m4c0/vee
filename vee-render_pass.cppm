@@ -218,7 +218,8 @@ namespace vee {
   export inline auto create_depthless_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
     return create_render_pass({
       .attachments {{
-        create_colour_attachment(pd, s) }},
+        create_colour_attachment(pd, s),
+      }},
       .subpasses {{
         create_subpass({
           .colours {{ create_attachment_ref(0, image_layout_color_attachment_optimal) }},
