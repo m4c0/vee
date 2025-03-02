@@ -47,12 +47,12 @@ namespace vee {
     res.finalLayout = static_cast<VkImageLayout>(d.final_layout);
     return res;
   }
-  export [[nodiscard]] constexpr auto create_colour_attachment(VkFormat fmt, vee::image_layout il) {
+  export [[nodiscard]] constexpr auto create_colour_attachment(VkFormat fmt, vee::image_layout final_layout) {
     return create_colour_attachment({
       .format = fmt,
       .load_op = attachment_load_op_clear,
       .store_op = attachment_store_op_store,
-      .final_layout = il,
+      .final_layout = final_layout,
     });
   }
   export [[nodiscard]] constexpr auto create_colour_attachment(VkPhysicalDevice pd, VkSurfaceKHR s) {
