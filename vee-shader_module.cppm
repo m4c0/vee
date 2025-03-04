@@ -13,10 +13,10 @@ export using shader_module =
     calls::handle<VkShaderModule, &::vkCreateShaderModule,
                   &::vkDestroyShaderModule>;
 
-export inline auto create_shader_module(void *data, unsigned size) {
+export inline auto create_shader_module(const void *data, unsigned size) {
   VkShaderModuleCreateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-  info.pCode = static_cast<unsigned *>(data);
+  info.pCode = static_cast<const unsigned *>(data);
   info.codeSize = size;
   return shader_module{&info};
 }
