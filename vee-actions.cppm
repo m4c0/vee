@@ -87,19 +87,26 @@ export struct render_pass_begin {
   VkRenderPass render_pass;
   VkFramebuffer framebuffer;
   VkExtent2D extent;
+  // Using sensible defaults. The magenta color is a visible marker for pixels
+  // missing rendering
   hai::view<VkClearColorValue> clear_colours { clear_colour(1, 0, 1, 1) };
   bool use_secondary_cmd_buf = false;
   bool clear_depth = true;
 };
-export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
-  // Using sensible defaults. The magenta color is a visible marker for pixels
-  // missing rendering
+static hai::array<VkClearValue> clear_values(const render_pass_begin & rpb) {
   auto dsz = rpb.clear_depth ? 1 : 0;
-  hai::array<VkClearValue> values { rpb.clear_colours.size() + dsz };
+  auto csz = rpb.clear_colours.size() + dsz;
+  if (csz == 0) return {};
+
+  hai::array<VkClearValue> values { csz };
   for (auto i = 0; i < rpb.clear_colours.size(); i++) {
     values[i].color = rpb.clear_colours[i];
   }
   if (rpb.clear_depth) values[values.size() - 1].depthStencil = {1.0f, 0};
+  return values;
+}
+export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
+  auto values = clear_values(rpb);
 
   VkSubpassContents sbc = rpb.use_secondary_cmd_buf
                               ? VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS
