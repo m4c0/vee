@@ -80,6 +80,13 @@ export auto vertex_attribute_vec2(unsigned binding, unsigned offset) {
   a.format = VK_FORMAT_R32G32_SFLOAT;
   return a;
 }
+export auto vertex_attribute_vec3(unsigned binding, unsigned offset) {
+  VkVertexInputAttributeDescription a{};
+  a.binding = binding;
+  a.offset = offset;
+  a.format = VK_FORMAT_R32G32B32_SFLOAT;
+  return a;
+}
 export auto vertex_attribute_vec4(unsigned binding, unsigned offset) {
   VkVertexInputAttributeDescription a{};
   a.binding = binding;
