@@ -16,10 +16,10 @@ export constexpr VkDescriptorSetLayoutBinding dsl_compute_storage() {
   b.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
   return b;
 }
-export constexpr VkDescriptorSetLayoutBinding dsl_fragment_sampler() {
+export constexpr VkDescriptorSetLayoutBinding dsl_fragment_sampler(unsigned count = 1) {
   VkDescriptorSetLayoutBinding b{};
   b.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-  b.descriptorCount = 1;
+  b.descriptorCount = count;
   b.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
   return b;
 }
