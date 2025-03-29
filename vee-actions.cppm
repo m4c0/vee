@@ -204,6 +204,15 @@ export inline auto cmd_dispatch(VkCommandBuffer cb, unsigned count_x, unsigned c
   calls::call(vkCmdDispatch, cb, count_x, count_y, count_z);
 }
 
+export struct draw_params {
+  unsigned vcount;
+  unsigned icount = 1;
+  unsigned first_v = 0;
+  unsigned first_i = 0;
+};
+export inline auto cmd_draw(VkCommandBuffer cb, const draw_params & p) {
+  calls::call(vkCmdDraw, cb, p.vcount, p.icount, p.first_v, p.first_i);
+}
 export inline auto cmd_draw(VkCommandBuffer cb, unsigned vtx, unsigned inst = 1,
                             unsigned first_inst = 0) {
   calls::call(vkCmdDraw, cb, vtx, inst, 0U, first_inst);
