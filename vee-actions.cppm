@@ -362,6 +362,20 @@ export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, 
   });
   calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
 }
+export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, const hai::array<VkImageView> & ivs, VkSampler s) {
+  hai::array<VkDescriptorImageInfo> iis { ivs.size() };
+  for (auto i = 0; i < ivs.size(); i++) {
+    iis[i] = descriptor_image_info(ivs[i], s);
+  }
+  auto w = write_descriptor_set({
+    .dstSet = set,
+    .dstBinding = binding,
+    .descriptorCount = iis.size(),
+    .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+    .pImageInfo = iis.begin(),
+  });
+  calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
+}
 export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, VkImageView iv, VkSampler s) {
   auto ii = descriptor_image_info(iv, s);
   auto w = write_descriptor_set({
