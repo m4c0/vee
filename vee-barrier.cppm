@@ -1,5 +1,6 @@
 export module vee:barrier;
 import :calls;
+import silog;
 import wagen;
 
 namespace vee {
