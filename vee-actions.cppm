@@ -221,6 +221,17 @@ export inline auto cmd_draw(VkCommandBuffer cb, unsigned vtx, unsigned inst = 1,
   calls::call(vkCmdDraw, cb, vtx, inst, 0U, first_inst);
 }
 
+export struct draw_indexed_params {
+  unsigned xcount;
+  unsigned icount = 1;
+  unsigned first_x = 0;
+  int voffs = 0;
+  unsigned first_i = 0;
+};
+export inline auto cmd_draw_indexed(VkCommandBuffer cb, const draw_indexed_params & p) {
+  calls::call(vkCmdDrawIndexed, cb, p.xcount, p.icount, p.first_x, p.voffs, p.first_i);
+}
+
 export inline auto cmd_end_render_pass(VkCommandBuffer cb) {
   calls::call(vkCmdEndRenderPass, cb);
 }
