@@ -9,6 +9,7 @@ export using buffer =
     calls::handle<VkBuffer, &::vkCreateBuffer, &::vkDestroyBuffer>;
 
 export enum class buffer_usage {
+  index_buffer = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
   storage_buffer = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
   transfer_dst_buffer = VK_BUFFER_USAGE_TRANSFER_DST_BIT,
   transfer_src_buffer = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
