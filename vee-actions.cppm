@@ -147,6 +147,9 @@ export inline auto cmd_bind_gr_pipeline(VkCommandBuffer cb, VkPipeline p) {
   calls::call(vkCmdBindPipeline, cb, VK_PIPELINE_BIND_POINT_GRAPHICS, p);
 }
 
+export inline auto cmd_bind_index_buffer_u32(VkCommandBuffer cb, VkBuffer buf) {
+  calls::call(vkCmdBindIndexBuffer, cb, buf, 0, VK_INDEX_TYPE_UINT32);
+}
 export inline auto cmd_bind_vertex_buffers(VkCommandBuffer cb, unsigned idx,
                                            VkBuffer buf) {
   VkDeviceSize offs{};
