@@ -231,6 +231,9 @@ export struct draw_indexed_params {
 export inline auto cmd_draw_indexed(VkCommandBuffer cb, const draw_indexed_params & p) {
   calls::call(vkCmdDrawIndexed, cb, p.xcount, p.icount, p.first_x, p.voffs, p.first_i);
 }
+export inline auto cmd_draw_indexed(VkCommandBuffer cb, unsigned xcount, unsigned icount = 1) {
+  cmd_draw_indexed(cb, { .xcount = xcount, .icount = icount });
+}
 
 export inline auto cmd_end_render_pass(VkCommandBuffer cb) {
   calls::call(vkCmdEndRenderPass, cb);
