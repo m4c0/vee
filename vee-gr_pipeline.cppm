@@ -120,6 +120,7 @@ export struct gr_pipeline_params {
   VkPipelineLayout pipeline_layout;
   VkRenderPass render_pass;
   VkPrimitiveTopology topology{VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST};
+  VkPolygonMode polygon_mode { VK_POLYGON_MODE_FILL };
   bool back_face_cull{true};
   bool depth_test{true};
   unsigned subpass { 0 };
@@ -170,7 +171,7 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
     raster.cullMode = VK_CULL_MODE_BACK_BIT;
   raster.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
   raster.lineWidth = 1;
-  raster.polygonMode = VK_POLYGON_MODE_FILL;
+  raster.polygonMode = gpp.polygon_mode;
 
   VkPipelineViewportStateCreateInfo viewport{};
   viewport.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
