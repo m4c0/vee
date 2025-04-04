@@ -7,8 +7,7 @@ using namespace wagen;
 namespace vee {
 export using device =
     calls::handle<VkDevice, &::vkCreateDevice, &::vkDestroyDevice>;
-export inline auto create_single_queue_device(VkPhysicalDevice pd,
-                                              unsigned qf) {
+export inline auto create_single_queue_device(VkPhysicalDevice pd, unsigned qf, const VkPhysicalDeviceFeatures & feats) {
   const float priority = 1.0f;
 
   constexpr const auto ext_count = 2;
@@ -33,10 +32,6 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
   smp_feats.samplerYcbcrConversion = vk_true;
   smp_feats.pNext = &sync_feats;
 
-  VkPhysicalDeviceFeatures feats{};
-  feats.independentBlend = vk_true;
-  feats.samplerAnisotropy = vk_true;
-
   VkDeviceCreateInfo ci{};
   ci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 #ifndef LECO_TARGET_LINUX
@@ -52,6 +47,12 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd,
   auto res = device(pd, &ci);
   wagen::device() = *res;
   return res;
+}
+export inline auto create_single_queue_device(VkPhysicalDevice pd, unsigned qf) {
+  return create_single_queue_device(pd, qf, {
+    .independentBlend  = vk_true,
+    .samplerAnisotropy = vk_true,
+  });
 }
 
 export inline auto get_queue_for_family(unsigned qf) {
