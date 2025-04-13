@@ -407,4 +407,15 @@ export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, 
 export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, VkImageView iv) {
   return update_descriptor_set(set, binding, iv, nullptr);
 }
+
+export inline auto update_descriptor_set_for_attachment(VkDescriptorSet set, unsigned binding, VkImageView iv) {
+  auto ii = descriptor_image_info(iv, nullptr);
+  vee::update_descriptor_set(vee::write_descriptor_set({
+    .dstSet = set,
+    .dstBinding = binding,
+    .descriptorCount = 1,
+    .descriptorType = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,
+    .pImageInfo = &ii,
+  }));
+}
 } // namespace vee
