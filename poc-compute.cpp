@@ -20,7 +20,7 @@ int main() try {
     vee::dsl_compute_storage(),
     vee::dsl_compute_storage(),
   });
-  auto pl = vee::create_pipeline_layout({ *dsl });
+  auto pl = vee::create_pipeline_layout(*dsl);
 
   auto dpool = vee::create_descriptor_pool(1, { vee::storage_buffer(3) });
 

@@ -82,7 +82,7 @@ public:
     });
     vee::descriptor_set dset = vee::allocate_descriptor_set(*dpool, *dsl);
 
-    vee::pipeline_layout pl = vee::create_pipeline_layout({ *dsl });
+    vee::pipeline_layout pl = vee::create_pipeline_layout(*dsl);
     vee::shader_module vert = vee::create_shader_module_from_resource("poc-multipass.vert.spv");
     vee::shader_module frag = vee::create_shader_module_from_resource("poc-multipass.frag.spv");
     vee::gr_pipeline gp0 = vee::create_graphics_pipeline({

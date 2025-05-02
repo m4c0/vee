@@ -41,46 +41,32 @@ inline auto vert_frag_push_constant_range(unsigned offset = 0) {
 export using pipeline_layout =
     calls::handle<VkPipelineLayout, &::vkCreatePipelineLayout,
                   &::vkDestroyPipelineLayout>;
-export template <unsigned D, unsigned P>
-inline auto create_pipeline_layout(const VkDescriptorSetLayout (&dsl)[D],
-                                   const VkPushConstantRange (&pcr)[P]) {
+
+export struct pipeline_layout_params {
+  hai::array<VkDescriptorSetLayout> descriptor_set_layouts;
+  hai::array<VkPushConstantRange> push_constant_ranges;
+};
+export inline auto create_pipeline_layout(const pipeline_layout_params & p) {
   VkPipelineLayoutCreateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  info.setLayoutCount = D;
-  info.pSetLayouts = dsl;
-  info.pushConstantRangeCount = P;
-  info.pPushConstantRanges = pcr;
+  info.setLayoutCount = p.descriptor_set_layouts.size();
+  info.pSetLayouts = p.descriptor_set_layouts.begin();
+  info.pushConstantRangeCount = p.push_constant_ranges.size();
+  info.pPushConstantRanges = p.push_constant_ranges.begin();
   return pipeline_layout{&info};
 }
-export template <unsigned D>
-inline auto create_pipeline_layout(const VkDescriptorSetLayout (&dsl)[D]) {
-  VkPipelineLayoutCreateInfo info{};
-  info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  info.setLayoutCount = D;
-  info.pSetLayouts = dsl;
-  return pipeline_layout{&info};
+
+export inline auto create_pipeline_layout(VkDescriptorSetLayout dsl) {
+  return create_pipeline_layout({{{ dsl }}, {}});
 }
-export template <unsigned P>
-inline auto create_pipeline_layout(const VkPushConstantRange (&pcr)[P]) {
-  VkPipelineLayoutCreateInfo info{};
-  info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  info.pushConstantRangeCount = P;
-  info.pPushConstantRanges = pcr;
-  return pipeline_layout{&info};
+export inline auto create_pipeline_layout(VkPushConstantRange pcr) {
+  return create_pipeline_layout({{}, {{ pcr }}});
 }
-export inline auto create_pipeline_layout(const VkDescriptorSetLayout &dsl,
-                                          const VkPushConstantRange &pcr) {
-  VkPipelineLayoutCreateInfo info{};
-  info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  info.pushConstantRangeCount = 1;
-  info.pPushConstantRanges = &pcr;
-  info.setLayoutCount = 1;
-  info.pSetLayouts = &dsl;
-  return pipeline_layout{&info};
-}
-export inline auto create_pipeline_layout() {
-  VkPipelineLayoutCreateInfo info{};
-  info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  return pipeline_layout{&info};
+export inline auto create_pipeline_layout(VkDescriptorSetLayout dsl,
+                                          VkPushConstantRange pcr) {
+  return create_pipeline_layout(pipeline_layout_params {
+    {{ dsl }},
+    {{ pcr }},
+  });
 }
 } // namespace vee
