@@ -14,20 +14,33 @@ namespace vee {
     res.size = sizeof(T);
     return res;
   }
-  export template<typename K> auto specialisation_info(K * data, hai::view<VkSpecializationMapEntry> map) {
+
+  export template<typename... Ts> auto specialisation_map_entries() {
+    auto map = hai::array<VkSpecializationMapEntry>::make(
+      specialisation_map_entry<Ts>()...
+    );
+ 
     unsigned sz = 0;
     for (auto i = 0; i < map.size(); i++) {
       map[i].constantID = i;
       map[i].offset = sz;
       sz += map[i].size;
     }
-    VkSpecializationInfo res {};
-    res.mapEntryCount = map.size();
-    res.pMapEntries = map.begin();
-    res.pData = data;
-    res.dataSize = sizeof(K);
-    return res;
+    return map;
   }
+
+  export template<typename... Ts> class specialisation_info : public VkSpecializationInfo {
+    hai::array<VkSpecializationMapEntry> map = specialisation_map_entries<Ts...>();
+
+  public:
+    template<typename K>
+    constexpr specialisation_info(K * data) {
+      mapEntryCount = map.size();
+      pMapEntries = map.begin();
+      pData = data;
+      dataSize = sizeof(K);
+    }
+  };
 
 export auto pipeline_frag_stage(VkShaderModule s, const char *fn, VkSpecializationInfo * si = {}) {
   VkPipelineShaderStageCreateInfo ci{};
