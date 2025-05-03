@@ -29,15 +29,20 @@ namespace vee {
     return map;
   }
 
+  template<typename T>
+  concept non_ptr_copyable = requires (T t) {
+    { t = T() };
+    { t } -> traits::is_assignable_from<traits::remove_ptr_t<T>>;
+  };
   export template<typename... Ts> class specialisation_info : public VkSpecializationInfo {
     hai::array<VkSpecializationMapEntry> map = specialisation_map_entries<Ts...>();
 
   public:
-    template<typename K>
-    constexpr specialisation_info(K * data) {
+    template<non_ptr_copyable K>
+    constexpr specialisation_info(const K & data) {
       mapEntryCount = map.size();
       pMapEntries = map.begin();
-      pData = data;
+      pData = &data;
       dataSize = sizeof(K);
     }
   };

@@ -76,7 +76,7 @@ public:
         .render_pass = *rp,
         .shaders {
             vee::pipeline_vert_stage(*vert, "main"),
-            vee::pipeline_frag_stage(*frag, "main", vee::specialisation_info<float>(&k)),
+            vee::pipeline_frag_stage(*frag, "main", vee::specialisation_info<float>(k)),
         },
         .bindings {
             vee::vertex_input_bind(sizeof(point)),
