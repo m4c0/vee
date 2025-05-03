@@ -42,22 +42,31 @@ namespace vee {
     }
   };
 
-export auto pipeline_frag_stage(VkShaderModule s, const char *fn, VkSpecializationInfo * si = {}) {
+export auto pipeline_frag_stage(VkShaderModule s, const char *fn) {
   VkPipelineShaderStageCreateInfo ci{};
   ci.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
   ci.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
   ci.module = s;
   ci.pName = fn;
-  ci.pSpecializationInfo = si;
   return ci;
 }
-export auto pipeline_vert_stage(VkShaderModule s, const char *fn, VkSpecializationInfo * si = {}) {
+export auto pipeline_frag_stage(VkShaderModule s, const char *fn, const VkSpecializationInfo & si) {
+  auto ci = pipeline_frag_stage(s, fn);
+  ci.pSpecializationInfo = &si;
+  return ci;
+}
+
+export auto pipeline_vert_stage(VkShaderModule s, const char *fn) {
   VkPipelineShaderStageCreateInfo ci{};
   ci.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
   ci.stage = VK_SHADER_STAGE_VERTEX_BIT;
   ci.module = s;
   ci.pName = fn;
-  ci.pSpecializationInfo = si;
+  return ci;
+}
+export auto pipeline_vert_stage(VkShaderModule s, const char *fn, const VkSpecializationInfo & si) {
+  auto ci = pipeline_vert_stage(s, fn);
+  ci.pSpecializationInfo = &si;
   return ci;
 }
 

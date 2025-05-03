@@ -71,13 +71,12 @@ public:
     float k = 1;
     vee::shader_module vert = vee::create_shader_module_from_resource("poc.vert.spv");
     vee::shader_module frag = vee::create_shader_module_from_resource("poc.frag.spv");
-    auto frag_k = vee::specialisation_info<float>(&k);
     vee::gr_pipeline gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = *rp,
         .shaders {
             vee::pipeline_vert_stage(*vert, "main"),
-            vee::pipeline_frag_stage(*frag, "main", &frag_k),
+            vee::pipeline_frag_stage(*frag, "main", vee::specialisation_info<float>(&k)),
         },
         .bindings {
             vee::vertex_input_bind(sizeof(point)),
