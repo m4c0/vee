@@ -1,5 +1,6 @@
 export module vee:pipeline_layout;
 import :calls;
+import hai;
 import wagen;
 
 using namespace wagen;
