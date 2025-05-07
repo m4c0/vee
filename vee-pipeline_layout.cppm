@@ -57,6 +57,9 @@ export inline auto create_pipeline_layout(const pipeline_layout_params & p) {
   return pipeline_layout{&info};
 }
 
+export inline auto create_pipeline_layout() {
+  return create_pipeline_layout({{}, {}});
+}
 export inline auto create_pipeline_layout(VkDescriptorSetLayout dsl) {
   return create_pipeline_layout({{{ dsl }}, {}});
 }
