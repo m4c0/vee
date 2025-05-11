@@ -148,6 +148,7 @@ export struct gr_pipeline_params {
   VkRenderPass render_pass;
   VkPrimitiveTopology topology{VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST};
   VkPolygonMode polygon_mode { VK_POLYGON_MODE_FILL };
+  VkExtent2D extent {};
   bool back_face_cull{true};
   bool depth_test{true};
   unsigned subpass { 0 };
@@ -216,7 +217,7 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   info.layout = gpp.pipeline_layout;
   info.pColorBlendState = &color_blend;
   info.pDepthStencilState = &depth_stencil;
-  info.pDynamicState = &dynamic_state;
+  info.pDynamicState = gpp.extent.width > 0 ? nullptr : &dynamic_state;
   info.pInputAssemblyState = &in_asm;
   info.pMultisampleState = &multisample;
   info.pRasterizationState = &raster;
