@@ -201,10 +201,23 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   raster.lineWidth = 1;
   raster.polygonMode = gpp.polygon_mode;
 
+  VkViewport vp {
+    .width    = static_cast<float>(gpp.extent.width),
+    .height   = static_cast<float>(gpp.extent.height),
+    .maxDepth = 1,
+  };
+  VkRect2D sc {
+    .extent = gpp.extent,
+  };
+
   VkPipelineViewportStateCreateInfo viewport{};
   viewport.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
   viewport.scissorCount = 1;
   viewport.viewportCount = 1;
+  if (gpp.extent.width > 0) {
+    viewport.pScissors  = &sc;
+    viewport.pViewports = &vp;
+  }
 
   VkDynamicState states[]{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
   VkPipelineDynamicStateCreateInfo dynamic_state{};
