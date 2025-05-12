@@ -8,33 +8,51 @@ namespace vee {
 export using sampler =
     calls::handle<VkSampler, &::vkCreateSampler, &::vkDestroySampler>;
 
+export struct sampler_create_info : VkSamplerCreateInfo {
+  sampler_create_info & address_mode(VkSamplerAddressMode mode) {
+    addressModeU = addressModeV = addressModeW = mode;
+    return *this;
+  }
+  sampler_create_info & anisotropy(float max) {
+    anisotropyEnable = vk_true;
+    maxAnisotropy = max;
+    return *this;
+  }
+  sampler_create_info & linear() {
+    mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    magFilter = VK_FILTER_LINEAR;
+    minFilter = VK_FILTER_LINEAR;
+    return *this;
+  }
+  sampler_create_info & nearest() {
+    mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+    magFilter = VK_FILTER_NEAREST;
+    minFilter = VK_FILTER_NEAREST;
+    return *this;
+  }
+};
+
+export inline auto create_sampler(VkSamplerCreateInfo info) {
+  info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+  return sampler{&info};
+}
+
 export enum sampler_type { linear_sampler, nearest_sampler };
 export inline auto create_sampler(sampler_type st) {
   static constexpr const auto max_anisotropy_ever = 16.0;
 
-  VkSamplerCreateInfo info{};
-  info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-  info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-  info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-  info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-  info.anisotropyEnable = vk_true;
-  info.maxAnisotropy = max_anisotropy_ever;
+  auto info = sampler_create_info {}
+    .address_mode(VK_SAMPLER_ADDRESS_MODE_REPEAT)
+    .anisotropy(max_anisotropy_ever);
+
   info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
   info.unnormalizedCoordinates = vk_false; // [0, 1) v [0, w)
 
   switch (st) {
-  case linear_sampler:
-    info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-    info.magFilter = VK_FILTER_LINEAR;
-    info.minFilter = VK_FILTER_LINEAR;
-    break;
-  case nearest_sampler:
-    info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
-    info.magFilter = VK_FILTER_NEAREST;
-    info.minFilter = VK_FILTER_NEAREST;
-    break;
+    case linear_sampler:  info.linear();  break;
+    case nearest_sampler: info.nearest(); break;
   }
-  return sampler{&info};
+  return create_sampler(info);
 }
 
 export using sampler_ycbcr_conversion =
