@@ -13,17 +13,20 @@ inline unsigned find_memory_type_index(VkPhysicalDevice pd, unsigned type_bits, 
   auto props = calls::create<VkPhysicalDeviceMemoryProperties, &::vkGetPhysicalDeviceMemoryProperties>(pd);
 
   for (unsigned i = 0; i < props.memoryTypeCount; i++) {
-    if (type_bits != 0 && (type_bits & (1U << i)) == 0) {
-      continue;
-    }
-    if ((props.memoryTypes[i].propertyFlags & flags) != flags) {
-      continue;
-    }
+    if (type_bits != 0 && (type_bits & (1U << i)) == 0) continue;
+    if ((props.memoryTypes[i].propertyFlags & flags) != flags) continue;
     return i;
   }
 
   silog::die("Failed to find suitable memory type");
 }
+  export inline auto find_device_local_memory_type_index(VkPhysicalDevice pd) {
+    return find_memory_type_index(pd, 0, device_local_flags);
+  }
+  export inline auto find_host_memory_type_index(VkPhysicalDevice pd) {
+    return find_memory_type_index(pd, 0, host_flags);
+  }
+
 export using device_memory = calls::handle<VkDeviceMemory, &::vkAllocateMemory, &::vkFreeMemory>;
 
 export inline auto create_memory(VkDeviceSize size, unsigned memory_type_idx) {
