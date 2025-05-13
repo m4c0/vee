@@ -1,5 +1,8 @@
 module;
+#ifdef LECO_TARGET_LINUX
 #include <X11/Xlib.h>
+#endif
+
 struct casein_native_handle {
   Display * display;
   Window window;
