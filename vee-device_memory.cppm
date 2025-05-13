@@ -34,25 +34,21 @@ export inline auto create_memory(VkPhysicalDevice pd, VkMemoryRequirements mr, V
 }
 
 export inline auto create_local_image_memory(VkPhysicalDevice pd, VkImage img) {
-  constexpr const auto flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
   auto mr = calls::create<VkMemoryRequirements, &::vkGetImageMemoryRequirements>(img);
-  return create_memory(pd, mr, flags);
+  return create_memory(pd, mr, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 }
 export inline auto create_local_buffer_memory(VkPhysicalDevice pd, VkBuffer buf) {
-  constexpr const auto flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
   auto mr = calls::create<VkMemoryRequirements, &::vkGetBufferMemoryRequirements>(buf);
-  return create_memory(pd, mr, flags);
+  return create_memory(pd, mr, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 }
 
 export inline auto create_host_buffer_memory(VkPhysicalDevice pd, VkBuffer buf) {
-  constexpr const auto flags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
   auto mr = calls::create<VkMemoryRequirements, &::vkGetBufferMemoryRequirements>(buf);
-  return create_memory(pd, mr, flags);
+  return create_memory(pd, mr, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 }
 export inline auto create_host_image_memory(VkPhysicalDevice pd, VkImage buf) {
-  constexpr const auto flags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
   auto mr = calls::create<VkMemoryRequirements, &::vkGetImageMemoryRequirements>(buf);
-  return create_memory(pd, mr, flags);
+  return create_memory(pd, mr, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 }
 
 export inline auto create_host_buffer_memory(VkPhysicalDevice pd, unsigned sz) {
