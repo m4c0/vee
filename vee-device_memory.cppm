@@ -22,9 +22,7 @@ inline unsigned find_memory_type_index(VkPhysicalDevice pd, unsigned type_bits, 
     return i;
   }
 
-  silog::log(silog::error, "Failed to find suitable memory type");
-  // TODO: throw exception?
-  return 0;
+  silog::die("Failed to find suitable memory type");
 }
 export using device_memory = calls::handle<VkDeviceMemory, &::vkAllocateMemory, &::vkFreeMemory>;
 
