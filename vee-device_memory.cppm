@@ -26,12 +26,16 @@ inline unsigned find_memory_type_index(VkPhysicalDevice pd, unsigned type_bits, 
 }
 export using device_memory = calls::handle<VkDeviceMemory, &::vkAllocateMemory, &::vkFreeMemory>;
 
-export inline auto create_memory(VkPhysicalDevice pd, VkMemoryRequirements mr, VkMemoryAllocateFlags flags) {
+export inline auto create_memory(VkDeviceSize size, unsigned memory_type_idx) {
   VkMemoryAllocateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-  info.allocationSize = mr.size;
-  info.memoryTypeIndex = find_memory_type_index(pd, mr.memoryTypeBits, flags);
+  info.allocationSize = size;
+  info.memoryTypeIndex = memory_type_idx;
   return device_memory(&info);
+}
+
+export inline auto create_memory(VkPhysicalDevice pd, VkMemoryRequirements mr, VkMemoryAllocateFlags flags) {
+  return create_memory(mr.size, find_memory_type_index(pd, mr.memoryTypeBits, flags));
 }
 
 export inline auto create_local_image_memory(VkPhysicalDevice pd, VkImage img) {
