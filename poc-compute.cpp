@@ -13,7 +13,7 @@ int main() try {
 
   constexpr const auto buf_sz = 1024 * 1024 * sizeof(float);
   constexpr const auto mem_sz = buf_sz * 3;
-  vee::device_memory mem = vee::create_host_buffer_memory(pd, mem_sz);
+  vee::device_memory mem = vee::create_host_memory(pd, mem_sz);
 
   auto dsl = vee::create_descriptor_set_layout({
     vee::dsl_compute_storage(),

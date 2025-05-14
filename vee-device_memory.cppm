@@ -59,10 +59,10 @@ export inline auto create_host_image_memory(VkPhysicalDevice pd, VkImage buf) {
   return create_memory(pd, mr, host_flags);
 }
 
-export inline auto create_host_buffer_memory(VkPhysicalDevice pd, unsigned sz) {
+export inline auto create_host_memory(VkPhysicalDevice pd, unsigned sz) {
   return create_memory(pd, VkMemoryRequirements { .size = sz }, host_flags);
 }
-export inline auto create_local_buffer_memory(VkPhysicalDevice pd, unsigned sz) {
+export inline auto create_local_memory(VkPhysicalDevice pd, unsigned sz) {
   return create_memory(pd, VkMemoryRequirements { .size = sz }, device_local_flags);
 }
 } // namespace vee
