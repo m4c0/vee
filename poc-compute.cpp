@@ -1,8 +1,9 @@
 #pragma leco app
 #pragma leco add_shader "poc.comp"
 
-import vee;
 import silog;
+import sires;
+import vee;
 
 int main() try {
   auto i = vee::create_instance("vee-poc-compute");
@@ -38,7 +39,7 @@ int main() try {
   vee::bind_buffer_memory(*buf2, *mem, buf_sz * 2);
   vee::update_descriptor_set(ds, 2, *buf2);
 
-  auto kern = vee::create_shader_module_from_resource("poc.comp.spv");
+  auto kern = vee::create_shader_module(sires::jojo_cstr("poc.comp.spv"));
   auto p = vee::create_compute_pipeline(*pl, *kern, "main");
 
   auto cp = vee::create_command_pool(qf);
