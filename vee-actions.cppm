@@ -147,13 +147,19 @@ export inline auto cmd_bind_gr_pipeline(VkCommandBuffer cb, VkPipeline p) {
   calls::call(vkCmdBindPipeline, cb, VK_PIPELINE_BIND_POINT_GRAPHICS, p);
 }
 
-export inline auto cmd_bind_index_buffer_u32(VkCommandBuffer cb, VkBuffer buf) {
-  calls::call(vkCmdBindIndexBuffer, cb, buf, 0, VK_INDEX_TYPE_UINT32);
+export inline auto cmd_bind_index_buffer_u16(VkCommandBuffer cb, VkBuffer buf, VkDeviceSize ofs = 0) {
+  calls::call(vkCmdBindIndexBuffer, cb, buf, ofs, VK_INDEX_TYPE_UINT16);
+}
+export inline auto cmd_bind_index_buffer_u32(VkCommandBuffer cb, VkBuffer buf, VkDeviceSize ofs = 0) {
+  calls::call(vkCmdBindIndexBuffer, cb, buf, ofs, VK_INDEX_TYPE_UINT32);
+}
+export inline auto cmd_bind_vertex_buffers(VkCommandBuffer cb, unsigned idx,
+                                           VkBuffer buf, VkDeviceSize offs) {
+  calls::call(vkCmdBindVertexBuffers, cb, idx, 1, &buf, &offs);
 }
 export inline auto cmd_bind_vertex_buffers(VkCommandBuffer cb, unsigned idx,
                                            VkBuffer buf) {
-  VkDeviceSize offs{};
-  calls::call(vkCmdBindVertexBuffers, cb, idx, 1, &buf, &offs);
+  cmd_bind_vertex_buffers(cb, idx, buf, {});
 }
 
 export inline auto cmd_copy_buffer(VkCommandBuffer cb, VkBuffer src,
