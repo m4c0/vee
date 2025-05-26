@@ -8,7 +8,7 @@ using namespace wagen;
 
 namespace vee {
   using image_aspect_flags = VkImageAspectFlagBits;
-  static auto image_subresource_range(unsigned aspect_mask) {
+  export inline auto image_subresource_range(unsigned aspect_mask) {
     return VkImageSubresourceRange {
       .aspectMask = aspect_mask,
       .levelCount = 1,
