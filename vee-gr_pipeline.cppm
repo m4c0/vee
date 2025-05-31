@@ -8,40 +8,21 @@ import wagen;
 using namespace wagen;
 
 namespace vee {
-  export template<typename T>
-  auto specialisation_map_entry() {
-    VkSpecializationMapEntry res {};
-    res.size = sizeof(T);
-    return res;
-  }
-
-  export template<typename... Ts> auto specialisation_map_entries() {
-    auto map = hai::array<VkSpecializationMapEntry>::make(
-      specialisation_map_entry<Ts>()...
-    );
- 
-    unsigned sz = 0;
-    for (auto i = 0; i < map.size(); i++) {
-      map[i].constantID = i;
-      map[i].offset = sz;
-      sz += map[i].size;
-    }
-    return map;
-  }
-
   template<typename T>
   concept non_ptr_copyable = requires (T t) {
     { t = T() };
     { t } -> traits::is_assignable_from<traits::remove_ptr_t<T>>;
   };
-  export template<typename... Ts> class specialisation_info : public VkSpecializationInfo {
-    hai::array<VkSpecializationMapEntry> map = specialisation_map_entries<Ts...>();
+  export template<typename T> class specialisation_info : public VkSpecializationInfo {
+    VkSpecializationMapEntry m_entry {
+      .size = sizeof(T),
+    };
 
   public:
     template<non_ptr_copyable K>
     constexpr specialisation_info(const K & data) {
-      mapEntryCount = map.size();
-      pMapEntries = map.begin();
+      mapEntryCount = 1;
+      pMapEntries = &m_entry;
       pData = &data;
       dataSize = sizeof(K);
     }
