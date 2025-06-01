@@ -15,15 +15,23 @@ namespace vee {
     { t } -> traits::is_assignable_from<traits::remove_ptr_t<T>>;
   };
   export template<non_ptr_copyable T> class specialisation_info : public VkSpecializationInfo, no::no {
-    hai::array<VkSpecializationMapEntry> m_entries { 1 }; 
+    hai::array<VkSpecializationMapEntry> m_entries; 
 
   public:
-    constexpr specialisation_info(const T & data) {
+    constexpr specialisation_info(const T & data, hai::view<VkSpecializationMapEntry> e)
+      : m_entries { e.size() }
+    {
+      for (auto i = 0; i < e.size(); i++) m_entries[i] = e[i];
+
       mapEntryCount = m_entries.size();
       pMapEntries = m_entries.begin();
       pData = &data;
       dataSize = sizeof(T);
+    }
 
+    constexpr specialisation_info(const T & data) 
+      : specialisation_info { data, { VkSpecializationMapEntry { .size = sizeof(T) } } }
+    {
       m_entries[0].size = sizeof(T);
     }
 
