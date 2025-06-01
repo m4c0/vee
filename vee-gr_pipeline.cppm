@@ -5,6 +5,7 @@ import silog;
 import traits;
 import wagen;
 
+using namespace traits::ints;
 using namespace wagen;
 
 namespace vee {
@@ -25,6 +26,11 @@ namespace vee {
       pMapEntries = &m_entry;
       pData = &data;
       dataSize = sizeof(K);
+    }
+
+    template<non_ptr_copyable K>
+    constexpr specialisation_info(uint16_t cid, const K & data) : specialisation_info(data) {
+      m_entry.constantID = cid;
     }
   };
 
