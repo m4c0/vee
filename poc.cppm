@@ -68,7 +68,10 @@ public:
 
     vee::pipeline_layout pl = vee::create_pipeline_layout(*dsl, vee::vert_frag_push_constant_range<upc>());
 
-    float k = 1;
+    struct sconst {
+      float k = 1.0;
+      float j = 0.0;
+    };
     vee::shader_module vert = vee::create_shader_module(sires::jojo_cstr("poc.vert.spv"));
     vee::shader_module frag = vee::create_shader_module(sires::jojo_cstr("poc.frag.spv"));
     vee::gr_pipeline gp = vee::create_graphics_pipeline({
@@ -76,7 +79,10 @@ public:
         .render_pass = *rp,
         .shaders {
             vee::pipeline_vert_stage(*vert, "main"),
-            vee::pipeline_frag_stage(*frag, "main", vee::specialisation_info<float>(k)),
+            vee::pipeline_frag_stage(*frag, "main", vee::specialisation_info<sconst>({
+              vee::specialisation_map_entry(0, &sconst::k),
+              vee::specialisation_map_entry(9, &sconst::j),
+            })),
         },
         .bindings {
             vee::vertex_input_bind(sizeof(point)),

@@ -9,6 +9,14 @@ using namespace traits::ints;
 using namespace wagen;
 
 namespace vee {
+  export template<typename T, typename K> auto specialisation_map_entry(uint16_t cid, K T::*m) { 
+    return VkSpecializationMapEntry {
+      .constantID = cid,
+      .offset = traits::offset_of<T>(m),
+      .size = sizeof(K),
+    };
+  }
+
   template<typename T>
   concept non_ptr_copyable = requires (T t) {
     { t = T() };
@@ -16,26 +24,29 @@ namespace vee {
   };
   export template<non_ptr_copyable T> class specialisation_info : public VkSpecializationInfo, no::no {
     hai::array<VkSpecializationMapEntry> m_entries; 
+    T m_data;
 
   public:
-    constexpr specialisation_info(const T & data, hai::view<VkSpecializationMapEntry> e)
+    constexpr specialisation_info(T data, hai::view<VkSpecializationMapEntry> e)
       : m_entries { e.size() }
+      , m_data { data }
     {
       for (auto i = 0; i < e.size(); i++) m_entries[i] = e[i];
 
       mapEntryCount = m_entries.size();
       pMapEntries = m_entries.begin();
-      pData = &data;
+      pData = &m_data;
       dataSize = sizeof(T);
     }
+    constexpr specialisation_info(hai::view<VkSpecializationMapEntry> e) : specialisation_info { T {}, e } {}
 
-    constexpr specialisation_info(const T & data) 
+    constexpr specialisation_info(T data) 
       : specialisation_info { data, { VkSpecializationMapEntry { .size = sizeof(T) } } }
     {
       m_entries[0].size = sizeof(T);
     }
 
-    constexpr specialisation_info(uint16_t cid, const T & data) : specialisation_info(data) {
+    constexpr specialisation_info(uint16_t cid, T data) : specialisation_info(data) {
       m_entries[0].constantID = cid;
     }
   };
