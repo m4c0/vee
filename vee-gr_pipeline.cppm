@@ -1,7 +1,7 @@
 export module vee:gr_pipeline;
 import :calls;
 import hai;
-import silog;
+import no;
 import traits;
 import wagen;
 
@@ -14,7 +14,7 @@ namespace vee {
     { t = T() };
     { t } -> traits::is_assignable_from<traits::remove_ptr_t<T>>;
   };
-  export template<non_ptr_copyable T> class specialisation_info : public VkSpecializationInfo {
+  export template<non_ptr_copyable T> class specialisation_info : public VkSpecializationInfo, no::no {
     hai::array<VkSpecializationMapEntry> m_entries { 1 }; 
 
   public:
