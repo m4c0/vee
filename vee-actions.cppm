@@ -423,19 +423,26 @@ export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, 
 export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, const hai::array<VkImageView> & ivs) {
   return update_descriptor_set(set, binding, 0, ivs);
 }
-export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, VkImageView iv, VkSampler s) {
+export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, unsigned first, VkImageView iv, VkSampler s) {
   auto ii = descriptor_image_info(iv, s);
   auto w = write_descriptor_set({
     .dstSet = set,
     .dstBinding = binding,
+    .dstArrayElement = first,
     .descriptorCount = 1,
     .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
     .pImageInfo = &ii,
   });
   calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
 }
+export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, VkImageView iv, VkSampler s) {
+  return update_descriptor_set(set, binding, 0, iv, s);
+}
+export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, unsigned first, VkImageView iv) {
+  return update_descriptor_set(set, binding, first, iv, nullptr);
+}
 export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, VkImageView iv) {
-  return update_descriptor_set(set, binding, iv, nullptr);
+  return update_descriptor_set(set, binding, 0, iv, nullptr);
 }
 
 export inline auto update_descriptor_set_for_attachment(VkDescriptorSet set, unsigned binding, VkImageView iv) {
