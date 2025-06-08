@@ -360,6 +360,12 @@ export constexpr auto descriptor_buffer_info(VkBuffer b) {
     .range = vk_whole_size,
   };
 }
+export constexpr auto descriptor_image_info(VkImageView i) {
+  return VkDescriptorImageInfo {
+    .imageView = i,
+    .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+  };
+}
 export constexpr auto descriptor_image_info(VkImageView i, VkSampler s) {
   return VkDescriptorImageInfo {
     .sampler = s,
@@ -398,6 +404,24 @@ export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, 
     .pImageInfo = iis.begin(),
   });
   calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
+}
+export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, unsigned first, const hai::array<VkImageView> & ivs) {
+  hai::array<VkDescriptorImageInfo> iis { ivs.size() };
+  for (auto i = 0; i < ivs.size(); i++) {
+    iis[i] = descriptor_image_info(ivs[i]);
+  }
+  auto w = write_descriptor_set({
+    .dstSet = set,
+    .dstBinding = binding,
+    .dstArrayElement = first,
+    .descriptorCount = iis.size(),
+    .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+    .pImageInfo = iis.begin(),
+  });
+  calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
+}
+export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, const hai::array<VkImageView> & ivs) {
+  return update_descriptor_set(set, binding, 0, ivs);
 }
 export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, VkImageView iv, VkSampler s) {
   auto ii = descriptor_image_info(iv, s);
