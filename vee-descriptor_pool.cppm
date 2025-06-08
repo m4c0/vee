@@ -37,6 +37,8 @@ export auto uniform_buffer(unsigned qty = 1) {
 export template <unsigned N>
 inline auto create_descriptor_pool(unsigned max_sets,
                                    const VkDescriptorPoolSize (&dps)[N]) {
+  // Actively avoiding VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT
+  // which requires driver management of the pool, leading to fragmentation.
   VkDescriptorPoolCreateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
   info.maxSets = max_sets;
