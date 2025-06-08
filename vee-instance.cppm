@@ -74,7 +74,7 @@ export inline auto create_instance(const char *app_name) {
   app_info.applicationVersion = 1;
   app_info.pEngineName = "m4c0/vee";
   app_info.engineVersion = 1;
-  app_info.apiVersion = vk_api_version_1_1;
+  app_info.apiVersion = vk_api_version_1_2;
 
   VkInstanceCreateInfo create_info{};
   create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
