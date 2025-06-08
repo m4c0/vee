@@ -87,6 +87,10 @@ create_descriptor_set_layout(VkDescriptorSetLayoutBinding (&&bindings)[N]) {
   info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
   info.bindingCount = N;
   info.pBindings = bindings;
+#ifdef LECO_TARGET_APPLE
+  // Otherwise we can't use descriptor arrays larger than 16
+  info.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
+#endif
   return descriptor_set_layout{&info};
 }
 } // namespace vee

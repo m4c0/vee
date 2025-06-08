@@ -42,6 +42,10 @@ inline auto create_descriptor_pool(unsigned max_sets,
   info.maxSets = max_sets;
   info.pPoolSizes = dps;
   info.poolSizeCount = N;
+#ifdef LECO_TARGET_APPLE
+  // Otherwise we can't use descriptor arrays larger than 16
+  info.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
+#endif
   return descriptor_pool{&info};
 }
 } // namespace vee
