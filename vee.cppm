@@ -26,6 +26,7 @@ export import :shader_module;
 export import :surface_capabilities;
 export import :surface_format;
 export import :swapchain;
+export import :update_descriptor_set;
 
 #ifdef __APPLE__
 export import :metal;
