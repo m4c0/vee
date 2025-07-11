@@ -62,7 +62,19 @@ public:
     vee::queue q = vee::get_queue_for_family(qf);
 
     vee::command_pool cp = vee::create_command_pool(qf);
-    vee::render_pass rp = vee::create_render_pass(pd, *s);
+    vee::render_pass rp = vee::create_render_pass({
+      .attachments {{
+        vee::create_colour_attachment(pd, *s),
+      }},
+      .subpasses {{
+        vee::create_subpass({
+          .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal) }},
+        }),
+      }},
+      .dependencies {{
+        vee::create_colour_dependency(),
+      }},
+    });
 
     vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler() });
 
@@ -135,11 +147,6 @@ public:
     while (!interrupted()) {
       vee::swapchain swc = vee::create_swapchain(pd, *s);
 
-      vee::image d_img = vee::create_depth_image(pd, *s);
-      vee::device_memory d_mem = vee::create_local_image_memory(pd, *d_img);
-      vee::bind_image_memory(*d_img, *d_mem);
-      vee::image_view d_iv = vee::create_depth_image_view(*d_img);
-
       auto imgs = vee::get_swapchain_images(*swc);
       auto frms = hai::array<hai::uptr<frame_stuff>> { imgs.size() };
       auto extent = vee::get_surface_capabilities(pd, *s).currentExtent;
@@ -147,7 +154,7 @@ public:
         auto iv = vee::create_image_view_for_surface(imgs[i], pd, *s);
         vee::fb_params fp {
           .render_pass = *rp,
-          .attachments {{ *iv, *d_iv }},
+          .attachments {{ *iv }},
           .extent = extent,
         };
         frms[i] = hai::uptr { new frame_stuff {

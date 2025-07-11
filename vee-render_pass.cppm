@@ -179,7 +179,7 @@ namespace vee {
     return render_pass { &info };
   }
 
-  export inline auto create_render_pass(VkFormat fmt, vee::image_layout il) {
+  export [[deprecated]] inline auto create_render_pass(VkFormat fmt, vee::image_layout il) {
     return create_render_pass({
       .attachments {{
         create_colour_attachment(fmt, il),
@@ -197,7 +197,7 @@ namespace vee {
       }},
     });
   }
-  export inline auto create_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
+  export [[deprecated]] inline auto create_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
     return create_render_pass({
       .attachments {{
         create_colour_attachment(pd, s),
@@ -215,7 +215,7 @@ namespace vee {
       }},
     });
   }
-  export inline auto create_depthless_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
+  export [[deprecated]] inline auto create_depthless_render_pass(VkPhysicalDevice pd, VkSurfaceKHR s) {
     return create_render_pass({
       .attachments {{
         create_colour_attachment(pd, s),
