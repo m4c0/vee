@@ -76,8 +76,7 @@ inline constexpr const auto message_for_result(VkResult res) {
   case VK_ERROR_INVALID_SHADER_NV:
     return "Vulkan API failure: VK_ERROR_INVALID_SHADER_NV";
   case VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT:
-    return "Vulkan API failure: "
-           "VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT";
+    return "Vulkan API failure: VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT";
   case VK_ERROR_NOT_PERMITTED_KHR:
     return "Vulkan API failure: VK_ERROR_NOT_PERMITTED_KHR";
   case VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT:
