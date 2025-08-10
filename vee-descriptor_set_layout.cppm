@@ -33,7 +33,7 @@ dsl_fragment_samplers(VkSampler (&&smp)[N]) {
   b.pImmutableSamplers = smp;
   return b;
 }
-export constexpr VkDescriptorSetLayoutBinding dsl_fragment_samplers(hai::array<VkSampler> smps) {
+export constexpr VkDescriptorSetLayoutBinding dsl_fragment_samplers(const hai::array<VkSampler> & smps) {
   VkDescriptorSetLayoutBinding b{};
   b.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
   b.descriptorCount = smps.size();
