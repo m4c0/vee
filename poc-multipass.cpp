@@ -84,8 +84,8 @@ public:
     vee::descriptor_set dset = vee::allocate_descriptor_set(*dpool, *dsl);
 
     vee::pipeline_layout pl = vee::create_pipeline_layout(*dsl);
-    vee::shader_module vert = vee::create_shader_module(sires::jojo_cstr("poc-multipass.vert.spv"));
-    vee::shader_module frag = vee::create_shader_module(sires::jojo_cstr("poc-multipass.frag.spv"));
+    vee::shader_module vert = vee::create_shader_module(sires::slurp("poc-multipass.vert.spv"));
+    vee::shader_module frag = vee::create_shader_module(sires::slurp("poc-multipass.frag.spv"));
     vee::gr_pipeline gp0 = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = *rp,
@@ -96,7 +96,7 @@ public:
         .bindings { vee::vertex_input_bind(sizeof(dotz::vec2)) },
         .attributes { vee::vertex_attribute_vec2(0, 0) },
     });
-    frag = vee::create_shader_module(sires::jojo_cstr("poc-multipass-b.frag.spv"));
+    frag = vee::create_shader_module(sires::slurp("poc-multipass-b.frag.spv"));
     vee::gr_pipeline gp1 = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = *rp,

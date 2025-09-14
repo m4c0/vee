@@ -84,8 +84,8 @@ public:
       float k = 1.0;
       float j = 0.0;
     };
-    vee::shader_module vert = vee::create_shader_module(sires::jojo_cstr("poc.vert.spv"));
-    vee::shader_module frag = vee::create_shader_module(sires::jojo_cstr("poc.frag.spv"));
+    vee::shader_module vert = vee::create_shader_module(sires::slurp("poc.vert.spv"));
+    vee::shader_module frag = vee::create_shader_module(sires::slurp("poc.frag.spv"));
     vee::gr_pipeline gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = *rp,

@@ -39,7 +39,7 @@ int main() try {
   vee::bind_buffer_memory(*buf2, *mem, buf_sz * 2);
   vee::update_descriptor_set(ds, 2, *buf2);
 
-  auto kern = vee::create_shader_module(sires::jojo_cstr("poc.comp.spv"));
+  auto kern = vee::create_shader_module(sires::slurp("poc.comp.spv"));
   auto p = vee::create_compute_pipeline(*pl, *kern, "main");
 
   auto cp = vee::create_command_pool(qf);
