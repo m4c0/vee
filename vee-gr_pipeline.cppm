@@ -144,6 +144,23 @@ export auto colour_blend_classic() {
   return b;
 }
 
+namespace depth {
+  export inline constexpr auto none() {
+    return VkPipelineDepthStencilStateCreateInfo {
+      .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+      .depthTestEnable = vk_false,
+    };
+  }
+  export inline constexpr auto op_less() {
+    return VkPipelineDepthStencilStateCreateInfo {
+      .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+      .depthTestEnable  = vk_true,
+      .depthWriteEnable = vk_true,
+      .depthCompareOp   = VK_COMPARE_OP_LESS,
+    };
+  }
+}
+
 export using gr_pipeline =
     calls::handle<VkPipeline, &::vkCreateGraphicsPipelines,
                   &::vkDestroyPipeline>;
@@ -155,8 +172,8 @@ export struct gr_pipeline_params {
   bool primitive_restart { false };
   VkExtent2D extent {};
   bool back_face_cull{true};
-  bool depth_test{true};
   unsigned subpass { 0 };
+  VkPipelineDepthStencilStateCreateInfo depth = depth::none();
   hai::view<VkPipelineColorBlendAttachmentState> blends { colour_blend_classic() };
   hai::view<VkPipelineShaderStageCreateInfo> shaders;
   hai::view<VkVertexInputBindingDescription> bindings;
@@ -175,12 +192,6 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   color_blend.logicOp = VK_LOGIC_OP_COPY;
   color_blend.attachmentCount = gpp.blends.size();
   color_blend.pAttachments = gpp.blends.begin();
-
-  VkPipelineDepthStencilStateCreateInfo depth_stencil{};
-  depth_stencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-  depth_stencil.depthTestEnable = gpp.depth_test ? vk_true : vk_false;
-  depth_stencil.depthWriteEnable = vk_true;
-  depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS;
 
   VkPipelineInputAssemblyStateCreateInfo in_asm{};
   in_asm.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -234,7 +245,7 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
   info.layout = gpp.pipeline_layout;
   info.pColorBlendState = &color_blend;
-  info.pDepthStencilState = &depth_stencil;
+  info.pDepthStencilState = &gpp.depth;
   info.pDynamicState = gpp.extent.width > 0 ? nullptr : &dynamic_state;
   info.pInputAssemblyState = &in_asm;
   info.pMultisampleState = &multisample;
