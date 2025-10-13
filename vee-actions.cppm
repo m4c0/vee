@@ -77,10 +77,11 @@ export inline auto begin_cmd_buf_sim_use(VkCommandBuffer cb) {
 }
 
 export inline auto clear_colour(float r, float g, float b, float a) {
-  return VkClearColorValue {{ r, g, b, a }};
+  return VkClearValue { .color {{ r, g, b, a }} };
 }
-export inline auto clear_colour(dotz::vec4 c) {
-  return VkClearColorValue {{ c.x, c.y, c.z, c.w }};
+export inline auto clear_colour(dotz::vec4 c) { return clear_colour(c.x, c.y, c.z, c.w); }
+export inline auto clear_depth(float d) {
+  return VkClearValue { .depthStencil { d, 0 } };
 }
 export struct render_pass_begin {
   VkCommandBuffer command_buffer;
@@ -89,25 +90,10 @@ export struct render_pass_begin {
   VkExtent2D extent;
   // Using sensible defaults. The magenta color is a visible marker for pixels
   // missing rendering
-  hai::view<VkClearColorValue> clear_colours { clear_colour(1, 0, 1, 1) };
+  hai::view<VkClearValue> clear_colours { clear_colour(1, 0, 1, 1) };
   bool use_secondary_cmd_buf = false;
-  bool clear_depth = true;
 };
-static hai::array<VkClearValue> clear_values(const render_pass_begin & rpb) {
-  auto dsz = rpb.clear_depth ? 1 : 0;
-  auto csz = rpb.clear_colours.size() + dsz;
-  if (csz == 0) return {};
-
-  hai::array<VkClearValue> values { csz };
-  for (auto i = 0; i < rpb.clear_colours.size(); i++) {
-    values[i].color = rpb.clear_colours[i];
-  }
-  if (rpb.clear_depth) values[values.size() - 1].depthStencil = {1.0f, 0};
-  return values;
-}
 export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
-  auto values = clear_values(rpb);
-
   VkSubpassContents sbc = rpb.use_secondary_cmd_buf
                               ? VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS
                               : VK_SUBPASS_CONTENTS_INLINE;
@@ -117,8 +103,8 @@ export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
   info.renderPass = rpb.render_pass;
   info.framebuffer = rpb.framebuffer;
   info.renderArea.extent = rpb.extent;
-  info.clearValueCount = values.size();
-  info.pClearValues = values.begin();
+  info.clearValueCount = rpb.clear_colours.size();
+  info.pClearValues = rpb.clear_colours.begin();
   calls::call(vkCmdBeginRenderPass, rpb.command_buffer, &info, sbc);
 }
 
