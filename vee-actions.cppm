@@ -275,6 +275,14 @@ export inline auto cmd_set_scissor(VkCommandBuffer cb, VkExtent2D ext) {
   calls::call(vkCmdSetScissor, cb, 0, 1, &rect);
 }
 
+export inline auto cmd_set_viewport_flipped(VkCommandBuffer cb, VkExtent2D ext) {
+  VkViewport viewport{};
+  viewport.width = ext.width;
+  viewport.height = -static_cast<int>(ext.height);
+  viewport.y = ext.height;
+  viewport.maxDepth = 1;
+  calls::call(vkCmdSetViewport, cb, 0, 1, &viewport);
+}
 export inline auto cmd_set_viewport(VkCommandBuffer cb, VkExtent2D ext) {
   VkViewport viewport{};
   viewport.width = ext.width;
