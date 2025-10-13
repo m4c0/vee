@@ -159,6 +159,13 @@ namespace depth {
       .depthCompareOp   = VK_COMPARE_OP_LESS,
     });
   }
+  export inline constexpr auto op_greater() {
+    return of({
+      .depthTestEnable  = vk_true,
+      .depthWriteEnable = vk_true,
+      .depthCompareOp   = VK_COMPARE_OP_GREATER,
+    });
+  }
 }
 
 export using gr_pipeline =
