@@ -178,6 +178,7 @@ export struct gr_pipeline_params {
   VkPolygonMode polygon_mode { VK_POLYGON_MODE_FILL };
   bool primitive_restart { false };
   VkExtent2D extent {};
+  bool front_face_cw { false };
   bool back_face_cull{true};
   unsigned subpass { 0 };
   VkPipelineDepthStencilStateCreateInfo depth = depth::none();
@@ -218,9 +219,10 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
 
   VkPipelineRasterizationStateCreateInfo raster{};
   raster.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-  if (gpp.back_face_cull)
-    raster.cullMode = VK_CULL_MODE_BACK_BIT;
-  raster.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+  if (gpp.back_face_cull) raster.cullMode = VK_CULL_MODE_BACK_BIT;
+  raster.frontFace = gpp.front_face_cw
+    ? VK_FRONT_FACE_CLOCKWISE
+    : VK_FRONT_FACE_COUNTER_CLOCKWISE;
   raster.lineWidth = 1;
   raster.polygonMode = gpp.polygon_mode;
 
