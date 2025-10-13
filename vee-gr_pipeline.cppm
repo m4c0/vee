@@ -177,8 +177,7 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   color_blend.pAttachments = gpp.blends.begin();
 
   VkPipelineDepthStencilStateCreateInfo depth_stencil{};
-  depth_stencil.sType =
-      VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+  depth_stencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
   depth_stencil.depthTestEnable = gpp.depth_test ? vk_true : vk_false;
   depth_stencil.depthWriteEnable = vk_true;
   depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS;
