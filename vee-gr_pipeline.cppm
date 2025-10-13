@@ -145,19 +145,19 @@ export auto colour_blend_classic() {
 }
 
 namespace depth {
+  export inline constexpr auto of(VkPipelineDepthStencilStateCreateInfo p) {
+    p.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    return p;
+  }
   export inline constexpr auto none() {
-    return VkPipelineDepthStencilStateCreateInfo {
-      .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-      .depthTestEnable = vk_false,
-    };
+    return of({ .depthTestEnable = vk_false });
   }
   export inline constexpr auto op_less() {
-    return VkPipelineDepthStencilStateCreateInfo {
-      .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+    return of({
       .depthTestEnable  = vk_true,
       .depthWriteEnable = vk_true,
       .depthCompareOp   = VK_COMPARE_OP_LESS,
-    };
+    });
   }
 }
 
