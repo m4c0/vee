@@ -13,6 +13,7 @@ export enum class buffer_usage {
   storage_buffer = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
   transfer_dst_buffer = VK_BUFFER_USAGE_TRANSFER_DST_BIT,
   transfer_src_buffer = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+  uniform_buffer = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
   vertex_buffer = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 };
 
