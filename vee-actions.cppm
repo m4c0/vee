@@ -297,6 +297,9 @@ export inline auto end_cmd_buf(VkCommandBuffer cb) {
   calls::call(vkEndCommandBuffer, cb);
 }
 
+export inline void *map_memory(VkDeviceMemory m, unsigned ofs, unsigned size) {
+  return calls::create<void *, &::vkMapMemory>(m, ofs, size, 0);
+}
 export inline void *map_memory(VkDeviceMemory m) {
   return calls::create<void *, &::vkMapMemory>(m, 0, vk_whole_size, 0);
 }
