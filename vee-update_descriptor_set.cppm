@@ -94,6 +94,16 @@ namespace vee {
     return update_descriptor_set(set, binding, 0, iv, nullptr);
   }
   
+  export inline auto update_descriptor_set_for_uniform(VkDescriptorSet set, unsigned binding, VkBuffer buf) {
+    auto bi = vee::descriptor_buffer_info(buf);
+    vee::update_descriptor_set(vee::write_descriptor_set({
+      .dstSet = set,
+      .dstBinding = binding,
+      .descriptorCount = 1,
+      .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+      .pBufferInfo = &bi,
+    }));
+  }
   export inline auto update_descriptor_set_for_attachment(VkDescriptorSet set, unsigned binding, VkImageView iv) {
     auto ii = descriptor_image_info(iv, nullptr);
     vee::update_descriptor_set(vee::write_descriptor_set({
