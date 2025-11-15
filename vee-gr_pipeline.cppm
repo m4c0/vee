@@ -138,6 +138,7 @@ export auto colour_blend_classic() {
   b.blendEnable = true;
   b.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
   b.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+  b.dstAlphaBlendFactor = VK_BLEND_FACTOR_DST_ALPHA;
   b.colorWriteMask =
       VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
       VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
