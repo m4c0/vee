@@ -32,7 +32,7 @@ export import :update_descriptor_set;
 export import :metal;
 #elif __ANDROID__
 export import :android;
-#elif defined(_WIN32)
+#elif _WIN32
 export import :windows;
 #elif __linux__
 export import :linux;
