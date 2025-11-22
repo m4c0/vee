@@ -82,9 +82,29 @@ public:
     // Secondary buffer recording
     /////////////////////////////////////////////////////////////////
 
+    vee::render_pass srp = vee::create_render_pass({
+      .attachments {{
+        vee::create_colour_attachment({
+          .format = vee::find_best_surface_image_format(pd, *s),
+          .load_op = vee::attachment_load_op_load,
+          .store_op = vee::attachment_store_op_store,
+          .initial_layout = vee::image_layout_color_attachment_optimal,
+          .final_layout = vee::image_layout_color_attachment_optimal,
+        }),
+      }},
+      .subpasses {{
+        vee::create_subpass({
+          .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal) }},
+        }),
+      }},
+      .dependencies {{
+        vee::create_colour_dependency(),
+      }},
+    });
+
     vee::command_buffer scb = vee::allocate_secondary_command_buffer(*cp);
 
-    vee::begin_cmd_buf_render_pass_continue(scb, *rp);
+    vee::begin_cmd_buf_render_pass_continue(scb, *srp);
     vee::cmd_set_scissor(scb, extent);
     vee::cmd_set_viewport(scb, extent);
     vee::cmd_bind_gr_pipeline(scb, *gp);
