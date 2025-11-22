@@ -64,6 +64,19 @@ namespace vee {
     });
   }
 
+  /// Creates a "pass-through" colour attachment. That attachment will support
+  /// loading and store, without changing the layout. This is suitable for a
+  /// secondary command buffer or an intermediate render pass.
+  export [[nodiscard]] constexpr auto create_passthru_colour_attachment(VkPhysicalDevice pd, VkSurfaceKHR s) {
+    return create_colour_attachment({
+      .format         = find_best_surface_format(pd, s).format,
+      .load_op        = attachment_load_op_load,
+      .store_op       = attachment_store_op_store,
+      .initial_layout = image_layout_color_attachment_optimal,
+      .final_layout   = image_layout_color_attachment_optimal,
+    });
+  }
+
   export inline constexpr auto create_depth_attachment() {
     VkAttachmentDescription res{};
     res.format = VK_FORMAT_D32_SFLOAT;

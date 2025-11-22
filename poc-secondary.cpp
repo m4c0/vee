@@ -84,13 +84,7 @@ public:
 
     vee::render_pass srp = vee::create_render_pass({
       .attachments {{
-        vee::create_colour_attachment({
-          .format = vee::find_best_surface_image_format(pd, *s),
-          .load_op = vee::attachment_load_op_load,
-          .store_op = vee::attachment_store_op_store,
-          .initial_layout = vee::image_layout_color_attachment_optimal,
-          .final_layout = vee::image_layout_color_attachment_optimal,
-        }),
+        vee::create_passthru_colour_attachment(pd, *s),
       }},
       .subpasses {{
         vee::create_subpass({
