@@ -91,12 +91,11 @@ export struct render_pass_begin {
   // Using sensible defaults. The magenta color is a visible marker for pixels
   // missing rendering
   hai::view<VkClearValue> clear_colours { clear_colour(1, 0, 1, 1) };
-  bool use_secondary_cmd_buf = false;
 };
-export inline auto cmd_begin_render_pass(const render_pass_begin &rpb) {
-  VkSubpassContents sbc = rpb.use_secondary_cmd_buf
-                              ? VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS
-                              : VK_SUBPASS_CONTENTS_INLINE;
+export inline auto cmd_begin_render_pass(const render_pass_begin & rpb, bool inlined = true) {
+  VkSubpassContents sbc = inlined
+    ? VK_SUBPASS_CONTENTS_INLINE
+    : VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS;
 
   VkRenderPassBeginInfo info{};
   info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;

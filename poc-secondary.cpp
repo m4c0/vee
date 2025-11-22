@@ -142,8 +142,7 @@ public:
               .framebuffer = *frame->fb,
               .extent = extent,
               .clear_colours = { vee::clear_colour(0.1, 0.2, 0.3, 1.0) },
-              .use_secondary_cmd_buf = true,
-            });
+            }, false);
             vee::cmd_execute_command(frame->cb, scb);
             vee::cmd_end_render_pass(frame->cb);
             vee::end_cmd_buf(frame->cb);
