@@ -105,6 +105,7 @@ namespace vee {
 
   export constexpr const auto subpass_external = vk_subpass_external;
   export enum pipeline_stage_flags {
+    pipeline_stage_bottom_of_pipe          = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
     pipeline_stage_color_attachment_output = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
     pipeline_stage_early_fragment_tests    = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
     pipeline_stage_fragment_shader         = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
