@@ -112,6 +112,7 @@ namespace vee {
     pipeline_stage_late_fragment_tests     = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
   };
   export enum access_flags {
+    access_color_attachment_read          = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT,
     access_color_attachment_write         = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
     access_depth_stencil_attachment_read  = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT,
     access_depth_stencil_attachment_write = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
