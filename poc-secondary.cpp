@@ -66,8 +66,6 @@ public:
     vee::device_memory v_mem = vee::create_host_buffer_memory(pd, *v_buf);
     vee::bind_buffer_memory(*v_buf, *v_mem);
 
-    vee::command_buffer cb = vee::allocate_secondary_command_buffer(*cp);
-
     vee::semaphore img_available_sema = vee::create_semaphore();
     vee::semaphore rnd_finished_sema = vee::create_semaphore();
     vee::fence f = vee::create_fence_signaled();
@@ -78,12 +76,29 @@ public:
     vs[2] = { 1, -1 };
     vee::unmap_memory(*v_mem);
 
+    auto extent = vee::get_surface_capabilities(pd, *s).currentExtent;
+
+    /////////////////////////////////////////////////////////////////
+    // Secondary buffer recording
+    /////////////////////////////////////////////////////////////////
+
+    vee::command_buffer scb = vee::allocate_secondary_command_buffer(*cp);
+
+    vee::begin_cmd_buf_render_pass_continue(scb, *rp);
+    vee::cmd_set_scissor(scb, extent);
+    vee::cmd_set_viewport(scb, extent);
+    vee::cmd_bind_gr_pipeline(scb, *gp);
+    vee::cmd_bind_vertex_buffers(scb, 0, *v_buf);
+    vee::cmd_draw(scb, 3);
+    vee::end_cmd_buf(scb);
+
+    /////////////////////////////////////////////////////////////////
+
     while (!interrupted()) {
       vee::swapchain swc = vee::create_swapchain(pd, *s);
 
       auto imgs = vee::get_swapchain_images(*swc);
       auto frms = hai::array<hai::uptr<frame_stuff>> { imgs.size() };
-      auto extent = vee::get_surface_capabilities(pd, *s).currentExtent;
       for (auto i = 0; i < imgs.size(); i++) {
         auto iv = vee::create_image_view_for_surface(imgs[i], pd, *s);
         vee::fb_params fp {
@@ -106,15 +121,6 @@ public:
           auto & frame = frms[idx];
 
           {
-            vee::begin_cmd_buf_render_pass_continue(cb, *rp);
-            vee::cmd_set_scissor(cb, extent);
-            vee::cmd_set_viewport(cb, extent);
-            vee::cmd_bind_gr_pipeline(cb, *gp);
-            vee::cmd_bind_vertex_buffers(cb, 0, *v_buf);
-            vee::cmd_draw(cb, 3);
-            vee::end_cmd_buf(cb);
-          }
-          {
             vee::begin_cmd_buf_one_time_submit(frame->cb);
             vee::cmd_begin_render_pass({
               .command_buffer = frame->cb,
@@ -124,7 +130,7 @@ public:
               .clear_colours = { vee::clear_colour(0.1, 0.2, 0.3, 1.0) },
               .use_secondary_cmd_buf = true,
             });
-            vee::cmd_execute_command(frame->cb, cb);
+            vee::cmd_execute_command(frame->cb, scb);
             vee::cmd_end_render_pass(frame->cb);
             vee::end_cmd_buf(frame->cb);
           }
