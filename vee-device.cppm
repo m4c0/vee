@@ -46,6 +46,7 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd, unsigned qf, 
 
   auto res = device(pd, &ci);
   wagen::device() = *res;
+  wagen::physical_device() = pd;
   return res;
 }
 export inline auto create_single_queue_device(VkPhysicalDevice pd, unsigned qf) {
