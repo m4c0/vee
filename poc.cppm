@@ -78,7 +78,17 @@ public:
 
     vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler() });
 
-    vee::pipeline_layout pl = vee::create_pipeline_layout(*dsl, vee::vert_frag_push_constant_range<upc>());
+    vee::pipeline_layout pl = vee::create_pipeline_layout({
+      .descriptor_set_layouts {{ *dsl }},
+      .push_constant_ranges {{
+        vee::vert_frag_push_constant_range<float>(traits::offset_of(&upc::mouse_x)),
+        vee::vert_frag_push_constant_range<float>(traits::offset_of(&upc::mouse_y)),
+        vee::vert_frag_push_constant_range<float>(traits::offset_of(&upc::factor)),
+        vee::vert_frag_push_constant_range<float>(traits::offset_of(&upc::vert_scale)),
+      }},
+    });
+    // This would also work
+    // vee::pipeline_layout pl = vee::create_pipeline_layout(*dsl, vee::vert_frag_push_constant_range<upc>());
 
     struct sconst {
       float k = 1.0;
