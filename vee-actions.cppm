@@ -240,29 +240,30 @@ export inline auto cmd_fill_buffer(VkCommandBuffer cb, VkBuffer buf, unsigned da
   calls::call(vkCmdFillBuffer, cb, buf, 0, vk_whole_size, data);
 }
 
-export template <typename Tp>
-inline auto cmd_push_compute_constants(VkCommandBuffer cb, VkPipelineLayout pl, Tp *v, unsigned offset = 0) {
+export template <typename Tp> inline auto cmd_push_compute_constants(VkCommandBuffer cb, VkPipelineLayout pl, const void * ptr, unsigned sz, unsigned offset = 0) {
+  calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_COMPUTE_BIT, offset, sz, ptr);
+}
+export template <typename Tp> inline auto cmd_push_fragment_constants(VkCommandBuffer cb, VkPipelineLayout pl, const void * ptr, unsigned sz, unsigned offset = 0) {
+  calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_FRAGMENT_BIT, offset, sz, ptr);
+}
+export template <typename Tp> inline auto cmd_push_vertex_constants(VkCommandBuffer cb, VkPipelineLayout pl, const void * ptr, unsigned sz, unsigned offset = 0) {
+  calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_VERTEX_BIT, offset, sz, ptr);
+}
+export template <typename Tp> inline auto cmd_push_vert_frag_constants(VkCommandBuffer cb, VkPipelineLayout pl, const void * ptr, unsigned sz, unsigned offset = 0) {
+  calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, offset, sz, ptr);
+}
+
+export template <typename Tp> inline auto cmd_push_compute_constants(VkCommandBuffer cb, VkPipelineLayout pl, Tp *v, unsigned offset = 0) {
   calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_COMPUTE_BIT, offset, sizeof(Tp), v);
 }
-export template <typename Tp>
-inline auto cmd_push_fragment_constants(VkCommandBuffer cb, VkPipelineLayout pl,
-                                        Tp *v, unsigned offset = 0) {
-  calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_FRAGMENT_BIT, offset,
-              sizeof(Tp), v);
+export template <typename Tp> inline auto cmd_push_fragment_constants(VkCommandBuffer cb, VkPipelineLayout pl, Tp *v, unsigned offset = 0) {
+  calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_FRAGMENT_BIT, offset, sizeof(Tp), v);
 }
-export template <typename Tp>
-inline auto cmd_push_vertex_constants(VkCommandBuffer cb, VkPipelineLayout pl,
-                                      Tp *v, unsigned offset = 0) {
-  calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_VERTEX_BIT, offset,
-              sizeof(Tp), v);
+export template <typename Tp> inline auto cmd_push_vertex_constants(VkCommandBuffer cb, VkPipelineLayout pl, Tp *v, unsigned offset = 0) {
+  calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_VERTEX_BIT, offset, sizeof(Tp), v);
 }
-export template <typename Tp>
-inline auto cmd_push_vert_frag_constants(VkCommandBuffer cb,
-                                         VkPipelineLayout pl, Tp *v,
-                                         unsigned offset = 0) {
-  calls::call(vkCmdPushConstants, cb, pl,
-              VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, offset,
-              sizeof(Tp), v);
+export template <typename Tp> inline auto cmd_push_vert_frag_constants(VkCommandBuffer cb, VkPipelineLayout pl, Tp *v, unsigned offset = 0) {
+  calls::call(vkCmdPushConstants, cb, pl, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, offset, sizeof(Tp), v);
 }
 
 export inline auto cmd_set_scissor(VkCommandBuffer cb, VkRect2D r) {
