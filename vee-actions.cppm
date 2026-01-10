@@ -33,6 +33,20 @@ export inline auto allocate_descriptor_set(VkDescriptorPool pool,
   info.pSetLayouts = &layout;
   return calls::create<VkDescriptorSet, &::vkAllocateDescriptorSets>(&info);
 }
+export inline auto allocate_descriptor_sets(VkDescriptorPool pool, VkDescriptorSetLayout layout, unsigned size) {
+  hai::array<VkDescriptorSetLayout> layouts { size };
+  for (auto i = 0; i < size; i++) layouts[i] = layout;
+
+  VkDescriptorSetAllocateInfo info {};
+  info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+  info.descriptorPool = pool;
+  info.descriptorSetCount = size;
+  info.pSetLayouts = layouts.begin();
+
+  hai::array<VkDescriptorSet> res { size };
+  calls::call(vkAllocateDescriptorSets, &info, res.begin());
+  return res;
+}
 
 export inline auto allocate_primary_command_buffer(VkCommandPool pool) {
   VkCommandBufferAllocateInfo info{};
