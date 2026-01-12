@@ -22,10 +22,10 @@ inline auto create_info_for_extent(VkExtent2D ext) {
 }
 export using image =
     calls::handle<VkImage, &::vkCreateImage, &::vkDestroyImage>;
-export inline auto create_depth_image(VkExtent2D ext) {
+export inline auto create_depth_image(VkExtent2D ext, auto ... usages) {
   auto info = create_info_for_extent(ext);
   info.format = VK_FORMAT_D32_SFLOAT;
-  info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+  info.usage = (VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | ... | static_cast<unsigned>(usages));
   return image{&info};
 }
 export inline auto create_depth_image(VkPhysicalDevice pd, VkSurfaceKHR s) {
