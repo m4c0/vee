@@ -160,6 +160,7 @@ namespace vee {
       .src_stage_mask = pipeline_stage_color_attachment_output,
       .dst_stage_mask = pipeline_stage_color_attachment_output,
       .dst_access_mask = access_color_attachment_write,
+      .dependency = dependency_by_region,
     });
   }
   export inline constexpr auto create_depth_dependency() {
@@ -172,6 +173,7 @@ namespace vee {
                       | pipeline_stage_late_fragment_tests,
       .dst_access_mask = access_depth_stencil_attachment_read
                        | access_depth_stencil_attachment_write,
+      .dependency = dependency_by_region,
     });
   }
 
