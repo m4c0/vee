@@ -8,14 +8,14 @@ using namespace wagen;
 
 namespace vee {
   using image_aspect_flags = VkImageAspectFlagBits;
-  export inline auto image_subresource_range(unsigned aspect_mask) {
+  export inline auto image_subresource_range(VkImageAspectFlags aspect_mask) {
     return VkImageSubresourceRange {
       .aspectMask = aspect_mask,
       .levelCount = 1,
       .layerCount = 1,
     };
   }
-  static auto image_view_create_info(VkImageViewCreateInfo info) {
+  export inline auto image_view_create_info(VkImageViewCreateInfo info) {
     info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     info.viewType = VK_IMAGE_VIEW_TYPE_2D;
     return info;
