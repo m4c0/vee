@@ -34,11 +34,12 @@ namespace vee {
     attachment_store_op store_op = attachment_store_op_store;
     image_layout initial_layout;
     image_layout final_layout;
+    VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT;
   };
   export [[nodiscard]] constexpr auto create_colour_attachment(const attachment_description & d) {
     VkAttachmentDescription res{};
     res.format = static_cast<VkFormat>(d.format);
-    res.samples = VK_SAMPLE_COUNT_1_BIT;
+    res.samples = d.samples;
     res.loadOp = static_cast<VkAttachmentLoadOp>(d.load_op);
     res.storeOp = static_cast<VkAttachmentStoreOp>(d.store_op);
     res.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -104,6 +105,7 @@ namespace vee {
     hai::array<VkAttachmentReference> colours;
     hai::array<VkAttachmentReference> inputs;
     VkAttachmentReference depth_stencil;
+    hai::array<VkAttachmentReference> resolves;
   };
   export inline constexpr auto create_subpass(const subpass_description & d) {
     VkSubpassDescription subpass{};
@@ -113,6 +115,7 @@ namespace vee {
     if (d.depth_stencil.layout) subpass.pDepthStencilAttachment = &d.depth_stencil;
     subpass.inputAttachmentCount = d.inputs.size();
     subpass.pInputAttachments = d.inputs.begin();
+    if (d.resolves.size()) subpass.pResolveAttachments = d.resolves.begin();
     return subpass;
   }
 
