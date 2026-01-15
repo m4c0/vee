@@ -7,7 +7,7 @@ import wagen;
 using namespace wagen;
 
 namespace vee {
-export inline auto image_create_info(VkExtent2D ext) {
+export inline auto image_create_info(VkExtent2D ext, VkFormat fmt, VkImageUsageFlags usage) {
   VkImageCreateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
   info.imageType = VK_IMAGE_TYPE_2D;
@@ -18,38 +18,27 @@ export inline auto image_create_info(VkExtent2D ext) {
   info.tiling = VK_IMAGE_TILING_OPTIMAL;
   info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
   info.samples = VK_SAMPLE_COUNT_1_BIT;
+  info.format = fmt;
+  info.usage = usage;
   return info;
 }
-export inline auto depth_image_create_info(VkExtent2D ext, auto ... usages) {
-  auto info = image_create_info(ext);
-  info.format = VK_FORMAT_D32_SFLOAT;
-  info.usage = (VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | ... | static_cast<unsigned>(usages));
-  return info;
+export inline auto depth_image_create_info(VkExtent2D ext, VkImageUsageFlags usage) {
+  return image_create_info(
+      ext, VK_FORMAT_D32_SFLOAT,
+      VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | usage);
 }
 
 export using image = calls::handle<VkImage, &::vkCreateImage, &::vkDestroyImage>;
-export inline auto create_depth_image(VkExtent2D ext, auto ... usages) {
-  auto info = depth_image_create_info(ext, usages...);
+export inline auto create_depth_image(VkExtent2D ext, VkImageUsageFlags usage) {
+  auto info = depth_image_create_info(ext, usage);
   return image{&info};
 }
 export inline auto create_depth_image(VkPhysicalDevice pd, VkSurfaceKHR s) {
-  return create_depth_image(get_surface_capabilities(pd, s).currentExtent);
+  return create_depth_image(get_surface_capabilities(pd, s).currentExtent, 0);
 }
 
-export enum image_usage {
-  image_usage_colour_attachment = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-  image_usage_input_attachment  = VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
-  image_usage_sampled           = VK_IMAGE_USAGE_SAMPLED_BIT,
-  image_usage_transfer_dst      = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-  image_usage_transfer_src      = VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
-};
-export inline auto create_image(VkExtent2D ext, VkFormat fmt, image_usage u, auto ... us) {
-  auto info = image_create_info(ext);
-  info.format = fmt;
-  info.usage = (static_cast<unsigned>(u) | ... | static_cast<unsigned>(us));
+export inline auto create_image(VkExtent2D ext, VkFormat fmt, VkImageUsageFlags usage) {
+  auto info = image_create_info(ext, fmt, usage);
   return image{&info};
-}
-export inline auto create_image(VkExtent2D ext, VkFormat fmt) {
-  return create_image(ext, fmt, image_usage_sampled, image_usage_transfer_dst);
 }
 } // namespace vee
