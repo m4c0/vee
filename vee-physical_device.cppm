@@ -68,7 +68,7 @@ static void log_rejected_device(VkPhysicalDevice pd, jute::view reason) {
   silog::log(silog::warning, "%s", msg.cstr().data());
 }
 
-export inline auto get_physical_device_properties(VkPhysicalDevice pd) {
+export inline auto get_physical_device_properties(VkPhysicalDevice pd = wagen::physical_device()) {
   VkPhysicalDeviceProperties props {};
   vkGetPhysicalDeviceProperties(pd, &props);
   return props;
