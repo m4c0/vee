@@ -177,6 +177,7 @@ export struct gr_pipeline_params {
   VkRenderPass render_pass;
   VkPrimitiveTopology topology{VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST};
   VkPolygonMode polygon_mode { VK_POLYGON_MODE_FILL };
+  VkSampleCountFlagBits multisampling = VK_SAMPLE_COUNT_1_BIT;
   bool primitive_restart { false };
   VkExtent2D extent {};
   bool front_face_cw { false };
@@ -216,7 +217,7 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
 
   VkPipelineMultisampleStateCreateInfo multisample{};
   multisample.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-  multisample.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+  multisample.rasterizationSamples = gpp.multisampling;
 
   VkPipelineRasterizationStateCreateInfo raster{};
   raster.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
