@@ -11,6 +11,7 @@ import traits;
 import vee;
 import wagen;
 
+using namespace traits::ints;
 using namespace wagen;
 
 struct frame_stuff {
@@ -86,6 +87,14 @@ static struct thread : public sith::thread {
         } };
       }
 
+      struct query {
+        uint64_t top;
+        uint64_t bottom;
+      };
+      auto buf = vee::create_buffer(imgs.size() * sizeof(query), vee::buffer_usage::transfer_dst_buffer);
+      auto mem = vee::create_host_buffer_memory(pd, *buf);
+      vee::bind_buffer_memory(*buf, *mem);
+
       // Two metrics per swapchain frame: top and bottom of pipeline
       auto qpool = vee::create_timestamp_query_pool(2 * imgs.size());
 
@@ -95,6 +104,12 @@ static struct thread : public sith::thread {
 
           auto idx = vee::acquire_next_image(*swc, *img_available_sema);
           auto & frame = frms[idx];
+
+          {
+            auto * q = static_cast<query *>(vee::map_memory(*mem));
+            silog::infof("T: %lld - B: %lld", q->top, q->bottom);
+            vee::unmap_memory(*mem);
+          }
 
           {
             vee::begin_cmd_buf_one_time_submit(frame->cb);
@@ -118,6 +133,8 @@ static struct thread : public sith::thread {
             vee::cmd_end_render_pass(frame->cb);
 
             vee::cmd_write_timestamp(frame->cb, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, *qpool, idx * 2 + 1);
+
+            vee::cmd_copy_query_pool_results(frame->cb, *qpool, idx * 2, 2, *buf, idx * sizeof(query));
 
             vee::end_cmd_buf(frame->cb);
           }
