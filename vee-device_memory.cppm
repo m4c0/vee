@@ -10,17 +10,17 @@ namespace vee {
   static constexpr const auto host_flags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
   static constexpr const auto lazy_flags = VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT;
 
-inline unsigned find_memory_type_index(VkPhysicalDevice pd, unsigned type_bits, VkMemoryAllocateFlags flags) {
-  auto props = calls::create<VkPhysicalDeviceMemoryProperties, &::vkGetPhysicalDeviceMemoryProperties>(pd);
+  inline unsigned find_memory_type_index(VkPhysicalDevice pd, unsigned type_bits, VkMemoryAllocateFlags flags) {
+    auto props = calls::create<VkPhysicalDeviceMemoryProperties, &::vkGetPhysicalDeviceMemoryProperties>(pd);
 
-  for (unsigned i = 0; i < props.memoryTypeCount; i++) {
-    if (type_bits != 0 && (type_bits & (1U << i)) == 0) continue;
-    if ((props.memoryTypes[i].propertyFlags & flags) != flags) continue;
-    return i;
+    for (unsigned i = 0; i < props.memoryTypeCount; i++) {
+      if (type_bits != 0 && (type_bits & (1U << i)) == 0) continue;
+      if ((props.memoryTypes[i].propertyFlags & flags) != flags) continue;
+      return i;
+    }
+
+    silog::die("Failed to find suitable memory type");
   }
-
-  silog::die("Failed to find suitable memory type");
-}
   export inline auto find_device_local_memory_type_index(VkPhysicalDevice pd) {
     return find_memory_type_index(pd, 0, device_local_flags);
   }
