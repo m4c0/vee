@@ -23,7 +23,7 @@ static inline auto get_present_mode(VkPhysicalDevice pd, VkSurfaceKHR s, bool vs
   if (!vsync) {
     // "immediate" pumps frames as fast as possible, but it might tear
     for (auto mode : get_pd_surf_present_modes(pd, s)) {
-      if (mode == VK_PRESENT_MODE_MAILBOX_KHR) return mode;
+      if (mode == VK_PRESENT_MODE_IMMEDIATE_KHR) return mode;
     }
   }
 
