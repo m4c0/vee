@@ -127,7 +127,9 @@ public:
 
       vee::extent extent = vee::get_surface_capabilities(pd, *s).currentExtent;
 
-      vee::image t_img = vee::create_image(extent, VK_FORMAT_R8G8B8A8_SRGB, vee::image_usage_colour_attachment, vee::image_usage_input_attachment);
+      vee::image t_img = vee::create_image(
+          extent, VK_FORMAT_R8G8B8A8_SRGB,
+          VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT);
       vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
       vee::bind_image_memory(*t_img, *t_mem);
       vee::image_view t_iv = vee::create_image_view(*t_img, VK_FORMAT_R8G8B8A8_SRGB);
