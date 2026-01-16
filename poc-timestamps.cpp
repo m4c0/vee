@@ -97,6 +97,7 @@ static struct thread : public sith::thread {
 
       // Two metrics per swapchain frame: top and bottom of pipeline
       auto qpool = vee::create_timestamp_query_pool(2 * imgs.size());
+      auto tperiod = vee::get_physical_device_properties().limits.timestampPeriod;
 
       while (!interrupted() && !g_resized) {
         try {
@@ -107,7 +108,8 @@ static struct thread : public sith::thread {
 
           {
             auto * q = static_cast<query *>(vee::map_memory(*mem));
-            silog::infof("T: %lld - B: %lld", q->top, q->bottom);
+            auto el = (q->bottom - q->top) * tperiod;
+            silog::infof("T: %lld - B: %lld - Elapsed: %fns", q->top, q->bottom, el);
             vee::unmap_memory(*mem);
           }
 
