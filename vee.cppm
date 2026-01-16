@@ -19,6 +19,7 @@ export import :image_view;
 export import :instance;
 export import :physical_device;
 export import :pipeline_layout;
+export import :query_pool;
 export import :render_pass;
 export import :sampler;
 export import :semaphore;

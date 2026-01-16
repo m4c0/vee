@@ -9,6 +9,9 @@ import sires;
 import sith;
 import traits;
 import vee;
+import wagen;
+
+using namespace wagen;
 
 struct frame_stuff {
   vee::image_view iv;
@@ -83,6 +86,9 @@ static struct thread : public sith::thread {
         } };
       }
 
+      // Two metrics per swapchain frame: top and bottom of pipeline
+      auto qpool = vee::create_timestamp_query_pool(2 * imgs.size());
+
       while (!interrupted() && !g_resized) {
         try {
           vee::wait_and_reset_fence(*f);
@@ -92,6 +98,12 @@ static struct thread : public sith::thread {
 
           {
             vee::begin_cmd_buf_one_time_submit(frame->cb);
+
+            // Must reset between each use
+            vee::cmd_reset_query_pool(frame->cb, *qpool, 2 * idx, 2);
+
+            vee::cmd_write_timestamp(frame->cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, *qpool, idx * 2);
+
             vee::cmd_begin_render_pass({
               .command_buffer = frame->cb,
               .render_pass = *rp,
@@ -104,6 +116,9 @@ static struct thread : public sith::thread {
             vee::cmd_bind_gr_pipeline(frame->cb, *gp);
             vee::cmd_draw(frame->cb, 3);
             vee::cmd_end_render_pass(frame->cb);
+
+            vee::cmd_write_timestamp(frame->cb, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, *qpool, idx * 2 + 1);
+
             vee::end_cmd_buf(frame->cb);
           }
 
