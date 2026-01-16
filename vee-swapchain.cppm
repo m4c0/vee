@@ -11,7 +11,7 @@ static constexpr const auto get_pd_surf_present_modes =
     calls::enumerate<&::vkGetPhysicalDeviceSurfacePresentModesKHR,
                      VkPresentModeKHR>();
 
-inline constexpr auto get_min_image_count(const VkSurfaceCapabilitiesKHR &cap) {
+static inline constexpr auto get_min_image_count(const VkSurfaceCapabilitiesKHR &cap) {
   auto count = cap.minImageCount + 1;
   if ((cap.maxImageCount > 0) && (count > cap.maxImageCount)) {
     return cap.maxImageCount;
@@ -19,19 +19,27 @@ inline constexpr auto get_min_image_count(const VkSurfaceCapabilitiesKHR &cap) {
   return count;
 }
 
-inline auto get_present_mode(VkPhysicalDevice pd, VkSurfaceKHR s) {
-  for (auto mode : get_pd_surf_present_modes(pd, s)) {
-    if (mode == VK_PRESENT_MODE_MAILBOX_KHR)
-      return mode;
+static inline auto get_present_mode(VkPhysicalDevice pd, VkSurfaceKHR s, bool vsync) {
+  if (!vsync) {
+    // "immediate" pumps frames as fast as possible, but it might tear
+    for (auto mode : get_pd_surf_present_modes(pd, s)) {
+      if (mode == VK_PRESENT_MODE_MAILBOX_KHR) return mode;
+    }
   }
+
+  // "mailbox" discards images if CPU is faster than GPU
+  for (auto mode : get_pd_surf_present_modes(pd, s)) {
+    if (mode == VK_PRESENT_MODE_MAILBOX_KHR) return mode;
+  }
+  // "fifo" is guaranteed by Vulkan spec
   return VK_PRESENT_MODE_FIFO_KHR;
 }
 
 export using swapchain = calls::handle<VkSwapchainKHR, &::vkCreateSwapchainKHR,
                                        &::vkDestroySwapchainKHR>;
-export inline auto create_swapchain(VkPhysicalDevice pd, VkSurfaceKHR s) {
+export inline auto create_swapchain(VkPhysicalDevice pd, VkSurfaceKHR s, bool vsync = true) {
   const auto cap = get_surface_capabilities(pd, s);
-  const auto present_mode = get_present_mode(pd, s);
+  const auto present_mode = get_present_mode(pd, s, vsync);
   const auto format = find_best_surface_format(pd, s);
 
   VkSwapchainCreateInfoKHR info{};
