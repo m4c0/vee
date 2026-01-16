@@ -8,6 +8,7 @@ using namespace wagen;
 namespace vee {
   static constexpr const auto device_local_flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
   static constexpr const auto host_flags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+  static constexpr const auto lazy_flags = VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT;
 
 inline unsigned find_memory_type_index(VkPhysicalDevice pd, unsigned type_bits, VkMemoryAllocateFlags flags) {
   auto props = calls::create<VkPhysicalDeviceMemoryProperties, &::vkGetPhysicalDeviceMemoryProperties>(pd);
@@ -59,8 +60,20 @@ export inline auto create_host_image_memory(VkPhysicalDevice pd, VkImage buf) {
   return create_memory(pd, mr, host_flags);
 }
 
+export inline auto create_lazy_buffer_memory(VkPhysicalDevice pd, VkBuffer buf) {
+  auto mr = calls::create<VkMemoryRequirements, &::vkGetBufferMemoryRequirements>(buf);
+  return create_memory(pd, mr, lazy_flags);
+}
+export inline auto create_lazy_image_memory(VkPhysicalDevice pd, VkImage buf) {
+  auto mr = calls::create<VkMemoryRequirements, &::vkGetImageMemoryRequirements>(buf);
+  return create_memory(pd, mr, lazy_flags);
+}
+
 export inline auto create_host_memory(VkPhysicalDevice pd, unsigned sz) {
   return create_memory(pd, VkMemoryRequirements { .size = sz }, host_flags);
+}
+export inline auto create_lazy_memory(VkPhysicalDevice pd, unsigned sz) {
+  return create_memory(pd, VkMemoryRequirements { .size = sz }, lazy_flags);
 }
 export inline auto create_local_memory(VkPhysicalDevice pd, unsigned sz) {
   return create_memory(pd, VkMemoryRequirements { .size = sz }, device_local_flags);
