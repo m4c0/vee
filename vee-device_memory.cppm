@@ -30,13 +30,13 @@ namespace vee {
 
     silog::die("Failed to find suitable memory type");
   }
-  export inline auto find_device_local_memory_type_index(VkPhysicalDevice pd) {
+  export inline auto find_device_local_memory_type_index(VkPhysicalDevice pd = wagen::physical_device()) {
     return find_memory_type_index(pd, 0, device_local_flags, device_local_flags);
   }
-  export inline auto find_host_memory_type_index(VkPhysicalDevice pd) {
+  export inline auto find_host_memory_type_index(VkPhysicalDevice pd = wagen::physical_device()) {
     return find_memory_type_index(pd, 0, host_flags, host_flags);
   }
-  export inline auto find_lazy_memory_type_index(VkPhysicalDevice pd) {
+  export inline auto find_lazy_memory_type_index(VkPhysicalDevice pd = wagen::physical_device()) {
     return find_memory_type_index(pd, 0, lazy_flags, device_local_flags);
   }
 
