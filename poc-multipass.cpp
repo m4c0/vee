@@ -109,7 +109,7 @@ public:
         .attributes { vee::vertex_attribute_vec2(0, 0) },
     });
 
-    vee::buffer v_buf = vee::create_vertex_buffer(sizeof(dotz::vec2) * 6);
+    vee::buffer v_buf = vee::create_buffer(sizeof(dotz::vec2) * 6, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
     vee::device_memory v_mem = vee::create_host_buffer_memory(pd, *v_buf);
     vee::bind_buffer_memory(*v_buf, *v_mem);
 

@@ -62,7 +62,7 @@ public:
       },
     });
 
-    vee::buffer v_buf = vee::create_vertex_buffer(sizeof(dotz::vec2) * 3);
+    vee::buffer v_buf = vee::create_buffer(sizeof(dotz::vec2) * 3, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
     vee::device_memory v_mem = vee::create_host_buffer_memory(pd, *v_buf);
     vee::bind_buffer_memory(*v_buf, *v_mem);
 

@@ -27,15 +27,15 @@ int main() try {
 
   auto ds = vee::allocate_descriptor_set(*dpool, *dsl);
 
-  auto buf0 = vee::create_buffer(buf_sz, vee::buffer_usage::storage_buffer);
+  auto buf0 = vee::create_buffer(buf_sz, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
   vee::bind_buffer_memory(*buf0, *mem, 0);
   vee::update_descriptor_set(ds, 0, *buf0);
 
-  auto buf1 = vee::create_buffer(buf_sz, vee::buffer_usage::storage_buffer);
+  auto buf1 = vee::create_buffer(buf_sz, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
   vee::bind_buffer_memory(*buf1, *mem, buf_sz);
   vee::update_descriptor_set(ds, 1, *buf1);
 
-  auto buf2 = vee::create_buffer(buf_sz, vee::buffer_usage::storage_buffer);
+  auto buf2 = vee::create_buffer(buf_sz, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
   vee::bind_buffer_memory(*buf2, *mem, buf_sz * 2);
   vee::update_descriptor_set(ds, 2, *buf2);
 

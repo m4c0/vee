@@ -119,7 +119,7 @@ public:
 
     vee::sampler smp = vee::create_sampler(vee::nearest_sampler);
 
-    vee::buffer ts_buf = vee::create_transfer_src_buffer(16 * 16 * sizeof(float));
+    vee::buffer ts_buf = vee::create_buffer(16 * 16 * sizeof(float), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
     vee::device_memory ts_mem = vee::create_host_buffer_memory(pd, *ts_buf);
     vee::bind_buffer_memory(*ts_buf, *ts_mem);
 
@@ -130,7 +130,7 @@ public:
     vee::bind_image_memory(*t_img, *t_mem);
     vee::image_view t_iv = vee::create_image_view(*t_img, VK_FORMAT_R8G8B8A8_SRGB);
 
-    vee::buffer v_buf = vee::create_vertex_buffer(sizeof(point) * 3);
+    vee::buffer v_buf = vee::create_buffer(sizeof(point) * 3, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
     vee::device_memory v_mem = vee::create_host_buffer_memory(pd, *v_buf);
     vee::bind_buffer_memory(*v_buf, *v_mem);
 

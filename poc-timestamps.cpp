@@ -91,7 +91,7 @@ static struct thread : public sith::thread {
         uint64_t top;
         uint64_t bottom;
       };
-      auto buf = vee::create_buffer(imgs.size() * sizeof(query), vee::buffer_usage::transfer_dst_buffer);
+      auto buf = vee::create_buffer(imgs.size() * sizeof(query), VK_BUFFER_USAGE_TRANSFER_DST_BIT);
       auto mem = vee::create_host_buffer_memory(pd, *buf);
       vee::bind_buffer_memory(*buf, *mem);
 
