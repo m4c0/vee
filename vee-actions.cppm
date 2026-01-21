@@ -94,8 +94,8 @@ export inline auto clear_colour(float r, float g, float b, float a) {
   return VkClearValue { .color {{ r, g, b, a }} };
 }
 export inline auto clear_colour(dotz::vec4 c) { return clear_colour(c.x, c.y, c.z, c.w); }
-export inline auto clear_depth(float d) {
-  return VkClearValue { .depthStencil { d, 0 } };
+export inline auto clear_depth(float d, unsigned s = 0) {
+  return VkClearValue { .depthStencil { d, s } };
 }
 export struct render_pass_begin {
   VkCommandBuffer command_buffer;
