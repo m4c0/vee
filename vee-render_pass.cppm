@@ -118,6 +118,7 @@ namespace vee {
     hai::array<VkAttachmentReference> inputs;
     VkAttachmentReference depth_stencil;
     hai::array<VkAttachmentReference> resolves;
+    hai::array<unsigned> preserves;
   };
   export inline constexpr auto create_subpass(const subpass_description & d) {
     VkSubpassDescription subpass{};
@@ -128,6 +129,8 @@ namespace vee {
     subpass.inputAttachmentCount = d.inputs.size();
     subpass.pInputAttachments = d.inputs.begin();
     if (d.resolves.size()) subpass.pResolveAttachments = d.resolves.begin();
+    subpass.preserveAttachmentCount = d.preserves.size();
+    subpass.pPreserveAttachments = d.preserves.begin();
     return subpass;
   }
 
