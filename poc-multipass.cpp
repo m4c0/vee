@@ -169,6 +169,10 @@ public:
             .render_pass = *rp,
             .framebuffer = *frame->fb,
             .extent = extent,
+            .clear_colours {
+              vee::clear_colour({}),
+              vee::clear_colour({}),
+            },
         });
         vee::cmd_set_scissor(frame->cb, extent);
         vee::cmd_set_viewport(frame->cb, extent);
