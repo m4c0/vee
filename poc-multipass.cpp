@@ -43,7 +43,7 @@ public:
           .store_op       = vee::attachment_store_op_dont_care,
           .final_layout   = vee::image_layout_read_only_optimal,
         }),
-        vee::create_colour_attachment(pd, *s),
+        vee::create_colour_attachment(pd, *s), // Swapchain output
       }},
       .subpasses {{ 
         vee::create_subpass({
@@ -55,22 +55,18 @@ public:
         }),
       }},
       .dependencies {{
-        vee::create_dependency({
-          .src_subpass = vee::subpass_external,
-          .src_stage_mask = vee::pipeline_stage_color_attachment_output,
-
-          .dst_subpass = 1,
-          .dst_stage_mask = vee::pipeline_stage_color_attachment_output,
-          .dst_access_mask = vee::access_color_attachment_write,
-        }),
+        // Hazard WRITE_AFTER_WRITE in subpass 1 for attachment 0 color aspect
+        // during store with storeOp VK_ATTACHMENT_STORE_OP_DONT_CARE.
         vee::create_dependency({
           .src_subpass = 0,
-          .src_stage_mask = vee::pipeline_stage_color_attachment_output,
-          .src_access_mask = vee::access_color_attachment_write,
+          .src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+          .src_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
 
           .dst_subpass = 1,
-          .dst_stage_mask = vee::pipeline_stage_fragment_shader,
-          .dst_access_mask = vee::access_input_attachment_read,
+          .dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+          .dst_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+          
+          .dependency = VK_DEPENDENCY_BY_REGION_BIT,
         }),
       }},
     });
