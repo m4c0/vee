@@ -84,4 +84,7 @@ export void set_debug_utils_object_name(VkObjectType type, auto handle, const ch
 export void set_debug_utils_object_name(VkImage img, const char * name) {
   set_debug_utils_object_name(VK_OBJECT_TYPE_IMAGE, img, name);
 }
+export void set_debug_utils_object_name(VkPipeline pl, const char * name) {
+  set_debug_utils_object_name(VK_OBJECT_TYPE_PIPELINE, pl, name);
+}
 } // namespace vee
