@@ -208,6 +208,25 @@ export inline auto cmd_copy_yuv420p_buffers_to_image(VkCommandBuffer cb,
   calls::call(vkCmdCopyBufferToImage, cb, v, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &vv);
 }
 
+export inline auto cmd_copy_image(
+    VkCommandBuffer cb,
+    VkImage src_image, VkImageLayout src_image_layout,
+    VkImage dst_image, VkImageLayout dst_image_layout,
+    VkExtent2D ext) {
+  VkImageCopy r {
+    .srcSubresource = {
+      .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+      .layerCount = 1,
+    },
+    .dstSubresource = {
+      .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+      .layerCount = 1,
+    },
+    .extent { ext.width, ext.height, 1 },
+  };
+  calls::call(vkCmdCopyImage, cb, src_image, src_image_layout, dst_image, dst_image_layout, 1, &r);
+}
+
 export inline auto cmd_dispatch(VkCommandBuffer cb, unsigned count_x, unsigned count_y, unsigned count_z) {
   calls::call(vkCmdDispatch, cb, count_x, count_y, count_z);
 }
