@@ -23,11 +23,9 @@ namespace vee {
 export inline auto create_single_queue_device(VkPhysicalDevice pd, unsigned qf, const VkPhysicalDeviceFeatures & feats, const void * next = nullptr) {
   const float priority = 1.0f;
 
-  constexpr const auto ext_count = 3;
-  const char * ext[ext_count] = {
-    vk_khr_swapchain_extension_name,
-    vk_khr_synchronization2_extension_name,
-  };
+  hai::varray<const char *> exts { 16 };
+  exts.push_back(vk_khr_swapchain_extension_name);
+  exts.push_back(vk_khr_synchronization2_extension_name);
 
   VkDeviceQueueCreateInfo queue_create_info{};
   queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -41,8 +39,8 @@ export inline auto create_single_queue_device(VkPhysicalDevice pd, unsigned qf, 
   ci.pQueueCreateInfos = &queue_create_info;
   ci.queueCreateInfoCount = 1;
   ci.pEnabledFeatures = &feats;
-  ci.ppEnabledExtensionNames = ext;
-  ci.enabledExtensionCount = ext_count;
+  ci.ppEnabledExtensionNames = exts.begin();
+  ci.enabledExtensionCount = exts.size();
   ci.enabledLayerCount = 0; // device layer is legacy
 
   auto res = device(pd, &ci);
