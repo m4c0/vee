@@ -237,6 +237,8 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
     .extent = gpp.extent,
   };
 
+  hai::varray<VkDynamicState> dyn_states { 16 };
+
   VkPipelineViewportStateCreateInfo viewport{};
   viewport.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
   viewport.scissorCount = 1;
@@ -244,20 +246,22 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   if (gpp.extent.width > 0) {
     viewport.pScissors  = &sc;
     viewport.pViewports = &vp;
+  } else {
+    dyn_states.push_back(VK_DYNAMIC_STATE_VIEWPORT);
+    dyn_states.push_back(VK_DYNAMIC_STATE_SCISSOR);
   }
 
-  VkDynamicState states[]{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
   VkPipelineDynamicStateCreateInfo dynamic_state{};
   dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-  dynamic_state.pDynamicStates = states;
-  dynamic_state.dynamicStateCount = 2;
+  dynamic_state.pDynamicStates = dyn_states.begin();
+  dynamic_state.dynamicStateCount = dyn_states.size();
 
   VkGraphicsPipelineCreateInfo info{};
   info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
   info.layout = gpp.pipeline_layout;
   info.pColorBlendState = &color_blend;
   info.pDepthStencilState = &gpp.depth;
-  info.pDynamicState = gpp.extent.width > 0 ? nullptr : &dynamic_state;
+  info.pDynamicState = dyn_states.size() == 0 ? nullptr : &dynamic_state;
   info.pInputAssemblyState = &in_asm;
   info.pMultisampleState = &multisample;
   info.pRasterizationState = &raster;
