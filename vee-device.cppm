@@ -7,6 +7,10 @@ using namespace wagen;
 namespace vee {
   export using device = calls::handle<VkDevice, &::vkCreateDevice, &::vkDestroyDevice>;
 
+  export constexpr inline auto physical_device_extended_dynamic_state(VkPhysicalDeviceExtendedDynamicState3FeaturesEXT e) {
+    e.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_3_FEATURES_EXT;
+    return e;
+  }
   export constexpr inline auto physical_device_sampler_ycbcr_conversion() {
     return VkPhysicalDeviceSamplerYcbcrConversionFeatures {
       .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES,

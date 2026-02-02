@@ -10,6 +10,9 @@ import sires;
 import sith;
 import traits;
 import vee;
+import wagen;
+
+using namespace wagen;
 
 struct point {
   float x;
@@ -57,7 +60,14 @@ public:
     vee::debug_utils_messenger dbg = vee::create_debug_utils_messenger();
     vee::surface s = vee::create_surface(casein::native_ptr);
     const auto & [pd, qf] = vee::find_physical_device_with_universal_queue(*s);
-    vee::device d = vee::create_single_queue_device(pd, qf);
+
+    auto nxt = vee::physical_device_extended_dynamic_state({
+      .extendedDynamicState3PolygonMode = true,
+    });
+    vee::device d = vee::create_single_queue_device(pd, qf, {
+      .fillModeNonSolid = true,
+      .samplerAnisotropy = true,
+    }, &nxt);
 
     vee::queue q = vee::get_queue_for_family(qf);
 
@@ -99,6 +109,7 @@ public:
     vee::gr_pipeline gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = *rp,
+        .polygon_mode = VK_POLYGON_MODE_LINE,
         .shaders {
             vee::pipeline_vert_stage(*vert, "main"),
             vee::pipeline_frag_stage(*frag, "main", vee::specialisation_info<sconst>({
@@ -187,6 +198,7 @@ public:
             vee::begin_cmd_buf_render_pass_continue(cb, *rp);
             vee::cmd_set_scissor(cb, extent);
             vee::cmd_set_viewport(cb, extent);
+            vkCmdSetPolygonModeEXT(cb, VK_POLYGON_MODE_FILL);
             vee::cmd_push_vert_frag_constants(cb, *pl, &pc);
             vee::cmd_bind_descriptor_set(cb, *pl, 0, desc_set);
             vee::cmd_bind_gr_pipeline(cb, *gp);
