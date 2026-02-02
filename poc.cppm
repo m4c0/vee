@@ -109,7 +109,7 @@ public:
     vee::gr_pipeline gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = *rp,
-        .polygon_mode = VK_POLYGON_MODE_LINE,
+        .polygon_mode = vee::dynamic_polygon_mode,
         .shaders {
             vee::pipeline_vert_stage(*vert, "main"),
             vee::pipeline_frag_stage(*frag, "main", vee::specialisation_info<sconst>({

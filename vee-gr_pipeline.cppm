@@ -169,6 +169,8 @@ namespace depth {
   }
 }
 
+  export constexpr const auto dynamic_polygon_mode = static_cast<VkPolygonMode>(0xFFFF);
+
 export using gr_pipeline =
     calls::handle<VkPipeline, &::vkCreateGraphicsPipelines,
                   &::vkDestroyPipeline>;
@@ -219,6 +221,8 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   multisample.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
   multisample.rasterizationSamples = gpp.multisampling;
 
+  hai::varray<VkDynamicState> dyn_states { 16 };
+
   VkPipelineRasterizationStateCreateInfo raster{};
   raster.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
   if (gpp.back_face_cull) raster.cullMode = VK_CULL_MODE_BACK_BIT;
@@ -226,7 +230,12 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
     ? VK_FRONT_FACE_CLOCKWISE
     : VK_FRONT_FACE_COUNTER_CLOCKWISE;
   raster.lineWidth = 1;
-  raster.polygonMode = gpp.polygon_mode;
+
+  if (gpp.polygon_mode == dynamic_polygon_mode) {
+    dyn_states.push_back(VK_DYNAMIC_STATE_POLYGON_MODE_EXT);
+  } else {
+    raster.polygonMode = gpp.polygon_mode;
+  }
 
   VkViewport vp {
     .width    = static_cast<float>(gpp.extent.width),
@@ -236,8 +245,6 @@ export inline auto create_graphics_pipeline(gr_pipeline_params &&gpp) {
   VkRect2D sc {
     .extent = gpp.extent,
   };
-
-  hai::varray<VkDynamicState> dyn_states { 16 };
 
   VkPipelineViewportStateCreateInfo viewport{};
   viewport.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
