@@ -20,12 +20,22 @@ namespace vee {
     };
   }
 
-export inline auto create_single_queue_device(VkPhysicalDevice pd, unsigned qf, const VkPhysicalDeviceFeatures & feats, const void * next = nullptr) {
+  struct stype_struct {
+    VkStructureType sType;
+    stype_struct * pNext;
+  };
+export inline auto create_single_queue_device(VkPhysicalDevice pd, unsigned qf, const VkPhysicalDeviceFeatures & feats, void * next = nullptr) {
   const float priority = 1.0f;
 
   hai::varray<const char *> exts { 16 };
   exts.push_back(vk_khr_swapchain_extension_name);
-  exts.push_back(vk_khr_synchronization2_extension_name);
+  for (auto n = reinterpret_cast<stype_struct *>(next); n; n = n->pNext) {
+    if (n->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES) {
+      exts.push_back(vk_khr_synchronization2_extension_name);
+    } else if (n->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_3_FEATURES_EXT) {
+      exts.push_back("VK_EXT_extended_dynamic_state3");
+    }
+  }
 
   VkDeviceQueueCreateInfo queue_create_info{};
   queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
