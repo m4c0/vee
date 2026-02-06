@@ -259,6 +259,14 @@ export inline auto cmd_draw_indexed(VkCommandBuffer cb, unsigned xcount, unsigne
   cmd_draw_indexed(cb, { .xcount = xcount, .icount = icount });
 }
 
+export inline auto cmd_draw_indirect(VkCommandBuffer cb, VkBuffer buf, unsigned count) {
+  calls::call(vkCmdDrawIndirect, cb, buf, 0, count, sizeof(VkDrawIndirectCommand));
+}
+
+export inline auto cmd_draw_indexed_indirect(VkCommandBuffer cb, VkBuffer buf, unsigned count) {
+  calls::call(vkCmdDrawIndexedIndirect, cb, buf, 0, count, sizeof(VkDrawIndexedIndirectCommand));
+}
+
 export inline auto cmd_end_render_pass(VkCommandBuffer cb) {
   calls::call(vkCmdEndRenderPass, cb);
 }
