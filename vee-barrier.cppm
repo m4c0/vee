@@ -29,11 +29,14 @@ namespace vee {
   };
   export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkBuffer buf, barrier_type bt) {
     switch (bt) {
-      case from_compute_to_compute:
+      case from_compute_to_compute: {
         constexpr const auto stage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
         cmd_pipeline_barrier(cb, stage, stage, buffer_memory_barrier(buf, VK_ACCESS_SHADER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT));
         break;
-      case from_fragment_to_fragment: silog::die("TBD: fragment-to-fragment barrier for images");
+      }
+      case from_fragment_to_fragment:
+        silog::die("TBD: fragment-to-fragment barrier for images");
+        break;
       case from_host_to_transfer:
         cmd_pipeline_barrier(cb,
             VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
@@ -54,7 +57,6 @@ namespace vee {
             VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_HOST_BIT,
             buffer_memory_barrier(buf, VK_ACCESS_MEMORY_WRITE_BIT, VK_ACCESS_HOST_READ_BIT));
         break;
-      }
     }
   }
 
