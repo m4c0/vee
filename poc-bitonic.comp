@@ -1,19 +1,24 @@
 #version 450
 
+layout(push_constant) uniform upc {
+  uint jump;
+  uint div;
+} pc;
+
 layout(binding = 0) readonly buffer buf_0 { uint inp[]; };
 layout(binding = 1) buffer buf_1 { uint res[]; };
 
 void main() {
-  uint id = gl_GlobalInvocationID.x;
-  uint idx = id * 2;
+  uint ia = gl_GlobalInvocationID.x;
+  uint ib = ia + pc.jump;
 
-  uint a = inp[idx];
-  uint b = inp[idx + 1];
-  if (id % 2 == 0) {
-    res[idx] = min(a, b);
-    res[idx + 1] = max(a, b);
+  uint a = inp[ia];
+  uint b = inp[ib];
+  if ((ia / pc.div) % 2 == 0) {
+    res[ia] = min(a, b);
+    res[ib] = max(a, b);
   } else {
-    res[idx] = max(a, b);
-    res[idx + 1] = min(a, b);
+    res[ia] = max(a, b);
+    res[ib] = min(a, b);
   }
 }
