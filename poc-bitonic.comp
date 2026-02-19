@@ -1,9 +1,19 @@
 #version 450
 
-layout(binding = 0) readonly buffer buf_0 { uint a[]; };
-layout(binding = 1) buffer buf_1 { uint b[]; };
+layout(binding = 0) readonly buffer buf_0 { uint inp[]; };
+layout(binding = 1) buffer buf_1 { uint res[]; };
 
 void main() {
-  uint i = gl_GlobalInvocationID.x;
-  b[i] = a[i];
+  uint id = gl_GlobalInvocationID.x;
+  uint idx = id * 2;
+
+  uint a = inp[idx];
+  uint b = inp[idx + 1];
+  if (id % 2 == 0) {
+    res[idx] = min(a, b);
+    res[idx + 1] = max(a, b);
+  } else {
+    res[idx] = max(a, b);
+    res[idx + 1] = min(a, b);
+  }
 }

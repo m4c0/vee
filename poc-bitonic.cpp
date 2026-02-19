@@ -66,7 +66,7 @@ int main() try {
     vee::begin_cmd_buf_one_time_submit(cb);
     vee::cmd_bind_c_pipeline(cb, *p);
     vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds0);
-    vee::cmd_dispatch(cb, elems, 1, 1);
+    vee::cmd_dispatch(cb, elems / 2, 1, 1);
     vee::end_cmd_buf(cb);
   }
   vee::queue_submit({
@@ -77,11 +77,11 @@ int main() try {
   vee::device_wait_idle();
 
   {
-    auto p = static_cast<unsigned *>(vee::map_memory(*mem0));
+    auto p = static_cast<unsigned *>(vee::map_memory(*mem1));
     for (auto i = 0; i < elems; i++) {
       silog::log(silog::info, ">>>>> %d", p[i]);
     }
-    vee::unmap_memory(*mem0);
+    vee::unmap_memory(*mem1);
   }
 } catch (...) {
   return 1;
