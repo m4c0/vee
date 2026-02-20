@@ -4,6 +4,17 @@ import silog;
 import wagen;
 
 namespace vee {
+  export inline auto memory_barrier(VkAccessFlags src, VkAccessFlags dst) {
+    return VkMemoryBarrier {
+      .sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER,
+      .srcAccessMask = src,
+      .dstAccessMask = dst,
+    };
+  }
+  export inline auto cmd_pipeline_barrier(VkCommandBuffer cb, VkPipelineStageFlags src, VkPipelineStageFlags dst, VkMemoryBarrier bmb) {
+    calls::call(vkCmdPipelineBarrier, cb, src, dst, 0, 1, &bmb, 0, nullptr, 0, nullptr);
+  }
+
   export inline auto buffer_memory_barrier(VkBuffer buf, VkAccessFlags src, VkAccessFlags dst) {
     return VkBufferMemoryBarrier {
       .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
