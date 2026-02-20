@@ -9,16 +9,22 @@ layout(binding = 0) readonly buffer buf_0 { uint inp[]; };
 layout(binding = 1) buffer buf_1 { uint res[]; };
 
 void main() {
-  uint ia = gl_GlobalInvocationID.x;
-  uint ib = ia + pc.jump;
+  uint id = gl_GlobalInvocationID.x;
+
+  uint dv = id / pc.div;
+  uint rs = id % pc.div;
+
+  uint ra = rs;
+  uint rb = (rs + pc.div / 2) % pc.div;
+
+  uint ia = dv * pc.div + ra;
+  uint ib = dv * pc.div + rb;
 
   uint a = inp[ia];
   uint b = inp[ib];
-  if ((ia / pc.div) % 2 == 0) {
-    res[ia] = min(a, b);
-    res[ib] = max(a, b);
+  if (((id / pc.jump) % 2 == 1) ^^ (ia < ib)) {
+    res[id] = min(a, b);
   } else {
-    res[ia] = max(a, b);
-    res[ib] = min(a, b);
+    res[id] = max(a, b);
   }
 }

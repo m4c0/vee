@@ -76,20 +76,55 @@ int main() try {
     vee::begin_cmd_buf_one_time_submit(cb);
     vee::cmd_bind_c_pipeline(cb, *p);
 
-    pc = { .jump = 1, .div = 2 };
+    pc = { .jump = 2, .div = 2 };
     vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds01);
     vee::cmd_push_compute_constants(cb, *pl, &pc);
     vee::cmd_dispatch(cb, elems, 1, 1);
 
-    //pc = { .jump = 2, .div = 4 };
-    //vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds10);
-    //vee::cmd_push_compute_constants(cb, *pl, &pc);
-    //vee::cmd_dispatch(cb, elems / 4, 1, 1);
+    pc = { .jump = 4, .div = 4 };
+    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds10);
+    vee::cmd_push_compute_constants(cb, *pl, &pc);
+    vee::cmd_dispatch(cb, elems, 1, 1);
 
-    //pc = { .jump = 1, .div = 4 };
-    //vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds01);
-    //vee::cmd_push_compute_constants(cb, *pl, &pc);
-    //vee::cmd_dispatch(cb, elems / 4, 1, 1);
+    pc = { .jump = 4, .div = 2 };
+    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds01);
+    vee::cmd_push_compute_constants(cb, *pl, &pc);
+    vee::cmd_dispatch(cb, elems, 1, 1);
+
+    pc = { .jump = 8, .div = 8 };
+    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds10);
+    vee::cmd_push_compute_constants(cb, *pl, &pc);
+    vee::cmd_dispatch(cb, elems, 1, 1);
+
+    pc = { .jump = 8, .div = 4 };
+    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds01);
+    vee::cmd_push_compute_constants(cb, *pl, &pc);
+    vee::cmd_dispatch(cb, elems, 1, 1);
+
+    pc = { .jump = 8, .div = 2 };
+    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds10);
+    vee::cmd_push_compute_constants(cb, *pl, &pc);
+    vee::cmd_dispatch(cb, elems, 1, 1);
+
+    pc = { .jump = 16, .div = 16 };
+    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds01);
+    vee::cmd_push_compute_constants(cb, *pl, &pc);
+    vee::cmd_dispatch(cb, elems, 1, 1);
+
+    pc = { .jump = 16, .div = 8 };
+    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds10);
+    vee::cmd_push_compute_constants(cb, *pl, &pc);
+    vee::cmd_dispatch(cb, elems, 1, 1);
+
+    pc = { .jump = 16, .div = 4 };
+    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds01);
+    vee::cmd_push_compute_constants(cb, *pl, &pc);
+    vee::cmd_dispatch(cb, elems, 1, 1);
+
+    pc = { .jump = 16, .div = 2 };
+    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds10);
+    vee::cmd_push_compute_constants(cb, *pl, &pc);
+    vee::cmd_dispatch(cb, elems, 1, 1);
 
     vee::end_cmd_buf(cb);
   }
