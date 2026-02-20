@@ -76,55 +76,16 @@ int main() try {
     vee::begin_cmd_buf_one_time_submit(cb);
     vee::cmd_bind_c_pipeline(cb, *p);
 
-    pc = { .jump = 2, .div = 2 };
-    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds01);
-    vee::cmd_push_compute_constants(cb, *pl, &pc);
-    vee::cmd_dispatch(cb, elems, 1, 1);
-
-    pc = { .jump = 4, .div = 4 };
-    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds10);
-    vee::cmd_push_compute_constants(cb, *pl, &pc);
-    vee::cmd_dispatch(cb, elems, 1, 1);
-
-    pc = { .jump = 4, .div = 2 };
-    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds01);
-    vee::cmd_push_compute_constants(cb, *pl, &pc);
-    vee::cmd_dispatch(cb, elems, 1, 1);
-
-    pc = { .jump = 8, .div = 8 };
-    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds10);
-    vee::cmd_push_compute_constants(cb, *pl, &pc);
-    vee::cmd_dispatch(cb, elems, 1, 1);
-
-    pc = { .jump = 8, .div = 4 };
-    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds01);
-    vee::cmd_push_compute_constants(cb, *pl, &pc);
-    vee::cmd_dispatch(cb, elems, 1, 1);
-
-    pc = { .jump = 8, .div = 2 };
-    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds10);
-    vee::cmd_push_compute_constants(cb, *pl, &pc);
-    vee::cmd_dispatch(cb, elems, 1, 1);
-
-    pc = { .jump = 16, .div = 16 };
-    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds01);
-    vee::cmd_push_compute_constants(cb, *pl, &pc);
-    vee::cmd_dispatch(cb, elems, 1, 1);
-
-    pc = { .jump = 16, .div = 8 };
-    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds10);
-    vee::cmd_push_compute_constants(cb, *pl, &pc);
-    vee::cmd_dispatch(cb, elems, 1, 1);
-
-    pc = { .jump = 16, .div = 4 };
-    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds01);
-    vee::cmd_push_compute_constants(cb, *pl, &pc);
-    vee::cmd_dispatch(cb, elems, 1, 1);
-
-    pc = { .jump = 16, .div = 2 };
-    vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds10);
-    vee::cmd_push_compute_constants(cb, *pl, &pc);
-    vee::cmd_dispatch(cb, elems, 1, 1);
+    bool use01 = true;
+    for (unsigned jump = 2; jump <= 16; jump <<= 1) {
+      for (unsigned div = jump; div >= 2; div >>= 1) {
+        pc = { .jump = jump, .div = div };
+        vee::cmd_bind_c_descriptor_set(cb, *pl, 0, use01 ? ds01 : ds10);
+        vee::cmd_push_compute_constants(cb, *pl, &pc);
+        vee::cmd_dispatch(cb, elems, 1, 1);
+        use01 = !use01;
+      }
+    }
 
     vee::end_cmd_buf(cb);
   }
