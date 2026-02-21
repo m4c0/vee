@@ -29,8 +29,7 @@ namespace vee {
   export inline auto update_descriptor_set(const VkWriteDescriptorSet & w) {
     calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
   }
-  export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, VkBuffer b) {
-    auto ii = descriptor_buffer_info(b);
+  export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, VkDescriptorBufferInfo ii) {
     auto w = write_descriptor_set({
       .dstSet = set,
       .dstBinding = binding,
@@ -39,6 +38,10 @@ namespace vee {
       .pBufferInfo = &ii,
     });
     calls::call(vkUpdateDescriptorSets, 1, &w, 0, nullptr);
+  }
+  export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, VkBuffer b) {
+    auto ii = descriptor_buffer_info(b);
+    update_descriptor_set(set, binding, ii);
   }
   export inline auto update_descriptor_set(VkDescriptorSet set, unsigned binding, const hai::array<VkImageView> & ivs, VkSampler s) {
     hai::array<VkDescriptorImageInfo> iis { ivs.size() };
