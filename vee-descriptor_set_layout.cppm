@@ -9,10 +9,10 @@ export using descriptor_set_layout =
     calls::handle<VkDescriptorSetLayout, &::vkCreateDescriptorSetLayout,
                   &::vkDestroyDescriptorSetLayout>;
 
-export constexpr VkDescriptorSetLayoutBinding dsl_compute_storage() {
+export constexpr VkDescriptorSetLayoutBinding dsl_compute_storage(unsigned count = 1) {
   VkDescriptorSetLayoutBinding b{};
   b.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-  b.descriptorCount = 1;
+  b.descriptorCount = count;
   b.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
   return b;
 }
