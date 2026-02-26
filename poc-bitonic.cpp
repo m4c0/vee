@@ -27,24 +27,15 @@ int main() try {
   });
   auto pl = vee::create_pipeline_layout(*dsl, vee::compute_push_constant_range<upc>());
 
-  auto dpool = vee::create_descriptor_pool(2, { vee::storage_buffer(4) });
+  auto dpool = vee::create_descriptor_pool(1, { vee::storage_buffer(1) });
 
   auto ds01 = vee::allocate_descriptor_set(*dpool, *dsl);
-  auto ds10 = vee::allocate_descriptor_set(*dpool, *dsl);
 
   auto mem0 = vee::create_host_memory(pd, buf_sz);
   auto buf0 = vee::create_buffer(buf_sz, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
   vee::bind_buffer_memory(*buf0, *mem0, 0);
 
-  auto mem1 = vee::create_host_memory(pd, buf_sz);
-  auto buf1 = vee::create_buffer(buf_sz, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
-  vee::bind_buffer_memory(*buf1, *mem1, 0);
-
-  // We "ping-pong" between bitonic stages
   vee::update_descriptor_set(ds01, 0, *buf0);
-  vee::update_descriptor_set(ds01, 1, *buf1);
-  vee::update_descriptor_set(ds10, 0, *buf1);
-  vee::update_descriptor_set(ds10, 1, *buf0);
 
   auto kern = vee::create_shader_module(sires::slurp("poc-bitonic.comp.spv"));
   auto p = vee::create_compute_pipeline(*pl, *kern, "main");
@@ -76,14 +67,12 @@ int main() try {
     vee::begin_cmd_buf_one_time_submit(cb);
     vee::cmd_bind_c_pipeline(cb, *p);
 
-    bool use01 = true;
     for (unsigned jump = 2; jump <= 16; jump <<= 1) {
       for (unsigned div = jump; div >= 2; div >>= 1) {
         pc = { .jump = jump, .div = div };
-        vee::cmd_bind_c_descriptor_set(cb, *pl, 0, use01 ? ds01 : ds10);
+        vee::cmd_bind_c_descriptor_set(cb, *pl, 0, ds01);
         vee::cmd_push_compute_constants(cb, *pl, &pc);
         vee::cmd_dispatch(cb, elems, 1, 1);
-        use01 = !use01;
       }
     }
 
@@ -103,14 +92,6 @@ int main() try {
       silog::log(silog::info, ">>>>> %d %d %d %d", p[i], p[i+1], p[i+2], p[i+3]);
     }
     vee::unmap_memory(*mem0);
-  }
-  silog::info("Memory 1");
-  {
-    auto p = static_cast<unsigned *>(vee::map_memory(*mem1));
-    for (auto i = 0; i < elems; i += 4) {
-      silog::log(silog::info, ">>>>> %d %d %d %d", p[i], p[i+1], p[i+2], p[i+3]);
-    }
-    vee::unmap_memory(*mem1);
   }
 } catch (...) {
   return 1;
