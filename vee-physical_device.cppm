@@ -13,7 +13,7 @@ static constexpr const auto get_pd_queue_family_props =
     calls::enumerate<&::vkGetPhysicalDeviceQueueFamilyProperties,
                      VkQueueFamilyProperties>();
 
-static bool is_surface_compatible(VkPhysicalDevice pd, VkSurfaceKHR s) {
+inline bool is_surface_compatible(VkPhysicalDevice pd, VkSurfaceKHR s) {
   auto count = 0U;
 
   vkGetPhysicalDeviceSurfaceFormatsKHR(pd, s, &count, nullptr);
@@ -29,7 +29,7 @@ static bool is_surface_compatible(VkPhysicalDevice pd, VkSurfaceKHR s) {
   return f.samplerAnisotropy == vk_true;
 }
 
-static bool get_queue_family(VkPhysicalDevice pd, VkSurfaceKHR s,
+inline bool get_queue_family(VkPhysicalDevice pd, VkSurfaceKHR s,
                              unsigned *idx) {
   auto queues = get_pd_queue_family_props(pd);
   for (*idx = 0; *idx < queues.size(); (*idx)++) {
@@ -57,7 +57,7 @@ static bool get_queue_family(VkPhysicalDevice pd, VkSurfaceKHR s,
   return false;
 }
 
-static void log_rejected_device(VkPhysicalDevice pd, jute::view reason) {
+inline void log_rejected_device(VkPhysicalDevice pd, jute::view reason) {
   VkPhysicalDeviceProperties props{};
   vkGetPhysicalDeviceProperties(pd, &props);
 

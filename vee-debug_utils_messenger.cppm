@@ -39,7 +39,7 @@ constexpr inline auto level_for_severity(auto severity) {
   }
 }
 
-static VkBool32 debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+VkBool32 debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
                                VkDebugUtilsMessageTypeFlagsEXT type,
                                const VkDebugUtilsMessengerCallbackDataEXT *data,
                                [[maybe_unused]] void *user_data) {

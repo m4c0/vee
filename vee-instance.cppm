@@ -9,7 +9,7 @@ using namespace wagen;
 extern "C" char *getenv(const char *);
 
 namespace vee {
-static bool is_api_dump_requested() {
+inline bool is_api_dump_requested() {
   const char *env = getenv("VEE_VULKAN_API_DUMP");
   if (env != nullptr) {
     silog::log(silog::info, "API dump requested");
@@ -23,7 +23,7 @@ static constexpr const auto enum_instance_layer_props =
 static constexpr const auto enum_instance_ext_props =
     calls::enumerate<&::vkEnumerateInstanceExtensionProperties,
                      VkExtensionProperties>();
-static auto get_layers() {
+inline auto get_layers() {
   auto api_dump = is_api_dump_requested();
 
   hai::varray<const char *> res{2};
@@ -40,7 +40,7 @@ static auto get_layers() {
   return res;
 }
 
-static auto get_extensions() {
+inline auto get_extensions() {
   hai::varray<const char *> res{5};
   res.push_back(vk_khr_surface_extension_name);
   res.push_back(vk_vulkan_platform_ext);

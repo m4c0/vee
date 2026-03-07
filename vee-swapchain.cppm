@@ -11,7 +11,7 @@ static constexpr const auto get_pd_surf_present_modes =
     calls::enumerate<&::vkGetPhysicalDeviceSurfacePresentModesKHR,
                      VkPresentModeKHR>();
 
-static inline constexpr auto get_min_image_count(const VkSurfaceCapabilitiesKHR &cap) {
+inline constexpr auto get_min_image_count(const VkSurfaceCapabilitiesKHR &cap) {
   auto count = cap.minImageCount + 1;
   if ((cap.maxImageCount > 0) && (count > cap.maxImageCount)) {
     return cap.maxImageCount;
@@ -19,7 +19,7 @@ static inline constexpr auto get_min_image_count(const VkSurfaceCapabilitiesKHR 
   return count;
 }
 
-static inline auto get_present_mode(VkPhysicalDevice pd, VkSurfaceKHR s, bool vsync) {
+inline auto get_present_mode(VkPhysicalDevice pd, VkSurfaceKHR s, bool vsync) {
   if (!vsync) {
     // "immediate" pumps frames as fast as possible, but it might tear
     for (auto mode : get_pd_surf_present_modes(pd, s)) {
