@@ -28,6 +28,7 @@ export import :surface_capabilities;
 export import :surface_format;
 export import :swapchain;
 export import :update_descriptor_set;
+export import wagen;
 
 #ifdef __APPLE__
 export import :metal;
@@ -38,3 +39,5 @@ export import :windows;
 #elif __linux__
 export import :linux;
 #endif
+
+export using namespace wagen;
