@@ -1,4 +1,5 @@
 #pragma leco app
+#pragma leco add_resource_dir "assets"
 #pragma leco add_shader "poc-skybox.frag"
 #pragma leco add_shader "poc-skybox.vert"
 export module poc;
@@ -8,6 +9,7 @@ import hai;
 import silog;
 import sires;
 import sith;
+import stubby;
 import traits;
 import vee;
 import wagen;
@@ -77,6 +79,7 @@ public:
     vee::gr_pipeline gp = vee::create_graphics_pipeline({
       .pipeline_layout = *pl,
       .render_pass = *rp,
+      .back_face_cull = false,
       .shaders {
         vee::pipeline_vert_stage(*vert, "main"),
         vee::pipeline_frag_stage(*frag, "main"),
@@ -90,12 +93,21 @@ public:
 
     vee::sampler smp = vee::create_sampler(vee::linear_sampler);
 
-    vee::buffer ts_buf = vee::create_buffer(16 * 16 * sizeof(float), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+    auto img = stbi::load(sires::slurp("DayEnvironmentHDRI098_1K_TONEMAPPED.jpg"));
+    unsigned img_w = img.width;
+    unsigned img_h = img.height;
+    auto img_pxs = img_w * img_h;
+
+    vee::buffer ts_buf = vee::create_buffer(img_pxs * 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
     vee::device_memory ts_mem = vee::create_host_buffer_memory(pd, *ts_buf);
     vee::bind_buffer_memory(*ts_buf, *ts_mem);
 
+    auto ps = static_cast<unsigned char *>(vee::map_memory(*ts_mem));
+    for (auto i = 0; i < img_pxs * 4; i++) ps[i] = (*img.data)[i];
+    vee::unmap_memory(*ts_mem);
+
     vee::image t_img = vee::create_image(
-        { 16, 16 }, VK_FORMAT_R8G8B8A8_SRGB,
+        { img_w, img_h }, VK_FORMAT_R8G8B8A8_SRGB,
         VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
     vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
     vee::bind_image_memory(*t_img, *t_mem);
@@ -106,12 +118,6 @@ public:
     vee::semaphore img_available_sema = vee::create_semaphore();
     vee::semaphore rnd_finished_sema = vee::create_semaphore();
     vee::fence f = vee::create_fence_signaled();
-
-    auto ps = static_cast<rgba *>(vee::map_memory(*ts_mem));
-    for (auto i = 0; i < 16 * 16; i++) {
-      ps[i] = { 255, 255, 255, static_cast<unsigned char>(i) };
-    }
-    vee::unmap_memory(*ts_mem);
 
     while (!interrupted()) {
       vee::swapchain swc = vee::create_swapchain(pd, *s);
@@ -142,7 +148,7 @@ public:
 
           vee::begin_cmd_buf_one_time_submit(frame->cb);
           vee::cmd_pipeline_barrier(frame->cb, *t_img, vee::from_host_to_transfer);
-          vee::cmd_copy_buffer_to_image(frame->cb, { 16, 16 }, *ts_buf, *t_img);
+          vee::cmd_copy_buffer_to_image(frame->cb, { img_w, img_h }, *ts_buf, *t_img);
           vee::cmd_pipeline_barrier(frame->cb, *t_img, vee::from_transfer_to_fragment);
           vee::cmd_begin_render_pass({
             .command_buffer = frame->cb,
