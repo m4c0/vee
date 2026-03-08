@@ -1,0 +1,21 @@
+#version 450
+
+layout(binding = 0) uniform sampler2D txt;
+
+layout(location = 0) in vec3 f_pos;
+layout(location = 0) out vec4 colour;
+
+void main() {
+  vec3 p = normalize(f_pos);
+  // we are looking from inside the sphere, so coordinates are inverted. Also,
+  // VUlkan inverts Y.
+  p.x *= -1;
+
+  const float pi = 3.1415926535;
+  float lng = atan(p.z, p.x);
+  float lat = asin(p.y);
+
+  vec2 uv = vec2(lng / pi, lat / (pi / 2));
+  uv = uv * 0.5 + 0.5;
+  colour = texture(txt, uv);
+}
