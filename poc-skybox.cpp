@@ -16,18 +16,6 @@ import wagen;
 
 using namespace wagen;
 
-struct point {
-  float x;
-  float y;
-  float z;
-  float w;
-};
-struct rgba {
-  unsigned char r;
-  unsigned char g;
-  unsigned char b;
-  unsigned char a;
-};
 struct upc {
   float mouse_x;
   float mouse_y;
@@ -72,7 +60,7 @@ public:
 
     vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler() });
 
-    vee::pipeline_layout pl = vee::create_pipeline_layout(*dsl);
+    vee::pipeline_layout pl = vee::create_pipeline_layout(*dsl, vee::vertex_push_constant_range<upc>());
 
     vee::shader_module vert = vee::create_shader_module(sires::slurp("poc-skybox.vert.spv"));
     vee::shader_module frag = vee::create_shader_module(sires::slurp("poc-skybox.frag.spv"));
@@ -93,6 +81,8 @@ public:
 
     vee::sampler smp = vee::create_sampler(vee::linear_sampler);
 
+    // AmbientCG provides images using Equirectangular projection, so they are
+    // not the classical "cube" we see in literature
     auto img = stbi::load(sires::slurp("DayEnvironmentHDRI098_1K_TONEMAPPED.jpg"));
     unsigned img_w = img.width;
     unsigned img_h = img.height;
@@ -106,11 +96,16 @@ public:
     for (auto i = 0; i < img_pxs * 4; i++) ps[i] = (*img.data)[i];
     vee::unmap_memory(*ts_mem);
 
-    vee::image t_img = vee::create_image(
+    auto t_img_ci = vee::image_create_info(
         { img_w, img_h }, VK_FORMAT_R8G8B8A8_SRGB,
         VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
+    // If using the classical cube of 6-images
+    // t_img_ci.arrayLayers = 6;
+    // t_img_ci.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+    vee::image t_img = vee::image { &t_img_ci };
     vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
     vee::bind_image_memory(*t_img, *t_mem);
+    // TODO: 6-image cube equivalent
     vee::image_view t_iv = vee::create_image_view(*t_img, VK_FORMAT_R8G8B8A8_SRGB);
 
     vee::update_descriptor_set(desc_set, 0, *t_iv, *smp);
@@ -161,6 +156,7 @@ public:
           vee::cmd_set_scissor(frame->cb, extent);
           vee::cmd_set_viewport(frame->cb, extent);
           vee::cmd_bind_descriptor_set(frame->cb, *pl, 0, desc_set);
+          vee::cmd_push_vertex_constants(frame->cb, *pl, &pc);
           vee::cmd_bind_gr_pipeline(frame->cb, *gp);
           vee::cmd_draw(frame->cb, 3);
 
@@ -195,6 +191,8 @@ static hai::uptr<sith::run_guard> tr {};
 struct init {
   init() {
     using namespace casein;
+    // Square window to avoid dealing with aspect
+    window_size = { 600, 600 };
     handle(CREATE_WINDOW, [] { tr.reset(new sith::run_guard(&t)); });
     handle(MOUSE_MOVE, [] {
       pc.mouse_x = casein::mouse_pos.x;
