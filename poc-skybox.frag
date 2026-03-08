@@ -11,10 +11,9 @@ void main() {
   // VUlkan inverts Y.
   p.x *= -1;
 
-  const float r = 2.0; // Not sure how to make this non-int
   const float pi = 3.1415926535;
-  float lng = r * atan(p.z, p.x);
-  float lat = r * atan(p.y);
+  float lng = atan(p.z, p.x);
+  float lat = asin(p.y);
 
   vec2 uv = vec2(lng / pi, lat / (pi / 2));
   uv = uv * 0.5 + 0.5;

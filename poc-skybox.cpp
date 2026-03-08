@@ -79,11 +79,15 @@ public:
     vee::descriptor_pool desc_pool = vee::create_descriptor_pool(1, { vee::combined_image_sampler() });
     vee::descriptor_set desc_set = vee::allocate_descriptor_set(*desc_pool, *dsl);
 
-    vee::sampler smp = vee::create_sampler(vee::linear_sampler);
+    // Sampler requires different V otherwise poles gets aberrations
+    auto smp_info = vee::sampler_create_info().linear();
+    smp_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    smp_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
+    vee::sampler smp = vee::create_sampler(smp_info);
 
     // AmbientCG provides images using Equirectangular projection, so they are
     // not the classical "cube" we see in literature
-    auto img = stbi::load(sires::slurp("DayEnvironmentHDRI098_1K_TONEMAPPED.jpg"));
+    auto img = stbi::load(sires::slurp("3840px-Blue_Marble_2002.png"));
     unsigned img_w = img.width;
     unsigned img_h = img.height;
     auto img_pxs = img_w * img_h;
