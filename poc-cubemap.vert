@@ -24,6 +24,7 @@ void main() {
     0, sin(ay), cos(ay) 
   );
 
-  f_pos = rot_y * rot_x * p3;
+  const float fovish = 0.3;
+  f_pos = rot_y * rot_x * vec3(p3.xy * fovish, p3.z);
   gl_Position = vec4(p3, 1);
 }
