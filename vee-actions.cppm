@@ -190,8 +190,8 @@ export auto vk_buffer_image_copy(VkImageAspectFlags aspect, VkOffset2D ofs, VkEx
 export inline auto cmd_copy_buffer_to_image(VkCommandBuffer cb, VkBuffer buf, VkImage img, VkBufferImageCopy * p, unsigned n) {
   calls::call(vkCmdCopyBufferToImage, cb, buf, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, n, p);
 }
-export inline auto cmd_copy_buffer_to_image(VkCommandBuffer cb, VkExtent2D ext, VkBuffer buf, VkImage img) {
-  auto r = vk_buffer_image_copy(VK_IMAGE_ASPECT_COLOR_BIT, {}, ext);
+export inline auto cmd_copy_buffer_to_image(VkCommandBuffer cb, VkExtent2D ext, VkBuffer buf, VkImage img, unsigned base_layer = 0) {
+  auto r = vk_buffer_image_copy(VK_IMAGE_ASPECT_COLOR_BIT, {}, ext, base_layer);
   cmd_copy_buffer_to_image(cb, buf, img, &r, 1);
 }
 export inline auto cmd_copy_image_to_buffer(VkCommandBuffer cb, VkOffset2D ofs, VkExtent2D ext, VkImage img, VkBuffer buf) {

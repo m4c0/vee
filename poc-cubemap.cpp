@@ -130,10 +130,7 @@ public:
 
       vee::cmd_pipeline_barrier(ccb, *t_img, vee::barrier_type::from_host_to_transfer, i);
 
-      auto ic = vee::vk_buffer_image_copy(VK_IMAGE_ASPECT_COLOR_BIT, {}, { img_w, img_h }); 
-      ic.imageSubresource.baseArrayLayer = i;
-      ic.imageSubresource.layerCount = 1;
-      vee::cmd_copy_buffer_to_image(ccb, *buf, *t_img, &ic, 1);
+      vee::cmd_copy_buffer_to_image(ccb, { img_w, img_h }, *buf, *t_img, i);
 
       vee::cmd_pipeline_barrier(ccb, *t_img, vee::barrier_type::from_transfer_to_fragment, i);
 
