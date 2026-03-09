@@ -22,6 +22,14 @@ export inline auto image_create_info(VkExtent2D ext, VkFormat fmt, VkImageUsageF
   info.usage = usage;
   return info;
 }
+export inline auto cube_image_create_info(VkExtent2D ext) {
+  auto res = vee::image_create_info(
+      ext, VK_FORMAT_R8G8B8A8_SRGB,
+      VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
+  res.arrayLayers = 6;
+  res.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+  return res;
+}
 export inline auto depth_image_create_info(VkExtent2D ext, VkImageUsageFlags usage) {
   return image_create_info(
       ext, VK_FORMAT_D32_SFLOAT,
@@ -29,6 +37,9 @@ export inline auto depth_image_create_info(VkExtent2D ext, VkImageUsageFlags usa
 }
 
 export using image = calls::handle<VkImage, &::vkCreateImage, &::vkDestroyImage>;
+export inline auto create_image(VkImageCreateInfo ci) {
+  return image { &ci };
+}
 export inline auto create_depth_image(VkExtent2D ext, VkImageUsageFlags usage) {
   auto info = depth_image_create_info(ext, usage);
   return image{&info};

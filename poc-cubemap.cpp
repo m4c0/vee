@@ -95,27 +95,11 @@ public:
     unsigned img_w = img_info.width;
     unsigned img_h = img_info.height;
 
-    auto t_img_ci = vee::image_create_info(
-        { img_w, img_h }, VK_FORMAT_R8G8B8A8_SRGB,
-        VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
-    t_img_ci.arrayLayers = 6;
-    t_img_ci.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
-    vee::image t_img { &t_img_ci };
+    vee::image t_img = vee::create_image(vee::cube_image_create_info({ img_w, img_h }));
     vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
     vee::bind_image_memory(*t_img, *t_mem);
 
-    VkImageViewCreateInfo t_iv_info {
-      .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-      .image = *t_img,
-      .viewType = VK_IMAGE_VIEW_TYPE_CUBE,
-      .format = VK_FORMAT_R8G8B8A8_SRGB,
-      .subresourceRange {
-        .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-        .levelCount = 1,
-        .layerCount = 6,
-      },
-    };
-    vee::image_view t_iv { &t_iv_info };
+    vee::image_view t_iv = vee::create_cube_image_view(*t_img);
 
     vee::update_descriptor_set(desc_set, 0, *t_iv, *smp);
 
@@ -144,29 +128,14 @@ public:
 
       vee::begin_cmd_buf_one_time_submit(ccb);
 
-      auto imb = vee::image_memory_barrier(*t_img);
-      imb.subresourceRange.baseArrayLayer = i;
-      imb.subresourceRange.layerCount = 1;
-      imb.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-      imb.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-      vee::cmd_pipeline_barrier(ccb, 
-          VK_PIPELINE_STAGE_HOST_BIT,
-          VK_PIPELINE_STAGE_TRANSFER_BIT,
-          imb);
+      vee::cmd_pipeline_barrier(ccb, *t_img, vee::barrier_type::from_host_to_transfer, i);
 
       auto ic = vee::vk_buffer_image_copy(VK_IMAGE_ASPECT_COLOR_BIT, {}, { img_w, img_h }); 
       ic.imageSubresource.baseArrayLayer = i;
       ic.imageSubresource.layerCount = 1;
       vee::cmd_copy_buffer_to_image(ccb, *buf, *t_img, &ic, 1);
 
-      imb.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-      imb.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-      imb.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-      imb.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-      vee::cmd_pipeline_barrier(ccb, 
-          VK_PIPELINE_STAGE_TRANSFER_BIT,
-          VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-          imb);
+      vee::cmd_pipeline_barrier(ccb, *t_img, vee::barrier_type::from_transfer_to_fragment, i);
 
       vee::end_cmd_buf(ccb);
       vee::queue_submit({ .queue = q, .command_buffer = ccb });
