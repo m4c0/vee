@@ -10,6 +10,7 @@ import silog;
 import sires;
 import sith;
 import stubby;
+import sv;
 import traits;
 import vee;
 import wagen;
@@ -85,34 +86,69 @@ public:
     smp_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
     vee::sampler smp = vee::create_sampler(smp_info);
 
-    // AmbientCG provides images using Equirectangular projection, so they are
-    // not the classical "cube" we see in literature
-    auto img = stbi::load(sires::slurp("3840px-Blue_Marble_2002.png"));
-    unsigned img_w = img.width;
-    unsigned img_h = img.height;
-    auto img_pxs = img_w * img_h;
+    constexpr const sv files[] {
+      "negx.jpg", "negy.jpg", "negz.jpg",
+      "posx.jpg", "posy.jpg", "posz.jpg",
+    };
+    vee::buffer vs_buf {};
+    vee::device_memory vs_mem {};
+    unsigned img_w, img_h;
+    unsigned char * ps;
+    for (int i = 0; i < 6; i++) {
+      auto img = stbi::load(sires::slurp(files[i]));
+      if (i == 0) {
+        img_w = img.width;
+        img_h = img.height;
+        vs_buf = vee::create_buffer(img_w * img_h * 4 * 6, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+        vs_mem = vee::create_host_buffer_memory(pd, *vs_buf);
+        vee::bind_buffer_memory(*vs_buf, *vs_mem);
 
-    vee::buffer ts_buf = vee::create_buffer(img_pxs * 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-    vee::device_memory ts_mem = vee::create_host_buffer_memory(pd, *ts_buf);
-    vee::bind_buffer_memory(*ts_buf, *ts_mem);
+        ps = static_cast<unsigned char *>(vee::map_memory(*vs_mem));
+      }
 
-    auto ps = static_cast<unsigned char *>(vee::map_memory(*ts_mem));
-    for (auto i = 0; i < img_pxs * 4; i++) ps[i] = (*img.data)[i];
-    vee::unmap_memory(*ts_mem);
+      auto img_pxs = img_w * img_h;
+      for (auto j = 0; j < img_pxs * 4; j++) *ps = (*img.data)[j];
+    }
+    vee::unmap_memory(*vs_mem);
 
     auto t_img_ci = vee::image_create_info(
         { img_w, img_h }, VK_FORMAT_R8G8B8A8_SRGB,
         VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
-    // If using the classical cube of 6-images
-    // t_img_ci.arrayLayers = 6;
-    // t_img_ci.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
-    vee::image t_img = vee::image { &t_img_ci };
+    t_img_ci.arrayLayers = 6;
+    t_img_ci.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+    vee::image t_img { &t_img_ci };
     vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
     vee::bind_image_memory(*t_img, *t_mem);
+
     // TODO: 6-image cube equivalent
-    vee::image_view t_iv = vee::create_image_view(*t_img, VK_FORMAT_R8G8B8A8_SRGB);
+    VkImageViewCreateInfo t_iv_info {
+      .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+      .image = *t_img,
+      .viewType = VK_IMAGE_VIEW_TYPE_CUBE,
+      .format = VK_FORMAT_R8G8B8A8_SRGB,
+      .subresourceRange {
+        .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+        .levelCount = 1,
+        .layerCount = 6,
+      },
+    };
+    vee::image_view t_iv { &t_iv_info };
 
     vee::update_descriptor_set(desc_set, 0, *t_iv, *smp);
+
+    auto ccb = vee::allocate_primary_command_buffer(*cp);
+    vee::begin_cmd_buf_one_time_submit(ccb);
+    vee::cmd_pipeline_barrier(ccb, *t_img, vee::from_host_to_transfer);
+
+    hai::array<VkBufferImageCopy> ic { 6 };
+    for (auto i = 0; i < 6; i++) {
+      ic[i] = vee::vk_buffer_image_copy(VK_IMAGE_ASPECT_COLOR_BIT, {}, { img_w, img_h }); 
+      ic[i].imageSubresource.layerCount = 6;
+    }
+    vee::cmd_copy_buffer_to_image(ccb, *vs_buf, *t_img, ic.begin(), 6);
+    vee::cmd_pipeline_barrier(ccb, *t_img, vee::from_transfer_to_fragment);
+    vee::end_cmd_buf(ccb);
+    vee::queue_submit({ .queue = q, .command_buffer = ccb });
 
     vee::semaphore img_available_sema = vee::create_semaphore();
     vee::semaphore rnd_finished_sema = vee::create_semaphore();
@@ -146,9 +182,6 @@ public:
           auto & frame = frms[idx];
 
           vee::begin_cmd_buf_one_time_submit(frame->cb);
-          vee::cmd_pipeline_barrier(frame->cb, *t_img, vee::from_host_to_transfer);
-          vee::cmd_copy_buffer_to_image(frame->cb, { img_w, img_h }, *ts_buf, *t_img);
-          vee::cmd_pipeline_barrier(frame->cb, *t_img, vee::from_transfer_to_fragment);
           vee::cmd_begin_render_pass({
             .command_buffer = frame->cb,
             .render_pass = *rp,

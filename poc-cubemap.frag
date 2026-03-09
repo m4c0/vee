@@ -1,6 +1,6 @@
 #version 450
 
-layout(binding = 0) uniform sampler2D txt;
+layout(binding = 0) uniform samplerCube txt;
 
 layout(location = 0) in vec3 f_pos;
 layout(location = 0) out vec4 colour;
@@ -17,5 +17,5 @@ void main() {
 
   vec2 uv = vec2(lng / pi, lat / (pi / 2));
   uv = uv * 0.5 + 0.5;
-  colour = texture(txt, uv);
+  colour = texture(txt, vec3(uv, 0));
 }

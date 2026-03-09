@@ -174,10 +174,11 @@ export inline auto cmd_copy_buffer(VkCommandBuffer cb, VkBuffer src,
   calls::call(vkCmdCopyBuffer, cb, src, dst, 1, &r);
 }
 
-constexpr auto vk_buffer_image_copy(VkImageAspectFlags aspect, VkOffset2D ofs, VkExtent2D ext) {
+export auto vk_buffer_image_copy(VkImageAspectFlags aspect, VkOffset2D ofs, VkExtent2D ext, unsigned baseLayer = 0) {
   VkBufferImageCopy r{};
   r.bufferOffset = 0;
   r.imageSubresource.aspectMask = aspect;
+  r.imageSubresource.baseArrayLayer = baseLayer;
   r.imageSubresource.layerCount = 1;
   r.imageOffset.x = ofs.x;
   r.imageOffset.y = ofs.y;
@@ -186,9 +187,12 @@ constexpr auto vk_buffer_image_copy(VkImageAspectFlags aspect, VkOffset2D ofs, V
   r.imageExtent.depth = 1;
   return r;
 }
+export inline auto cmd_copy_buffer_to_image(VkCommandBuffer cb, VkBuffer buf, VkImage img, VkBufferImageCopy * p, unsigned n) {
+  calls::call(vkCmdCopyBufferToImage, cb, buf, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, n, p);
+}
 export inline auto cmd_copy_buffer_to_image(VkCommandBuffer cb, VkExtent2D ext, VkBuffer buf, VkImage img) {
   auto r = vk_buffer_image_copy(VK_IMAGE_ASPECT_COLOR_BIT, {}, ext);
-  calls::call(vkCmdCopyBufferToImage, cb, buf, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &r);
+  cmd_copy_buffer_to_image(cb, buf, img, &r, 1);
 }
 export inline auto cmd_copy_image_to_buffer(VkCommandBuffer cb, VkOffset2D ofs, VkExtent2D ext, VkImage img, VkBuffer buf) {
   auto r = vk_buffer_image_copy(VK_IMAGE_ASPECT_COLOR_BIT, ofs, ext);
