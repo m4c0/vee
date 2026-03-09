@@ -138,7 +138,15 @@ public:
 
     auto ccb = vee::allocate_primary_command_buffer(*cp);
     vee::begin_cmd_buf_one_time_submit(ccb);
-    vee::cmd_pipeline_barrier(ccb, *t_img, vee::from_host_to_transfer);
+
+    auto imb = vee::image_memory_barrier(*t_img);
+    imb.subresourceRange.layerCount = 6;
+    imb.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    imb.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    vee::cmd_pipeline_barrier(ccb, 
+        VK_PIPELINE_STAGE_HOST_BIT,
+        VK_PIPELINE_STAGE_TRANSFER_BIT,
+        imb);
 
     hai::array<VkBufferImageCopy> ic { 6 };
     for (auto i = 0; i < 6; i++) {
@@ -146,7 +154,18 @@ public:
       ic[i].imageSubresource.layerCount = 6;
     }
     vee::cmd_copy_buffer_to_image(ccb, *vs_buf, *t_img, ic.begin(), 6);
-    vee::cmd_pipeline_barrier(ccb, *t_img, vee::from_transfer_to_fragment);
+
+    imb = vee::image_memory_barrier(*t_img);
+    imb.subresourceRange.layerCount = 6;
+    imb.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    imb.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    imb.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    imb.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    vee::cmd_pipeline_barrier(ccb, 
+        VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+        imb);
+
     vee::end_cmd_buf(ccb);
     vee::queue_submit({ .queue = q, .command_buffer = ccb });
 
