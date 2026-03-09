@@ -87,8 +87,9 @@ public:
     vee::sampler smp = vee::create_sampler(smp_info);
 
     constexpr const sv files[] {
-      "negx.jpg", "negy.jpg", "negz.jpg",
-      "posx.jpg", "posy.jpg", "posz.jpg",
+      "negx.jpg", "posx.jpg",
+      "posy.jpg", "negy.jpg",
+      "negz.jpg", "posz.jpg",
     };
     auto img_info = stbi::load(sires::slurp(files[0]));
     unsigned img_w = img_info.width;

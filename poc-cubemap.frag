@@ -7,15 +7,7 @@ layout(location = 0) out vec4 colour;
 
 void main() {
   vec3 p = normalize(f_pos);
-  // we are looking from inside the sphere, so coordinates are inverted. Also,
-  // VUlkan inverts Y.
-  p.x *= -1;
+  p.y *= -1; // Classical Vulkan being weird on Y
 
-  const float pi = 3.1415926535;
-  float lng = atan(p.z, p.x);
-  float lat = asin(p.y);
-
-  vec2 uv = vec2(lng / pi, lat / (pi / 2));
-  uv = uv * 0.5 + 0.5;
-  colour = texture(txt, vec3(uv, 0));
+  colour = texture(txt, p);
 }
