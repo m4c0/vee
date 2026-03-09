@@ -128,8 +128,18 @@ public:
       vee::device_memory mem = vee::create_host_buffer_memory(pd, *buf);
       vee::bind_buffer_memory(*buf, *mem);
 
-      auto ps = static_cast<unsigned char *>(vee::map_memory(*mem));
-      for (auto j = 0; j < img_w * img_h * 4; j++) ps[j] = (*img.data)[j];
+      auto ps = static_cast<unsigned *>(vee::map_memory(*mem));
+      auto is = reinterpret_cast<unsigned *>(*img.data);
+      if (i == 2 || i == 3) {
+        // Example images has to do some shenanigans on negy and posy
+        for (auto j = 0; j < img_h; j++) {
+          for (auto k = 0; k < img_w; k++) {
+            ps[(img_h - j - 1) * img_w + (img_w - k - 1)] = is[j * img_w + k];
+          }
+        }
+      } else {
+        for (auto j = 0; j < img_w * img_h; j++) ps[j] = is[j];
+      }
       vee::unmap_memory(*mem);
 
       vee::begin_cmd_buf_one_time_submit(ccb);
