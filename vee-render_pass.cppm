@@ -103,7 +103,7 @@ namespace vee {
     };
   }
 
-  constexpr auto create_attachment_ref(unsigned att, VkImageLayout il) {
+  export inline constexpr auto create_attachment_ref(unsigned att, VkImageLayout il) {
     VkAttachmentReference ref{};
     ref.attachment = att;
     ref.layout = il;
