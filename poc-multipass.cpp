@@ -37,27 +37,30 @@ public:
     // TODO: dependency
     vee::render_pass rp = vee::create_render_pass({
       .attachments {{
-        vee::create_colour_attachment({
+        {
           .format         = VK_FORMAT_R8G8B8A8_SRGB,
-          .load_op        = vee::attachment_load_op_clear,
-          .store_op       = vee::attachment_store_op_dont_care,
-          .final_layout   = vee::image_layout_read_only_optimal,
-        }),
-        vee::create_colour_attachment(pd, *s), // Swapchain output
+          .samples        = VK_SAMPLE_COUNT_1_BIT,
+          .loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR,
+          .storeOp        = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+          .stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+          .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+          .finalLayout    = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        },
+        vee::colour_attachment(pd, *s), // Swapchain output
       }},
       .subpasses {{ 
-        vee::create_subpass({
-          .colours {{ vee::create_attachment_ref(0, vee::image_layout_attachment_optimal) }},
+        vee::subpass({
+          .colours {{ vee::attachment_ref(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) }},
         }),
-        vee::create_subpass({
-          .colours {{ vee::create_attachment_ref(1, vee::image_layout_color_attachment_optimal) }},
-          .inputs {{ vee::create_attachment_ref(0, vee::image_layout_read_only_optimal) }},
+        vee::subpass({
+          .colours {{ vee::attachment_ref(1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) }},
+          .inputs {{ vee::attachment_ref(0, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) }},
         }),
       }},
       .dependencies {{
         // Hazard WRITE_AFTER_WRITE in subpass 1 for attachment 0 color aspect
         // during store with storeOp VK_ATTACHMENT_STORE_OP_DONT_CARE.
-        vee::create_dependency({
+        vee::dependency({
           .src_subpass = 0,
           .src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
           .src_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
@@ -69,7 +72,7 @@ public:
           .dependency = VK_DEPENDENCY_BY_REGION_BIT,
         }),
         // Hazard WRITE_AFTER_READ SYNC_PRESENT_ENGINE_SYNCVAL_PRESENT_ACQUIRE_READ_SYNCVAL
-        vee::create_dependency({
+        vee::dependency({
           .src_subpass = vee::subpass_external,
           .src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
 

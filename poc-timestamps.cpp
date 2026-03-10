@@ -36,15 +36,15 @@ static struct thread : public sith::thread {
 
     vee::render_pass rp = vee::create_render_pass({
       .attachments {{
-        vee::create_colour_attachment(pd, *s),
+        vee::colour_attachment(pd, *s),
       }},
       .subpasses {{
-        vee::create_subpass({
-          .colours {{ vee::create_attachment_ref(0, vee::image_layout_color_attachment_optimal) }},
+        vee::subpass({
+          .colours {{ vee::attachment_ref(0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) }},
         }),
       }},
       .dependencies {{
-        vee::create_colour_dependency(),
+        vee::colour_dependency(),
       }},
     });
 
