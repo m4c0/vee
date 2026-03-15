@@ -171,7 +171,7 @@ namespace vee {
     hai::array<VkAttachmentDescription> attachments;
     hai::array<VkSubpassDescription> subpasses;
     hai::array<VkSubpassDependency> dependencies;
-    void * next;
+    void * next = nullptr;
   };
   export inline auto create_render_pass(const create_render_pass_params & p) {
     VkRenderPassCreateInfo info{};
