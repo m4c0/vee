@@ -23,6 +23,11 @@ namespace vee {
 
   export using image_view = calls::handle<VkImageView, &::vkCreateImageView, &::vkDestroyImageView>;
 
+  export inline auto create_image_view(VkImageViewCreateInfo info) {
+    info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    return image_view { &info };
+  }
+
   export inline auto create_depth_image_view(VkImage img) {
     auto info = image_view_create_info({
       .image = img,
@@ -69,6 +74,7 @@ namespace vee {
     });
     return image_view { &info };
   }
+
   export inline auto create_image_view_for_surface(VkImage img, VkPhysicalDevice pd, VkSurfaceKHR s) {
     auto sfmt = vee::find_best_surface_format(pd, s);
     return create_image_view(img, sfmt.format);

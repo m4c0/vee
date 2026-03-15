@@ -1,5 +1,6 @@
+#extension GL_EXT_multiview : require
 layout(location = 0) out vec4 colour;
 
 void main() {
-  colour = vec4(1);
+  colour = gl_ViewIndex == 0 ? vec4(0, 0, 0, 1) : vec4(1);
 }
