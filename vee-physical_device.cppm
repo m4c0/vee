@@ -103,4 +103,9 @@ export inline auto find_physical_device_with_universal_queue(VkSurfaceKHR s) {
   silog::log(silog::error, "No suitable physical devices found");
   return physical_device_pair{};
 }
+
+export inline constexpr auto physical_device_vulkan11_features(VkPhysicalDeviceVulkan11Features f) {
+  f.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+  return f;
+}
 } // namespace vee

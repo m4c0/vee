@@ -160,12 +160,18 @@ namespace vee {
     });
   }
 
+  export inline constexpr auto render_pass_multiview_create_info(VkRenderPassMultiviewCreateInfo info) {
+    info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_MULTIVIEW_CREATE_INFO;
+    return info;
+  }
+
   export using render_pass = calls::handle<VkRenderPass, &::vkCreateRenderPass, &::vkDestroyRenderPass>;
   
   export struct create_render_pass_params {
     hai::array<VkAttachmentDescription> attachments;
     hai::array<VkSubpassDescription> subpasses;
     hai::array<VkSubpassDependency> dependencies;
+    void * next;
   };
   export inline auto create_render_pass(const create_render_pass_params & p) {
     VkRenderPassCreateInfo info{};
