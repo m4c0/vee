@@ -176,6 +176,7 @@ namespace vee {
   export inline auto create_render_pass(const create_render_pass_params & p) {
     VkRenderPassCreateInfo info{};
     info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    info.pNext = p.next;
     info.attachmentCount = p.attachments.size();
     info.pAttachments = p.attachments.begin();
     info.subpassCount = p.subpasses.size();
