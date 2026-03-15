@@ -1,6 +1,8 @@
 #pragma leco app
 #pragma leco add_shader "poc-multiview.frag"
 #pragma leco add_shader "poc-multiview.vert"
+#pragma leco add_shader "poc-multiview-b.frag"
+#pragma leco add_shader "poc-multiview-b.vert"
 export module poc;
 
 import casein;
@@ -57,20 +59,28 @@ public:
       }},
     });
 
-    vee::pipeline_layout pl = vee::create_pipeline_layout();
+    vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({
+      vee::dsl_fragment_sampler(),
+      vee::dsl_fragment_sampler(),
+    });
+    vee::pipeline_layout pl = vee::create_pipeline_layout(*dsl);
 
-    vee::shader_module vert = vee::create_shader_module(sires::slurp("poc-multiview.vert.spv"));
-    vee::shader_module frag = vee::create_shader_module(sires::slurp("poc-multiview.frag.spv"));
+    vee::shader_module vert = vee::create_shader_module(sires::slurp("poc-multiview-b.vert.spv"));
+    vee::shader_module frag = vee::create_shader_module(sires::slurp("poc-multiview-b.frag.spv"));
     vee::gr_pipeline gp = vee::create_graphics_pipeline({
       .pipeline_layout = *pl,
       .render_pass = *rp,
-      .extent { 16, 16 },
       .back_face_cull = false,
       .shaders {
         vee::pipeline_vert_stage(*vert, "main"),
         vee::pipeline_frag_stage(*frag, "main"),
       },
     });
+
+    vee::descriptor_pool dpool = vee::create_descriptor_pool(2, {
+      vee::combined_image_sampler(2),
+    });
+    vee::descriptor_set dset = vee::allocate_descriptor_set(*dpool, *dsl);
 
     vee::semaphore img_available_sema = vee::create_semaphore();
     vee::semaphore rnd_finished_sema = vee::create_semaphore();
@@ -100,7 +110,7 @@ public:
     });
     vee::render_pass t_r0 = vee::create_render_pass({
       .attachments {{
-        vee::colour_attachment(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL),
+        vee::colour_attachment(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL),
       }},
       .subpasses {{
         vee::subpass({
@@ -130,6 +140,9 @@ public:
         vee::pipeline_frag_stage(*t_sf0, "main"),
       },
     });
+
+    vee::sampler smp = vee::create_sampler(vee::linear_sampler);
+    vee::update_descriptor_set(dset, 0, *t_v0, *smp);
 
     while (!interrupted()) {
       vee::swapchain swc = vee::create_swapchain(pd, *s);
@@ -182,6 +195,7 @@ public:
           vee::cmd_set_scissor(frame->cb, extent);
           vee::cmd_set_viewport(frame->cb, extent);
           vee::cmd_bind_gr_pipeline(frame->cb, *gp);
+          vee::cmd_bind_descriptor_set(frame->cb, *pl, 0, dset);
           vee::cmd_draw(frame->cb, 3);
 
           vee::cmd_end_render_pass(frame->cb);
