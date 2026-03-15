@@ -126,6 +126,7 @@ public:
       .render_pass = *t_r0,
       .attachments {{ *t_v0 }},
       .extent { 16, 16 },
+      .layers = 2,
     });
     vee::pipeline_layout t_pl0 = vee::create_pipeline_layout();
     vee::shader_module t_sv0 = vee::create_shader_module(sires::slurp("poc-multiview.vert.spv"));

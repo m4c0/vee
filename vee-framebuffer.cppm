@@ -11,6 +11,7 @@ export struct fb_params {
   VkRenderPass render_pass;
   hai::array<VkImageView> attachments;
   VkExtent2D extent;
+  unsigned layers = 1;
 };
 export using framebuffer = calls::handle<VkFramebuffer, &::vkCreateFramebuffer,
                                          &::vkDestroyFramebuffer>;
@@ -20,7 +21,7 @@ export inline auto create_framebuffer(const fb_params &p) {
   info.renderPass = p.render_pass;
   info.attachmentCount = p.attachments.size();
   info.pAttachments = p.attachments.begin();
-  info.layers = 1;
+  info.layers = p.layers;
   info.width = p.extent.width;
   info.height = p.extent.height;
 
