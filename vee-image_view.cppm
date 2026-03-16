@@ -8,11 +8,11 @@ using namespace wagen;
 
 namespace vee {
   using image_aspect_flags = VkImageAspectFlagBits;
-  export inline auto image_subresource_range(VkImageAspectFlags aspect_mask) {
+  export inline auto image_subresource_range(VkImageAspectFlags aspect_mask, unsigned layer_count = 1) {
     return VkImageSubresourceRange {
       .aspectMask = aspect_mask,
       .levelCount = 1,
-      .layerCount = 1,
+      .layerCount = layer_count,
     };
   }
   export inline auto image_view_create_info(VkImageViewCreateInfo info) {
@@ -43,11 +43,7 @@ namespace vee {
       .image = img,
       .viewType = VK_IMAGE_VIEW_TYPE_CUBE,
       .format = VK_FORMAT_R8G8B8A8_SRGB,
-      .subresourceRange {
-        .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-        .levelCount = 1,
-        .layerCount = 6,
-      },
+      .subresourceRange = image_subresource_range(VK_IMAGE_ASPECT_COLOR_BIT, 6),
     };
     return vee::image_view { &ci };
   }
