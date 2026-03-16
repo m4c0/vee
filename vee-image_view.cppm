@@ -38,14 +38,12 @@ namespace vee {
   }
 
   export inline auto create_cube_image_view(VkImage img) {
-    VkImageViewCreateInfo ci {
-      .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+    return create_image_view({
       .image = img,
       .viewType = VK_IMAGE_VIEW_TYPE_CUBE,
       .format = VK_FORMAT_R8G8B8A8_SRGB,
       .subresourceRange = image_subresource_range(VK_IMAGE_ASPECT_COLOR_BIT, 6),
-    };
-    return vee::image_view { &ci };
+    });
   }
 
   export inline auto create_image_view(VkImage img, VkFormat fmt) {
