@@ -22,10 +22,8 @@ export inline auto image_create_info(VkExtent2D ext, VkFormat fmt, VkImageUsageF
   info.usage = usage;
   return info;
 }
-export inline auto cube_image_create_info(VkExtent2D ext) {
-  auto res = vee::image_create_info(
-      ext, VK_FORMAT_R8G8B8A8_SRGB,
-      VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
+export inline auto cube_image_create_info(VkExtent2D ext, VkFormat fmt, VkImageUsageFlags usage) {
+  auto res = vee::image_create_info(ext, fmt, usage);
   res.arrayLayers = 6;
   res.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
   return res;
