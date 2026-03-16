@@ -1,7 +1,7 @@
 #pragma leco app
 #pragma leco add_resource_dir "assets"
-#pragma leco add_shader "poc-skybox.frag"
-#pragma leco add_shader "poc-skybox.vert"
+#pragma leco add_shader "poc-equirect.frag"
+#pragma leco add_shader "poc-equirect.vert"
 export module poc;
 
 import casein;
@@ -32,7 +32,7 @@ static _Atomic bool g_resized = false;
 static class thread : public sith::thread {
 public:
   void run() override {
-    vee::instance i = vee::create_instance("vee-poc-skybox");
+    vee::instance i = vee::create_instance("vee-poc-equirect");
     vee::debug_utils_messenger dbg = vee::create_debug_utils_messenger();
     vee::surface s = vee::create_surface(casein::native_ptr);
     const auto & [pd, qf] = vee::find_physical_device_with_universal_queue(*s);
@@ -62,8 +62,8 @@ public:
 
     vee::pipeline_layout pl = vee::create_pipeline_layout(*dsl, vee::vertex_push_constant_range<upc>());
 
-    vee::shader_module vert = vee::create_shader_module(sires::slurp("poc-skybox.vert.spv"));
-    vee::shader_module frag = vee::create_shader_module(sires::slurp("poc-skybox.frag.spv"));
+    vee::shader_module vert = vee::create_shader_module(sires::slurp("poc-equirect.vert.spv"));
+    vee::shader_module frag = vee::create_shader_module(sires::slurp("poc-equirect.frag.spv"));
     vee::gr_pipeline gp = vee::create_graphics_pipeline({
       .pipeline_layout = *pl,
       .render_pass = *rp,
