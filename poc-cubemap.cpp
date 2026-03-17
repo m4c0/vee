@@ -101,7 +101,12 @@ public:
     vee::device_memory t_mem = vee::create_local_image_memory(pd, *t_img);
     vee::bind_image_memory(*t_img, *t_mem);
 
-    vee::image_view t_iv = vee::create_cube_image_view(*t_img);
+    vee::image_view t_iv = vee::create_image_view({
+      .image = *t_img,
+      .viewType = VK_IMAGE_VIEW_TYPE_CUBE,
+      .format = VK_FORMAT_R8G8B8A8_UNORM,
+      .subresourceRange = vee::image_subresource_range(VK_IMAGE_ASPECT_COLOR_BIT, 6),
+    });
 
     vee::update_descriptor_set(desc_set, 0, *t_iv, *smp);
 

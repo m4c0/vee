@@ -32,15 +32,6 @@ namespace vee {
     });
   }
 
-  export inline auto create_cube_image_view(VkImage img) {
-    return create_image_view({
-      .image = img,
-      .viewType = VK_IMAGE_VIEW_TYPE_CUBE,
-      .format = VK_FORMAT_R8G8B8A8_SRGB,
-      .subresourceRange = image_subresource_range(VK_IMAGE_ASPECT_COLOR_BIT, 6),
-    });
-  }
-
   export inline auto create_image_view(VkImage img, VkFormat fmt) {
     return create_image_view({
       .image = img,
