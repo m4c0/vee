@@ -42,7 +42,7 @@ public:
       .samplerAnisotropy = true,
     });
 
-    vee::queue q = vee::get_queue_for_family(qf);
+    VkQueue q = vee::get_queue_for_family(qf);
 
     vee::command_pool cp = vee::create_command_pool(qf);
     vee::render_pass rp = vee::create_render_pass({

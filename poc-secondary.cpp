@@ -26,7 +26,7 @@ public:
     const auto & [pd, qf] = vee::find_physical_device_with_universal_queue(*s);
     vee::device d = vee::create_single_queue_device(pd, qf);
 
-    vee::queue q = vee::get_queue_for_family(qf);
+    VkQueue q = vee::get_queue_for_family(qf);
 
     vee::command_pool cp = vee::create_command_pool(qf);
     vee::render_pass rp = vee::create_render_pass({
