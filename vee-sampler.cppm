@@ -55,13 +55,17 @@ export inline auto create_sampler(sampler_type st) {
   return create_sampler(info);
 }
 
+// TODO: move this to a better place
+export inline auto get_physical_device_properties(VkFormat fmt) {
+  auto pd = wagen::physical_device();
+  return calls::create<VkFormatProperties, &::vkGetPhysicalDeviceFormatProperties>(pd, fmt);
+}
+
 export using sampler_ycbcr_conversion =
     calls::handle<VkSamplerYcbcrConversion, &::vkCreateSamplerYcbcrConversion,
                   &::vkDestroySamplerYcbcrConversion>;
 export inline auto create_sampler_yuv420p_conversion(VkPhysicalDevice pd) {
-  auto fp =
-      calls::create<VkFormatProperties, &::vkGetPhysicalDeviceFormatProperties>(
-          pd, VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM);
+  auto fp = get_physical_device_properties(VK_FORMAT_G8_B8_R8_3PLANE_420_UNORM);
   auto coff =
       fp.optimalTilingFeatures & VK_FORMAT_FEATURE_COSITED_CHROMA_SAMPLES_BIT
           ? VK_CHROMA_LOCATION_COSITED_EVEN
