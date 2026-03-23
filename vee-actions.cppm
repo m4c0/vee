@@ -240,6 +240,9 @@ export inline auto cmd_copy_image(
 export inline auto cmd_dispatch(VkCommandBuffer cb, unsigned count_x, unsigned count_y, unsigned count_z) {
   calls::call(vkCmdDispatch, cb, count_x, count_y, count_z);
 }
+export inline auto cmd_dispatch_indirect(VkCommandBuffer cb, VkBuffer buf, unsigned offset = 0) {
+  calls::call(vkCmdDispatchIndirect, cb, buf, offset);
+}
 
 export struct draw_params {
   unsigned vcount;
