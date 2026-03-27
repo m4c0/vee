@@ -345,6 +345,10 @@ export inline auto cmd_set_viewport(VkCommandBuffer cb, VkExtent2D ext) {
   calls::call(vkCmdSetViewport, cb, 0, 1, &viewport);
 }
 
+export template<typename T> inline auto cmd_update_buffer(VkCommandBuffer cb, const T * data, unsigned ofs = 0) {
+  calls::call(vkCmdUpdateBuffer, cb, ofs, sizeof(T), data);
+}
+
 export inline auto device_wait_idle() { calls::call(vkDeviceWaitIdle); }
 
 export inline auto end_cmd_buf(VkCommandBuffer cb) {
